@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Bot, TrendingUp, TrendingDown, Minus, Clock } from "lucide-react";
+import { Bot, TrendingUp, TrendingDown, Minus } from "lucide-react";
 
 interface AiAnalysis {
   ticker: string;
@@ -189,12 +189,6 @@ export function NewsTab({ ticker }: { ticker: string }) {
         </Card>
       )}
 
-      {/* Footer */}
-      <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-        <Clock className="h-3 w-3" />
-        Analysis for {data.analysisDate} · Based on {data.articlesCount} articles
-        {data.modelUsed && <> · {data.modelUsed}</>}
-      </div>
     </div>
   );
 }
