@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Bot, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { Bot, TrendingUp, TrendingDown, Minus, Loader2, Sparkles } from "lucide-react";
 
 interface AiAnalysis {
   ticker: string;
@@ -33,22 +34,54 @@ interface AiAnalysis {
 export function NewsTab({ ticker }: { ticker: string }) {
   const [data, setData] = useState<AiAnalysis | null>(null);
   const [loading, setLoading] = useState(true);
+  const [generating, setGenerating] = useState(false);
+  const [genError, setGenError] = useState("");
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const res = await fetch(`/api/stocks/${ticker}/ai-analysis`);
-        const json = await res.json();
-        setData(json.data);
-      } catch (e) {
-        console.error("AI analysis load error:", e);
-      } finally {
-        setLoading(false);
-      }
+  const loadAnalysis = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/stocks/${ticker}/ai-analysis`);
+      const json = await res.json();
+      setData(json.data);
+    } catch (e) {
+      console.error("AI analysis load error:", e);
+    } finally {
+      setLoading(false);
     }
-    load();
   }, [ticker]);
 
+  useEffect(() => {
+    loadAnalysis();
+  }, [loadAnalysis]);
+
+  // Auto-trigger generation when no analysis exists
+  useEffect(() => {
+    if (!loading && data && !data.hasAnalysis && !generating) {
+      generateAnalysis();
+    }
+  }, [loading, data]);
+
+  const generateAnalysis = async () => {
+    setGenerating(true);
+    setGenError("");
+    try {
+      const res = await fetch(`/api/stocks/${ticker}/generate-analysis`, {
+        method: "POST",
+      });
+      const json = await res.json();
+      if (json.data) {
+        setData(json.data);
+      } else {
+        setGenError(json.error || "Generation failed");
+      }
+    } catch (e) {
+      setGenError(String(e));
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  // Loading skeleton
   if (loading) {
     return (
       <div className="space-y-4">
@@ -75,15 +108,40 @@ export function NewsTab({ ticker }: { ticker: string }) {
     );
   }
 
+  // Generating state
+  if (generating) {
+    return (
+      <Card className="border-primary/20">
+        <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+          <Loader2 className="h-10 w-10 text-primary animate-spin mb-4" />
+          <p className="font-medium mb-1">Generating AI Analysis</p>
+          <p className="text-sm text-muted-foreground">
+            Fetching news, summarizing with AI, and computing scores for {ticker}...
+          </p>
+          <p className="text-xs text-muted-foreground mt-2">This usually takes 5–10 seconds.</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // No analysis + error
   if (!data?.hasAnalysis) {
     return (
       <Card>
         <CardContent className="flex flex-col items-center justify-center py-12 text-center">
           <Bot className="h-12 w-12 text-muted-foreground/30 mb-4" />
           <p className="text-muted-foreground mb-2">No AI Analysis Yet</p>
-          <p className="text-sm text-muted-foreground">
-            {data?.message || "AI analysis is generated daily. Check back tomorrow."}
+          <p className="text-sm text-muted-foreground mb-4">
+            {genError || data?.message || "AI analysis is generated daily. Click below to generate now."}
           </p>
+          <Button
+            variant="outline"
+            onClick={generateAnalysis}
+            disabled={generating}
+          >
+            <Sparkles className="h-4 w-4 mr-2" />
+            Generate Now
+          </Button>
         </CardContent>
       </Card>
     );
