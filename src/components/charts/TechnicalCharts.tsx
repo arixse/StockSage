@@ -186,6 +186,7 @@ export function VolumeChart({ data }: Props) {
       },
       rightPriceScale: {
         borderColor: "rgba(150,150,150,0.2)",
+        visible: false,
       },
       timeScale: { borderColor: "rgba(150,150,150,0.2)" },
       width: containerRef.current.clientWidth,
@@ -201,13 +202,9 @@ export function VolumeChart({ data }: Props) {
         color: d.close >= d.open ? "rgba(34,197,94,0.4)" : "rgba(239,68,68,0.4)",
       }));
 
-    if (volumeData.length === 0) return;
-
-    const volumeSeries = chart.addSeries(HistogramSeries, {
+    chart.addSeries(HistogramSeries, {
       priceFormat: { type: "volume" },
-    });
-    volumeSeries.setData(volumeData as any);
-    chart.timeScale().fitContent();
+    }).setData(volumeData as any);
 
     chart.timeScale().fitContent();
 
