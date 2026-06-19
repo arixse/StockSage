@@ -27,29 +27,21 @@ export default async function StockPage({ params }: Props) {
   const { ticker } = await params;
   const upperTicker = ticker.toUpperCase();
 
-  let quote = null;
-  let company = null;
-  let chartData = null;
-  let error = null;
+  // Fetch each independently to avoid one failure blocking all
+  const [quote, company, chartData] = await Promise.all([
+    fetchStockQuote(upperTicker).catch(() => null),
+    fetchCompanyOverview(upperTicker).catch(() => null),
+    fetchStockChart(upperTicker, "1y"),
+  ]);
 
-  try {
-    [quote, company, chartData] = await Promise.all([
-      fetchStockQuote(upperTicker),
-      fetchCompanyOverview(upperTicker),
-      fetchStockChart(upperTicker),
-    ]);
-  } catch (e) {
-    error = e instanceof Error ? e.message : "Failed to load stock data";
-  }
-
-  if (error && !quote && !company) {
+  if (!quote && !company && chartData.length === 0) {
     return (
       <div className="flex flex-col min-h-full">
         <Header />
         <main className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <p className="text-destructive mb-2">Failed to load {upperTicker}</p>
-            <p className="text-sm text-muted-foreground">{error}</p>
+            <p className="text-sm text-muted-foreground">No data available from API. Try again later.</p>
             <Button variant="outline" className="mt-4" render={<Link href="/" />}>
               Go Home
             </Button>

@@ -8,10 +8,11 @@ export async function GET(
   const { ticker } = await params;
   const upperTicker = ticker.toUpperCase();
   const { searchParams } = new URL(request.url);
-  const outputSize = searchParams.get("outputsize") as "compact" | "full" | null;
+  const range = searchParams.get("range") || "1y";
+  const interval = searchParams.get("interval") || "1d";
 
   try {
-    const data = await fetchStockChart(upperTicker, outputSize || "compact");
+    const data = await fetchStockChart(upperTicker, range, interval);
     return NextResponse.json({ data });
   } catch (error) {
     console.error(`Chart data error for ${upperTicker}:`, error);
