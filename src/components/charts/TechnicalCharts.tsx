@@ -21,6 +21,10 @@ export function MACDChart({ data }: Props) {
         background: { type: ColorType.Solid, color: "transparent" },
         textColor: "#999",
       },
+      localization: {
+        locale: "en-US",
+        dateFormat: "yyyy-MM-dd",
+      },
       grid: {
         vertLines: { color: "rgba(150,150,150,0.1)" },
         horzLines: { color: "rgba(150,150,150,0.1)" },
@@ -102,6 +106,10 @@ export function RSIChart({ data }: Props) {
         background: { type: ColorType.Solid, color: "transparent" },
         textColor: "#999",
       },
+      localization: {
+        locale: "en-US",
+        dateFormat: "yyyy-MM-dd",
+      },
       grid: {
         vertLines: { color: "rgba(150,150,150,0.1)" },
         horzLines: { color: "rgba(150,150,150,0.1)" },
@@ -165,6 +173,10 @@ export function VolumeChart({ data }: Props) {
       layout: {
         background: { type: ColorType.Solid, color: "transparent" },
         textColor: "#999",
+      },
+      localization: {
+        locale: "en-US",
+        dateFormat: "yyyy-MM-dd",
       },
       grid: {
         vertLines: { visible: false },
