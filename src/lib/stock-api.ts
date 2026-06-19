@@ -42,20 +42,168 @@ export interface StockQuote {
 }
 
 export async function fetchStockQuote(ticker: string): Promise<StockQuote | null> {
-  // 1. Twelve Data (800 req/day)
+  // 1. Yahoo Finance (free, unlimited, real-time US stocks)
+  const yq = await yahooQuote(ticker);
+  if (yq) return yq;
+
+  // 2. Twelve Data
   const td = await twelveQuote(ticker);
   if (td) return td;
 
-  // 2. Finnhub
+  // 3. Finnhub
   const fq = await finnhubQuote(ticker);
   if (fq) return fq;
 
-  // 3. Alpha Vantage
   return alphaQuote(ticker);
 }
 
 export async function fetchStockQuotes(tickers: string[]): Promise<(StockQuote | null)[]> {
+  // Yahoo batch quote
+  const yh = await yahooBatchQuotes(tickers);
+  if (yh && yh.some((r) => r != null)) {
+    return yh;
+  }
   return Promise.all(tickers.map((t) => fetchStockQuote(t)));
+}
+
+// ─── Yahoo Finance (crumb flow) ──────────────────────────────────────
+
+let yahooCrumb: { crumb: string; cookie: string; expires: number } | null = null;
+
+async function getYahooCrumb(): Promise<{ crumb: string; cookie: string } | null> {
+  if (yahooCrumb && Date.now() < yahooCrumb.expires) {
+    return { crumb: yahooCrumb.crumb, cookie: yahooCrumb.cookie };
+  }
+
+  try {
+    const ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0";
+
+    const r1 = await fetch("https://fc.yahoo.com/", { headers: { "User-Agent": ua } });
+    const setCookie = r1.headers.get("set-cookie") || "";
+    const m = setCookie.match(/A3=[^;]+/);
+    if (!m) return null;
+    const cookie = m[0];
+
+    const r2 = await fetch(`https://query2.finance.yahoo.com/v1/test/getcrumb`, {
+      headers: { "User-Agent": ua, Cookie: cookie },
+    });
+    const crumb = (await r2.text()).trim();
+    if (!crumb || crumb.length > 20) return null;
+
+    yahooCrumb = { crumb, cookie, expires: Date.now() + 20 * 60 * 1000 };
+    return { crumb, cookie };
+  } catch {
+    return null;
+  }
+}
+
+async function yahooFetch(path: string): Promise<any> {
+  const auth = await getYahooCrumb();
+  if (!auth) return null;
+  const sep = path.includes("?") ? "&" : "?";
+  const url = `https://query2.finance.yahoo.com${path}${sep}crumb=${auth.crumb}`;
+  const res = await fetch(url, {
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0",
+      Cookie: auth.cookie,
+    },
+    next: { revalidate: 60 },
+  });
+  if (!res.ok) return null;
+  return res.json();
+}
+
+// Yahoo single quote
+async function yahooQuote(ticker: string): Promise<StockQuote | null> {
+  const data = await yahooFetch(`/v7/finance/quote?symbols=${ticker}`);
+  const r = data?.quoteResponse?.result?.[0];
+  if (!r) return null;
+  return {
+    ticker: r.symbol, price: r.regularMarketPrice ?? 0,
+    change: r.regularMarketChange ?? 0, changePercent: r.regularMarketChangePercent ?? 0,
+    high: r.regularMarketDayHigh ?? 0, low: r.regularMarketDayLow ?? 0,
+    open: r.regularMarketOpen ?? 0, prevClose: r.regularMarketPreviousClose ?? 0,
+    volume: r.regularMarketVolume ?? 0,
+    timestamp: r.regularMarketTime ? new Date(r.regularMarketTime * 1000).toISOString() : "",
+    currency: r.currency || "USD", exchangeName: r.fullExchangeName || "", shortName: r.shortName || "",
+  };
+}
+
+// Yahoo batch quotes
+async function yahooBatchQuotes(tickers: string[]): Promise<(StockQuote | null)[] | null> {
+  const data = await yahooFetch(`/v7/finance/quote?symbols=${tickers.join(",")}`);
+  if (!data?.quoteResponse?.result) return null;
+  const map = new Map<string, any>(data.quoteResponse.result.map((r: any) => [r.symbol, r]));
+  return tickers.map((t) => {
+    const r = map.get(t);
+    if (!r) return null;
+    return {
+      ticker: r.symbol, price: r.regularMarketPrice ?? 0,
+      change: r.regularMarketChange ?? 0, changePercent: r.regularMarketChangePercent ?? 0,
+      high: r.regularMarketDayHigh ?? 0, low: r.regularMarketDayLow ?? 0,
+      open: r.regularMarketOpen ?? 0, prevClose: r.regularMarketPreviousClose ?? 0,
+      volume: r.regularMarketVolume ?? 0,
+      timestamp: r.regularMarketTime ? new Date(r.regularMarketTime * 1000).toISOString() : "",
+      currency: r.currency || "USD", exchangeName: r.fullExchangeName || "", shortName: r.shortName || "",
+    };
+  });
+}
+
+// Yahoo chart
+const YAHOO_RANGE: Record<string, string> = {
+  "1m": "1mo", "3m": "3mo", "6m": "6mo", "1y": "1y", "2y": "2y", "5y": "5y", max: "max",
+};
+
+async function yahooChart(ticker: string, range: string, interval: string): Promise<OHLCVBar[]> {
+  const yRange = YAHOO_RANGE[range] || "1y";
+  const data = await yahooFetch(`/v8/finance/chart/${ticker}?range=${yRange}&interval=${interval}`);
+  const result = data?.chart?.result?.[0];
+  if (!result?.timestamp) return [];
+  const quote = result.indicators?.quote?.[0];
+  const adj = result.indicators?.adjclose?.[0]?.adjclose;
+  if (!quote) return [];
+  return result.timestamp
+    .map((ts: number, i: number) => ({
+      date: new Date(ts * 1000).toISOString().split("T")[0],
+      open: quote.open?.[i], high: quote.high?.[i], low: quote.low?.[i],
+      close: adj?.[i] ?? quote.close?.[i], volume: quote.volume?.[i] || 0,
+    }))
+    .filter((d: any) => d.open != null && d.close != null);
+}
+
+// Yahoo fundamentals
+async function yahooOverview(ticker: string): Promise<CompanyOverview | null> {
+  const modules = "assetProfile,defaultKeyStatistics,financialData,summaryDetail";
+  const data = await yahooFetch(`/v11/finance/quoteSummary/${ticker}?modules=${modules}`);
+  const s = data?.quoteSummary?.result?.[0];
+  if (!s) return null;
+
+  const prof = s.assetProfile || {};
+  const stats = s.defaultKeyStatistics || {};
+  const fin = s.financialData || {};
+  const det = s.summaryDetail || {};
+
+  return {
+    ticker,
+    companyName: det.longName || prof.shortName || ticker,
+    sector: prof.sector || "",
+    industry: prof.industry || "",
+    exchange: prof.exchange || "",
+    marketCap: stats.marketCap?.raw ?? det.marketCap?.raw,
+    peRatio: stats.trailingPE?.raw ?? det.trailingPE?.raw,
+    forwardPE: stats.forwardPE?.raw ?? det.forwardPE?.raw,
+    epsTTM: stats.trailingEps?.raw ?? det.trailingEps?.raw,
+    pbRatio: stats.priceToBook?.raw ?? det.priceToBook?.raw,
+    dividendYield: det.dividendYield?.raw,
+    beta: det.beta?.raw,
+    revenueTTM: fin.totalRevenue?.raw,
+    netIncomeTTM: fin.netIncomeToCommon?.raw,
+    roe: fin.returnOnEquity?.raw,
+    roa: fin.returnOnAssets?.raw,
+    grossMargin: fin.grossMargins?.raw,
+    operatingMargin: fin.operatingMargins?.raw,
+    netMargin: fin.profitMargins?.raw,
+  };
 }
 
 // ─── Twelve Data ──────────────────────────────────────────────────────
@@ -185,11 +333,15 @@ export async function fetchStockChart(
   range: string = "1y",
   interval: string = "1d"
 ): Promise<OHLCVBar[]> {
-  // 1. Twelve Data (800 req/day, full OHLCV history)
+  // 1. Yahoo Finance (free, unlimited, 30+ years history)
+  const yh = await yahooChart(ticker, range, interval);
+  if (yh.length > 0) return yh;
+
+  // 2. Twelve Data fallback
   const td = await twelveChart(ticker, range, interval);
   if (td.length > 0) return td;
 
-  // 2. Alpha Vantage fallback
+  // 3. Alpha Vantage last resort
   return alphaChart(ticker, range);
 }
 
@@ -306,11 +458,26 @@ export interface SearchResult {
 }
 
 export async function searchStocks(query: string): Promise<SearchResult[]> {
-  // Finnhub search (works from China)
+  // 1. Yahoo
+  const yh = await yahooSearch(query);
+  if (yh.length > 0) return yh;
+
+  // 2. Finnhub
   const fh = await finnhubSearch(query);
   if (fh.length > 0) return fh;
 
   return alphaSearch(query);
+}
+
+async function yahooSearch(query: string): Promise<SearchResult[]> {
+  const data = await yahooFetch(`/v1/finance/search?q=${encodeURIComponent(query)}&quotesCount=10`);
+  if (!data?.quotes) return [];
+  return data.quotes
+    .filter((q: any) => q.quoteType === "EQUITY" || q.quoteType === "ETF")
+    .map((q: any) => ({
+      ticker: q.symbol, companyName: q.shortname || q.longname || "",
+      type: q.quoteType || "", exchange: q.exchange || "",
+    }));
 }
 
 async function finnhubSearch(query: string): Promise<SearchResult[]> {
@@ -379,11 +546,15 @@ export interface CompanyOverview {
 }
 
 export async function fetchCompanyOverview(ticker: string): Promise<CompanyOverview | null> {
-  // 1. Twelve Data profile + statistics
+  // 1. Yahoo Finance
+  const yh = await yahooOverview(ticker);
+  if (yh) return yh;
+
+  // 2. Twelve Data
   const td = await twelveOverview(ticker);
   if (td) return td;
 
-  // 2. Finnhub
+  // 3. Finnhub
   const profile = await finnhubProfile(ticker);
   if (profile.companyName) {
     const metrics = await finnhubMetrics(ticker);
