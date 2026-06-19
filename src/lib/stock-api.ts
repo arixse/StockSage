@@ -1,13 +1,19 @@
 /**
- * Stock data API — Finnhub primary, Alpha Vantage fallback.
+ * Stock data API — Twelve Data primary, Finnhub fallback, Alpha Vantage last resort.
  *
- * Finnhub: Free tier = 60 requests/minute, real-time US stock data.
- * Sign up at https://finnhub.io/register to get a free API key.
- * Alpha Vantage kept as fallback for fundamentals.
+ * Twelve Data: Free tier 800 req/day, real-time US stocks, OHLCV, fundamentals.
+ *   Sign up: https://twelvedata.com/apikey
+ * Finnhub: Free tier 60 req/min for quotes, no candle data on free.
+ * Alpha Vantage: 25 req/day, last-resort fallback.
  */
 
+const TWELVE_DATA_BASE = "https://api.twelvedata.com";
 const FINNHUB_BASE = "https://finnhub.io/api/v1";
 const ALPHA_VANTAGE_BASE = "https://www.alphavantage.co/query";
+
+function getTwelveDataKey(): string {
+  return process.env.TWELVE_DATA_API_KEY || "demo";
+}
 
 function getFinnhubKey(): string {
   return process.env.FINNHUB_API_KEY || "";
@@ -15,11 +21,6 @@ function getFinnhubKey(): string {
 
 function getAvKey(): string {
   return process.env.ALPHA_VANTAGE_API_KEY || "demo";
-}
-
-function hasFinnhub(): boolean {
-  const key = getFinnhubKey();
-  return key.length > 0 && key !== "your-finnhub-key";
 }
 
 // ─── Quote ────────────────────────────────────────────────────────────
@@ -41,15 +42,53 @@ export interface StockQuote {
 }
 
 export async function fetchStockQuote(ticker: string): Promise<StockQuote | null> {
-  if (hasFinnhub()) {
-    return finnhubQuote(ticker);
-  }
+  // 1. Twelve Data (800 req/day)
+  const td = await twelveQuote(ticker);
+  if (td) return td;
+
+  // 2. Finnhub
+  const fq = await finnhubQuote(ticker);
+  if (fq) return fq;
+
+  // 3. Alpha Vantage
   return alphaQuote(ticker);
 }
 
 export async function fetchStockQuotes(tickers: string[]): Promise<(StockQuote | null)[]> {
-  // Finnhub doesn't support batch, so fetch individually in parallel
   return Promise.all(tickers.map((t) => fetchStockQuote(t)));
+}
+
+// ─── Twelve Data ──────────────────────────────────────────────────────
+
+async function twelveQuote(ticker: string): Promise<StockQuote | null> {
+  try {
+    const key = getTwelveDataKey();
+    const res = await fetch(
+      `${TWELVE_DATA_BASE}/quote?symbol=${ticker}&apikey=${key}`,
+      { next: { revalidate: 60 } }
+    );
+    if (!res.ok) return null;
+    const d = await res.json();
+    if (d.code || !d.symbol) return null;
+
+    return {
+      ticker: d.symbol,
+      price: parseFloat(d.close) || 0,
+      change: parseFloat(d.change) || 0,
+      changePercent: parseFloat(d.percent_change) || 0,
+      high: parseFloat(d.high) || 0,
+      low: parseFloat(d.low) || 0,
+      open: parseFloat(d.open) || 0,
+      prevClose: parseFloat(d.previous_close) || 0,
+      volume: parseInt(d.volume) || 0,
+      timestamp: d.datetime || "",
+      currency: d.currency || "USD",
+      exchangeName: d.exchange || "",
+      shortName: d.name || "",
+    };
+  } catch {
+    return null;
+  }
 }
 
 async function finnhubQuote(ticker: string): Promise<StockQuote | null> {
@@ -146,13 +185,41 @@ export async function fetchStockChart(
   range: string = "1y",
   interval: string = "1d"
 ): Promise<OHLCVBar[]> {
-  // Try Finnhub first, fall back to Alpha Vantage
-  if (hasFinnhub()) {
-    const data = await finnhubChart(ticker, range, interval);
-    if (data.length > 0) return data;
-  }
-  // Alpha Vantage fallback for chart data
+  // 1. Twelve Data (800 req/day, full OHLCV history)
+  const td = await twelveChart(ticker, range, interval);
+  if (td.length > 0) return td;
+
+  // 2. Alpha Vantage fallback
   return alphaChart(ticker, range);
+}
+
+const RANGE_OUTPUT: Record<string, number> = {
+  "1m": 22, "3m": 66, "6m": 130, "1y": 260, "2y": 520, "5y": 1300, "max": 5000,
+};
+
+async function twelveChart(ticker: string, range: string, interval: string): Promise<OHLCVBar[]> {
+  try {
+    const key = getTwelveDataKey();
+    const outputsize = RANGE_OUTPUT[range] || 260;
+    const res = await fetch(
+      `${TWELVE_DATA_BASE}/time_series?symbol=${ticker}&interval=${interval}&outputsize=${outputsize}&apikey=${key}`,
+      { next: { revalidate: 300 } }
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+    if (data.code || data.status === "error") return [];
+
+    return (data.values || []).reverse().map((v: any) => ({
+      date: v.datetime,
+      open: parseFloat(v.open),
+      high: parseFloat(v.high),
+      low: parseFloat(v.low),
+      close: parseFloat(v.close),
+      volume: parseInt(v.volume) || 0,
+    }));
+  } catch {
+    return [];
+  }
 }
 
 async function finnhubChart(
@@ -239,9 +306,10 @@ export interface SearchResult {
 }
 
 export async function searchStocks(query: string): Promise<SearchResult[]> {
-  if (hasFinnhub()) {
-    return finnhubSearch(query);
-  }
+  // Finnhub search (works from China)
+  const fh = await finnhubSearch(query);
+  if (fh.length > 0) return fh;
+
   return alphaSearch(query);
 }
 
@@ -311,12 +379,17 @@ export interface CompanyOverview {
 }
 
 export async function fetchCompanyOverview(ticker: string): Promise<CompanyOverview | null> {
-  if (hasFinnhub()) {
-    const profile = await finnhubProfile(ticker);
+  // 1. Twelve Data profile + statistics
+  const td = await twelveOverview(ticker);
+  if (td) return td;
+
+  // 2. Finnhub
+  const profile = await finnhubProfile(ticker);
+  if (profile.companyName) {
     const metrics = await finnhubMetrics(ticker);
-    const merged: CompanyOverview = {
+    return {
       ticker,
-      companyName: profile.companyName || metrics.ticker || ticker,
+      companyName: profile.companyName || ticker,
       sector: profile.sector || "",
       industry: profile.industry || "",
       exchange: profile.exchange || "",
@@ -335,9 +408,65 @@ export async function fetchCompanyOverview(ticker: string): Promise<CompanyOverv
       operatingMargin: metrics.operatingMargin,
       netMargin: metrics.netMargin,
     };
-    return merged;
   }
+
+  // 3. Alpha Vantage
   return alphaCompanyOverview(ticker);
+}
+
+async function twelveOverview(ticker: string): Promise<CompanyOverview | null> {
+  try {
+    const key = getTwelveDataKey();
+    const [statRes, profileRes] = await Promise.all([
+      fetch(`${TWELVE_DATA_BASE}/statistics?symbol=${ticker}&apikey=${key}`),
+      fetch(`${TWELVE_DATA_BASE}/quote?symbol=${ticker}&apikey=${key}`),
+    ]);
+    if (!statRes.ok) return null;
+    const s = await statRes.json();
+    if (s.code) return null;
+
+    // Profile for name/exchange
+    let name = "", exchange = "";
+    if (profileRes.ok) {
+      const p = await profileRes.json();
+      name = p.name || "";
+      exchange = p.exchange || "";
+    }
+
+    return {
+      ticker: s.meta?.symbol || ticker,
+      companyName: name,
+      sector: "",
+      industry: "",
+      exchange,
+      marketCap: s.statistics?.valuations_metrics?.market_capitalization
+        ? parseFloat(s.statistics.valuations_metrics.market_capitalization)
+        : undefined,
+      peRatio: s.statistics?.valuations_metrics?.pe_ratio_ttm
+        ? parseFloat(s.statistics.valuations_metrics.pe_ratio_ttm)
+        : undefined,
+      forwardPE: s.statistics?.valuations_metrics?.forward_pe
+        ? parseFloat(s.statistics.valuations_metrics.forward_pe)
+        : undefined,
+      epsTTM: s.statistics?.financials?.income_statement?.basic_earnings_per_share_ttm
+        ? parseFloat(s.statistics.financials.income_statement.basic_earnings_per_share_ttm)
+        : undefined,
+      pbRatio: undefined,
+      dividendYield: s.statistics?.valuations_metrics?.dividend_yield_ttm
+        ? parseFloat(s.statistics.valuations_metrics.dividend_yield_ttm)
+        : undefined,
+      beta: undefined,
+      revenueTTM: undefined,
+      netIncomeTTM: undefined,
+      roe: undefined,
+      roa: undefined,
+      grossMargin: undefined,
+      operatingMargin: undefined,
+      netMargin: undefined,
+    };
+  } catch {
+    return null;
+  }
 }
 
 async function finnhubProfile(ticker: string): Promise<Partial<CompanyOverview>> {
