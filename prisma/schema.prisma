@@ -1,0 +1,175 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Note: auth.users is managed by Supabase, not Prisma.
+// These tables extend the Supabase auth system.
+
+model Profile {
+  id        String   @id @db.Uuid
+  email     String   @unique
+  name      String?
+  avatarUrl String?  @map("avatar_url")
+  tier      String   @default("free") // free | basic | pro
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  subscription  Subscription?
+  watchlists    Watchlist[]
+  portfolios    Portfolio[]
+  emailPrefs    EmailPreference?
+  emailLogs     EmailLog[]
+
+  @@map("profiles")
+}
+
+model Subscription {
+  id                   String    @id @default(uuid()) @db.Uuid
+  userId               String    @unique @map("user_id") @db.Uuid
+  stripeCustomerId     String?   @map("stripe_customer_id")
+  stripeSubscriptionId String?   @map("stripe_subscription_id")
+  stripePriceId        String?   @map("stripe_price_id")
+  status               String    @default("inactive")
+  tier                 String    @default("free")
+  currentPeriodEnd     DateTime? @map("current_period_end")
+  canceledAt           DateTime? @map("canceled_at")
+  createdAt            DateTime  @default(now()) @map("created_at")
+
+  profile Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
+}
+
+model Watchlist {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  name      String   @default("My Watchlist")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  profile Profile          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items   WatchlistItem[]
+
+  @@map("watchlists")
+}
+
+model WatchlistItem {
+  id          String   @id @default(uuid()) @db.Uuid
+  watchlistId String   @map("watchlist_id") @db.Uuid
+  ticker      String
+  addedAt     DateTime @default(now()) @map("added_at")
+
+  watchlist Watchlist @relation(fields: [watchlistId], references: [id], onDelete: Cascade)
+
+  @@unique([watchlistId, ticker])
+  @@map("watchlist_items")
+}
+
+model Portfolio {
+  id       String   @id @default(uuid()) @db.Uuid
+  userId   String   @map("user_id") @db.Uuid
+  ticker   String
+  shares   Decimal  @default(0) @db.Decimal(15, 6)
+  avgCost  Decimal? @map("avg_cost") @db.Decimal(15, 4)
+  addedAt  DateTime @default(now()) @map("added_at")
+
+  profile Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, ticker])
+  @@map("portfolios")
+}
+
+model Stock {
+  ticker      String   @id
+  companyName String   @map("company_name")
+  sector      String?
+  industry    String?
+  exchange    String?
+  marketCap   BigInt?  @map("market_cap")
+  lastUpdated DateTime @default(now()) @map("last_updated")
+
+  prices         StockPrice[]
+  aiAnalyses     AiAnalysis[]
+  newsArticles   NewsArticle[]
+
+  @@map("stocks")
+}
+
+model StockPrice {
+  id        BigInt  @id @default(autoincrement())
+  ticker    String
+  tradeDate DateTime @map("trade_date") @db.Date
+  open      Decimal? @db.Decimal(15, 4)
+  high      Decimal? @db.Decimal(15, 4)
+  low       Decimal? @db.Decimal(15, 4)
+  close     Decimal? @db.Decimal(15, 4)
+  adjClose  Decimal? @map("adj_close") @db.Decimal(15, 4)
+  volume    BigInt?
+
+  stock Stock @relation(fields: [ticker], references: [ticker])
+
+  @@unique([ticker, tradeDate])
+  @@index([ticker, tradeDate])
+  @@map("stock_prices")
+}
+
+model AiAnalysis {
+  id           String   @id @default(uuid()) @db.Uuid
+  ticker       String
+  analysisType String   @map("analysis_type") // news_summary | stock_score | daily_digest
+  content      Json
+  generatedAt  DateTime @default(now()) @map("generated_at")
+  validUntil   DateTime? @map("valid_until")
+
+  stock Stock @relation(fields: [ticker], references: [ticker])
+
+  @@index([ticker, analysisType])
+  @@map("ai_analyses")
+}
+
+model NewsArticle {
+  id          String    @id @default(uuid()) @db.Uuid
+  ticker      String
+  title       String
+  url         String
+  source      String?
+  publishedAt DateTime? @map("published_at")
+  summary     String?
+  sentiment   String?   // positive | negative | neutral
+  fetchedAt   DateTime  @default(now()) @map("fetched_at")
+
+  stock Stock @relation(fields: [ticker], references: [ticker])
+
+  @@index([ticker, publishedAt])
+  @@map("news_articles")
+}
+
+model EmailPreference {
+  userId          String  @id @map("user_id") @db.Uuid
+  dailyDigest     Boolean @default(true) @map("daily_digest")
+  weeklySummary   Boolean @default(false) @map("weekly_summary")
+  priceAlerts     Boolean @default(false) @map("price_alerts")
+  deliveryHourUtc Int     @default(13) @map("delivery_hour_utc")
+
+  profile Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("email_preferences")
+}
+
+model EmailLog {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  emailType  String   @map("email_type") // daily_digest | weekly_summary | price_alert | welcome
+  status     String   @default("sent") // sent | failed | bounced
+  resendId   String?  @map("resend_id")
+  sentAt     DateTime @default(now()) @map("sent_at")
+  errorMsg   String?  @map("error_message")
+
+  profile Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("email_logs")
+}
