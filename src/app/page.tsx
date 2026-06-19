@@ -81,7 +81,7 @@ export default async function HomePage() {
         {/* Trending Stocks Ticker */}
         <section className="border-y">
           <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center gap-6 overflow-x-auto">
+            <div className="flex items-center gap-6 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">
                 Trending:
               </span>
