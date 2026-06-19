@@ -61,8 +61,13 @@ export function KLineChart({ data, ticker }: KLineChartProps) {
       wickDownColor: "#ef4444",
     });
 
+    const isValid = (v: any) => v != null && !isNaN(v);
+    const validData = data.filter(
+      (d) => isValid(d.open) && isValid(d.high) && isValid(d.low) && isValid(d.close)
+    );
+
     candleSeries.setData(
-      data.map((d) => ({
+      validData.map((d) => ({
         time: d.time,
         open: d.open,
         high: d.high,
@@ -79,11 +84,13 @@ export function KLineChart({ data, ticker }: KLineChartProps) {
     });
 
     volumeSeries.setData(
-      data.map((d) => ({
-        time: d.time,
-        value: d.volume,
-        color: d.close >= d.open ? "rgba(34,197,94,0.3)" : "rgba(239,68,68,0.3)",
-      }))
+      validData
+        .filter((d) => isValid(d.volume))
+        .map((d) => ({
+          time: d.time,
+          value: d.volume,
+          color: d.close >= d.open ? "rgba(34,197,94,0.3)" : "rgba(239,68,68,0.3)",
+        }))
     );
 
     chart.priceScale("volume").applyOptions({

@@ -8,6 +8,8 @@ interface Props {
   data: OHLCVBar[];
 }
 
+const isValid = (v: any) => v != null && !isNaN(v);
+
 export function MACDChart({ data }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -41,14 +43,14 @@ export function MACDChart({ data }: Props) {
         time: d,
         value: tech.macd[i],
       }))
-      .filter((d) => d.value != null);
+      .filter((d) => isValid(d.value));
 
     const signalData = tech.dates
       .map((d, i) => ({
         time: d,
         value: tech.macdSignal[i],
       }))
-      .filter((d) => d.value != null);
+      .filter((d) => isValid(d.value));
 
     const histogramData = tech.dates
       .map((d, i) => ({
@@ -59,7 +61,7 @@ export function MACDChart({ data }: Props) {
             ? "rgba(34,197,94,0.5)"
             : "rgba(239,68,68,0.5)",
       }))
-      .filter((d) => d.value != null);
+      .filter((d) => isValid(d.value));
 
     chart.addSeries(LineSeries, {
       color: "#3b82f6",
@@ -129,7 +131,7 @@ export function RSIChart({ data }: Props) {
         time: d,
         value: tech.rsi14[i],
       }))
-      .filter((d) => d.value != null);
+      .filter((d) => isValid(d.value));
 
     chart.addSeries(LineSeries, {
       color: "#8b5cf6",
@@ -192,11 +194,13 @@ export function VolumeChart({ data }: Props) {
       crosshair: { mode: 0 },
     });
 
-    const volumeData = data.map((d) => ({
-      time: d.date,
-      value: d.volume,
-      color: d.close >= d.open ? "rgba(34,197,94,0.4)" : "rgba(239,68,68,0.4)",
-    }));
+    const volumeData = data
+      .filter((d) => isValid(d.volume) && isValid(d.close) && isValid(d.open))
+      .map((d) => ({
+        time: d.date,
+        value: d.volume,
+        color: d.close >= d.open ? "rgba(34,197,94,0.4)" : "rgba(239,68,68,0.4)",
+      }));
 
     chart.addSeries(HistogramSeries, {
       priceFormat: { type: "volume" },
