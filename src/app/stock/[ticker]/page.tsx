@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { KLineChart } from "@/components/charts/KLineChart";
+import { NewsTab } from "@/components/news/NewsTab";
 import { MACDChart, RSIChart, VolumeChart } from "@/components/charts/TechnicalCharts";
 import { Star, TrendingUp, TrendingDown, BarChart3, Newspaper, Sparkles, Activity } from "lucide-react";
 import { latestTechnicals, type OHLCVBar } from "@/lib/technicals";
@@ -243,21 +244,7 @@ export default async function StockPage({ params }: Props) {
             </TabsContent>
 
             <TabsContent value="news" className="mt-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>AI News Summary</CardTitle>
-                  <CardDescription>AI-generated summaries of the latest news for {upperTicker}.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-col items-center justify-center py-12 text-center">
-                    <Newspaper className="h-12 w-12 text-muted-foreground/30 mb-4" />
-                    <p className="text-muted-foreground mb-2">AI News Analysis</p>
-                    <p className="text-sm text-muted-foreground">
-                      Configure API keys to enable AI-powered news summarization.
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
+              <NewsTab ticker={upperTicker} />
             </TabsContent>
 
             <TabsContent value="fundamentals" className="mt-4">

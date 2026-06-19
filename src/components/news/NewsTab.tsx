@@ -1,0 +1,200 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Bot, TrendingUp, TrendingDown, Minus, Clock } from "lucide-react";
+
+interface AiAnalysis {
+  ticker: string;
+  analysisDate: string;
+  summary: {
+    text: string;
+    keyPoints: string[];
+    sentiment: string;
+    confidence: number;
+  } | null;
+  score: {
+    overallScore: number;
+    technicalScore: number;
+    fundamentalScore: number;
+    sentimentScore: number;
+    recommendation: string;
+    summary: string;
+  } | null;
+  articlesCount: number;
+  modelUsed: string;
+  generatedAt: string;
+  hasAnalysis: boolean;
+  message?: string;
+}
+
+export function NewsTab({ ticker }: { ticker: string }) {
+  const [data, setData] = useState<AiAnalysis | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await fetch(`/api/stocks/${ticker}/ai-analysis`);
+        const json = await res.json();
+        setData(json.data);
+      } catch (e) {
+        console.error("AI analysis load error:", e);
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, [ticker]);
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        <Card className="border-primary/20 bg-primary/5">
+          <CardContent className="p-6 space-y-3">
+            <Skeleton className="h-5 w-40" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-3/4" />
+            <Skeleton className="h-3 w-20" />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6 space-y-3">
+            <Skeleton className="h-4 w-32" />
+            <div className="grid grid-cols-4 gap-3">
+              <Skeleton className="h-16" />
+              <Skeleton className="h-16" />
+              <Skeleton className="h-16" />
+              <Skeleton className="h-16" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!data?.hasAnalysis) {
+    return (
+      <Card>
+        <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+          <Bot className="h-12 w-12 text-muted-foreground/30 mb-4" />
+          <p className="text-muted-foreground mb-2">No AI Analysis Yet</p>
+          <p className="text-sm text-muted-foreground">
+            {data?.message || "AI analysis is generated daily. Check back tomorrow."}
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const { summary, score } = data;
+
+  const sentimentIcon =
+    summary?.sentiment === "bullish" ? (
+      <TrendingUp className="h-5 w-5 text-green-500" />
+    ) : summary?.sentiment === "bearish" ? (
+      <TrendingDown className="h-5 w-5 text-red-500" />
+    ) : (
+      <Minus className="h-5 w-5 text-yellow-500" />
+    );
+
+  const sentimentBadge =
+    summary?.sentiment === "bullish" ? (
+      <Badge className="bg-green-500/10 text-green-600 border-green-500/20">Bullish</Badge>
+    ) : summary?.sentiment === "bearish" ? (
+      <Badge variant="destructive">Bearish</Badge>
+    ) : (
+      <Badge variant="secondary">Neutral</Badge>
+    );
+
+  const scoreBadge = score ? (
+    score.overallScore >= 80 ? (
+      <Badge className="bg-green-500/10 text-green-600 border-green-500/20">
+        {score.recommendation.replace("_", " ").toUpperCase()}
+      </Badge>
+    ) : score.overallScore >= 65 ? (
+      <Badge>{score.recommendation.replace("_", " ").toUpperCase()}</Badge>
+    ) : score.overallScore >= 45 ? (
+      <Badge variant="secondary">{score.recommendation.replace("_", " ").toUpperCase()}</Badge>
+    ) : (
+      <Badge variant="destructive">{score.recommendation.replace("_", " ").toUpperCase()}</Badge>
+    )
+  ) : null;
+
+  return (
+    <div className="space-y-4">
+      {/* AI Summary */}
+      {summary && (
+        <Card className="border-primary/20 bg-primary/5">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Bot className="h-4 w-4 text-primary" />
+                AI Summary
+              </CardTitle>
+              {sentimentBadge}
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex items-start gap-2">
+              {sentimentIcon}
+              <p className="text-sm leading-relaxed">{summary.text}</p>
+            </div>
+            {summary.keyPoints.length > 0 && (
+              <div className="space-y-1.5 pl-7">
+                {summary.keyPoints.map((point, i) => (
+                  <div key={i} className="flex items-start gap-2 text-sm">
+                    <span className="text-primary mt-1">•</span>
+                    <span className="text-muted-foreground">{point}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            <p className="text-xs text-muted-foreground pl-7">
+              Confidence: {(summary.confidence * 100).toFixed(0)}%
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* AI Score */}
+      {score && (
+        <Card>
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base">AI Score</CardTitle>
+              {scoreBadge}
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-4 gap-3 mb-3">
+              {[
+                { label: "Overall", value: score.overallScore, color: "text-primary" },
+                { label: "Technical", value: score.technicalScore, color: "text-blue-500" },
+                { label: "Fundamental", value: score.fundamentalScore, color: "text-purple-500" },
+                { label: "Sentiment", value: score.sentimentScore, color: "text-orange-500" },
+              ].map((item) => (
+                <div key={item.label} className="text-center">
+                  <p className={`text-2xl font-bold ${item.color}`}>{item.value}</p>
+                  <p className="text-xs text-muted-foreground">{item.label}</p>
+                </div>
+              ))}
+            </div>
+            {score.summary && (
+              <p className="text-sm text-muted-foreground">{score.summary}</p>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Footer */}
+      <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+        <Clock className="h-3 w-3" />
+        Analysis for {data.analysisDate} · Based on {data.articlesCount} articles
+        {data.modelUsed && <> · {data.modelUsed}</>}
+      </div>
+    </div>
+  );
+}
