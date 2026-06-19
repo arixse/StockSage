@@ -7,6 +7,9 @@
  * Alpha Vantage: 25 req/day, last-resort fallback.
  */
 
+import { createLogger } from "@/lib/logger";
+const log = createLogger("stock-api");
+
 const TWELVE_DATA_BASE = "https://api.twelvedata.com";
 const FINNHUB_BASE = "https://finnhub.io/api/v1";
 const ALPHA_VANTAGE_BASE = "https://www.alphavantage.co/query";
@@ -42,27 +45,26 @@ export interface StockQuote {
 }
 
 export async function fetchStockQuote(ticker: string): Promise<StockQuote | null> {
-  // 1. Yahoo Finance (free, unlimited, real-time US stocks)
   const yq = await yahooQuote(ticker);
-  if (yq) return yq;
-
-  // 2. Twelve Data
+  if (yq) { log.info("quote", `${ticker} → Yahoo ($${yq.price})`); return yq; }
   const td = await twelveQuote(ticker);
-  if (td) return td;
-
-  // 3. Finnhub
+  if (td) { log.info("quote", `${ticker} → TwelveData ($${td.price})`); return td; }
   const fq = await finnhubQuote(ticker);
-  if (fq) return fq;
-
-  return alphaQuote(ticker);
+  if (fq) { log.info("quote", `${ticker} → Finnhub ($${fq.price})`); return fq; }
+  const aq = await alphaQuote(ticker);
+  if (aq) { log.info("quote", `${ticker} → AlphaVantage ($${aq.price})`); return aq; }
+  log.warn("quote", `${ticker} → ALL FAILED`);
+  return null;
 }
 
 export async function fetchStockQuotes(tickers: string[]): Promise<(StockQuote | null)[]> {
-  // Yahoo batch quote
   const yh = await yahooBatchQuotes(tickers);
   if (yh && yh.some((r) => r != null)) {
+    const ok = yh.filter((r) => r != null).length;
+    log.info("quotes", `batch ${ok}/${tickers.length} via Yahoo`);
     return yh;
   }
+  log.info("quotes", `batch ${tickers.length} → falling back to individual`);
   return Promise.all(tickers.map((t) => fetchStockQuote(t)));
 }
 
@@ -72,6 +74,7 @@ let yahooCrumb: { crumb: string; cookie: string; expires: number } | null = null
 
 async function getYahooCrumb(): Promise<{ crumb: string; cookie: string } | null> {
   if (yahooCrumb && Date.now() < yahooCrumb.expires) {
+    log.debug("Yahoo", "crumb reused (cached)");
     return { crumb: yahooCrumb.crumb, cookie: yahooCrumb.cookie };
   }
 
@@ -81,18 +84,20 @@ async function getYahooCrumb(): Promise<{ crumb: string; cookie: string } | null
     const r1 = await fetch("https://fc.yahoo.com/", { headers: { "User-Agent": ua } });
     const setCookie = r1.headers.get("set-cookie") || "";
     const m = setCookie.match(/A3=[^;]+/);
-    if (!m) return null;
+    if (!m) { log.warn("Yahoo", "crumb: no A3 cookie"); return null; }
     const cookie = m[0];
 
     const r2 = await fetch(`https://query2.finance.yahoo.com/v1/test/getcrumb`, {
       headers: { "User-Agent": ua, Cookie: cookie },
     });
     const crumb = (await r2.text()).trim();
-    if (!crumb || crumb.length > 20) return null;
+    if (!crumb || crumb.length > 20) { log.warn("Yahoo", `crumb: invalid (len=${crumb.length})`); return null; }
 
     yahooCrumb = { crumb, cookie, expires: Date.now() + 20 * 60 * 1000 };
+    log.info("Yahoo", "crumb obtained successfully");
     return { crumb, cookie };
-  } catch {
+  } catch (e) {
+    log.error("Yahoo", `crumb exception: ${e}`);
     return null;
   }
 }
@@ -333,16 +338,14 @@ export async function fetchStockChart(
   range: string = "1y",
   interval: string = "1d"
 ): Promise<OHLCVBar[]> {
-  // 1. Yahoo Finance (free, unlimited, 30+ years history)
   const yh = await yahooChart(ticker, range, interval);
-  if (yh.length > 0) return yh;
-
-  // 2. Twelve Data fallback
+  if (yh.length > 0) { log.info("chart", `${ticker} → Yahoo (${yh.length} bars, ${range})`); return yh; }
   const td = await twelveChart(ticker, range, interval);
-  if (td.length > 0) return td;
-
-  // 3. Alpha Vantage last resort
-  return alphaChart(ticker, range);
+  if (td.length > 0) { log.info("chart", `${ticker} → TwelveData (${td.length} bars)`); return td; }
+  const av = await alphaChart(ticker, range);
+  if (av.length > 0) { log.info("chart", `${ticker} → AlphaVantage (${av.length} bars)`); return av; }
+  log.warn("chart", `${ticker} → ALL FAILED`);
+  return [];
 }
 
 const RANGE_OUTPUT: Record<string, number> = {
@@ -458,15 +461,13 @@ export interface SearchResult {
 }
 
 export async function searchStocks(query: string): Promise<SearchResult[]> {
-  // 1. Yahoo
   const yh = await yahooSearch(query);
-  if (yh.length > 0) return yh;
-
-  // 2. Finnhub
+  if (yh.length > 0) { log.info("search", `"${query}" → Yahoo (${yh.length} results)`); return yh; }
   const fh = await finnhubSearch(query);
-  if (fh.length > 0) return fh;
-
-  return alphaSearch(query);
+  if (fh.length > 0) { log.info("search", `"${query}" → Finnhub (${fh.length} results)`); return fh; }
+  const av = await alphaSearch(query);
+  log.info("search", `"${query}" → AlphaVantage (${av.length} results)`);
+  return av;
 }
 
 async function yahooSearch(query: string): Promise<SearchResult[]> {

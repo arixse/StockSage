@@ -3,6 +3,9 @@
  */
 import OpenAI from "openai";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger("ai-pipeline");
 
 function getLLMClient(): OpenAI | null {
   const key = process.env.LLM_API_KEY;
@@ -27,7 +30,7 @@ interface NewsArticle {
 
 async function fetchNewsForTicker(ticker: string): Promise<NewsArticle[]> {
   const key = process.env.FINNHUB_API_KEY;
-  if (!key) return [];
+  if (!key) { log.warn("news", `${ticker}: no Finnhub key`); return []; }
 
   try {
     const to = new Date().toISOString().split("T")[0];
@@ -59,7 +62,9 @@ async function aiSummarize(ticker: string, articles: NewsArticle[]): Promise<{
   confidence: number;
 } | null> {
   const client = getLLMClient();
-  if (!client || articles.length === 0) return null;
+  if (!client || articles.length === 0) { log.warn("summarize", `${ticker}: no LLM client or no articles`); return null; }
+
+  log.info("summarize", `${ticker}: calling ${LLM_MODEL} with ${articles.length} articles`);
 
   const articlesText = articles
     .map((a, i) => `[${i + 1}] ${a.title} (${a.source})\n${a.summary}`)
@@ -117,7 +122,9 @@ async function aiScore(
   scoreSummary: string;
 } | null> {
   const client = getLLMClient();
-  if (!client) return null;
+  if (!client) { log.warn("score", `${ticker}: no LLM client`); return null; }
+
+  log.info("score", `${ticker}: calling ${LLM_MODEL}`);
 
   const prompt = `Score ${ticker} based on this analysis:
 
@@ -169,21 +176,21 @@ export async function runDailyPipeline(ticker: string) {
   const supabase = createAdminClient();
   const today = new Date().toISOString().split("T")[0];
 
-  console.log(`[Pipeline] Processing ${ticker}...`);
+  log.info("pipeline", `start: ${ticker}`);
 
   // 1. Fetch news
   const articles = await fetchNewsForTicker(ticker);
-  console.log(`[Pipeline] ${ticker}: ${articles.length} articles`);
+  log.info("pipeline", `${ticker}: ${articles.length} articles fetched`);
 
   // 2. AI Summarize
   const summary = await aiSummarize(ticker, articles);
-  console.log(`[Pipeline] ${ticker}: summary=${summary?.sentiment || "skipped"}`);
+  log.info("pipeline", `${ticker}: summarize → ${summary?.sentiment || "skipped"}`);
 
   // 3. AI Score
   const score = summary
     ? await aiScore(ticker, summary.summaryText, summary.sentiment)
     : null;
-  console.log(`[Pipeline] ${ticker}: score=${score?.recommendation || "skipped"}`);
+  log.info("pipeline", `${ticker}: score → ${score?.recommendation || "skipped"}`);
 
   // 4. Persist to Supabase
   const { error } = await supabase.from("ai_daily_analysis").upsert(
