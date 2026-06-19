@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { fetchStockQuote, fetchCompanyOverview, fetchStockChart } from "@/lib/stock-api";
+import { getCachedQuotes, getCachedChart, getCachedCompanyOverview } from "@/lib/stock-cache";
 import { latestTechnicals } from "@/lib/technicals";
 import type { OHLCVBar } from "@/lib/technicals";
 
@@ -11,11 +12,17 @@ export async function GET(
   const upperTicker = ticker.toUpperCase();
 
   try {
-    // Gather all available data for scoring
+    // Cache-first: read from Supabase, fall back to live API
     const [quote, company, chartData] = await Promise.all([
-      fetchStockQuote(upperTicker).catch(() => null),
-      fetchCompanyOverview(upperTicker).catch(() => null),
-      fetchStockChart(upperTicker, "compact").catch(() => []),
+      getCachedQuotes([upperTicker])
+        .then((arr) => arr[0] ?? fetchStockQuote(upperTicker))
+        .catch(() => null),
+      getCachedCompanyOverview(upperTicker)
+        .then((c) => c ?? fetchCompanyOverview(upperTicker))
+        .catch(() => null),
+      getCachedChart(upperTicker, "compact")
+        .then((bars) => bars.length > 0 ? bars : fetchStockChart(upperTicker, "compact"))
+        .catch(() => []),
     ]);
 
     const ohlcvForTech: OHLCVBar[] = (chartData || []).map((d: any) => ({

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { syncTrackedTickers } from "@/lib/ticker-sync";
 
 // POST — Add a stock to the watchlist
 export async function POST(
@@ -44,6 +45,9 @@ export async function POST(
     }
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+
+  // Sync tracked_tickers in background (don't block response)
+  syncTrackedTickers().catch((e) => console.error("[watchlist/add] sync error:", e));
 
   return NextResponse.json({ data });
 }

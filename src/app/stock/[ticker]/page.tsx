@@ -11,6 +11,7 @@ import { Star, TrendingUp, TrendingDown, BarChart3, Newspaper, Sparkles, Activit
 import { latestTechnicals, type OHLCVBar } from "@/lib/technicals";
 import Link from "next/link";
 import { fetchStockQuote, fetchStockChart, fetchCompanyOverview } from "@/lib/stock-api";
+import { getCachedQuotes, getCachedChart, getCachedCompanyOverview } from "@/lib/stock-cache";
 
 interface Props {
   params: Promise<{ ticker: string }>;
@@ -28,11 +29,16 @@ export default async function StockPage({ params }: Props) {
   const { ticker } = await params;
   const upperTicker = ticker.toUpperCase();
 
-  // Fetch each independently to avoid one failure blocking all
+  // Cache-first: read from Supabase, fall back to live API
   const [quote, company, chartData] = await Promise.all([
-    fetchStockQuote(upperTicker).catch(() => null),
-    fetchCompanyOverview(upperTicker).catch(() => null),
-    fetchStockChart(upperTicker, "1y"),
+    getCachedQuotes([upperTicker])
+      .then((arr) => arr[0] ?? fetchStockQuote(upperTicker))
+      .catch(() => null),
+    getCachedCompanyOverview(upperTicker)
+      .then((c) => c ?? fetchCompanyOverview(upperTicker))
+      .catch(() => null),
+    getCachedChart(upperTicker, "1y")
+      .then((bars) => bars.length > 0 ? bars : fetchStockChart(upperTicker, "1y")),
   ]);
 
   if (!quote && !company && chartData.length === 0) {

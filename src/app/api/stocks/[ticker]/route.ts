@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { fetchStockQuote, fetchCompanyOverview } from "@/lib/stock-api";
+import { getCachedQuotes, getCachedCompanyOverview } from "@/lib/stock-cache";
 
 export async function GET(
   request: NextRequest,
@@ -10,8 +11,10 @@ export async function GET(
 
   try {
     const [quote, company] = await Promise.all([
-      fetchStockQuote(upperTicker),
-      fetchCompanyOverview(upperTicker),
+      getCachedQuotes([upperTicker])
+        .then((arr) => arr[0] ?? fetchStockQuote(upperTicker)),
+      getCachedCompanyOverview(upperTicker)
+        .then((c) => c ?? fetchCompanyOverview(upperTicker)),
     ]);
 
     return NextResponse.json({ data: { ticker: upperTicker, quote, company } });

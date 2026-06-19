@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { syncTrackedTickers } from "@/lib/ticker-sync";
 
 // DELETE — Remove a stock from the watchlist
 export async function DELETE(
@@ -33,6 +34,9 @@ export async function DELETE(
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+
+  // Sync tracked_tickers in background (don't block response)
+  syncTrackedTickers().catch((e) => console.error("[watchlist/remove] sync error:", e));
 
   return NextResponse.json({ data: { success: true } });
 }

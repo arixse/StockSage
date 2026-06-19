@@ -1,0 +1,125 @@
+import { NextRequest, NextResponse } from "next/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { syncTrackedTickers } from "@/lib/ticker-sync";
+import {
+  upsertStockQuotes,
+  upsertStockPrices,
+  upsertStockFundamentals,
+  getLatestPriceDate,
+} from "@/lib/stock-cache";
+import {
+  fetchStockQuotes,
+  fetchStockChart,
+  fetchCompanyOverview,
+} from "@/lib/stock-api";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger("stock-cron");
+
+export async function GET(request: NextRequest) {
+  const authHeader = request.headers.get("authorization");
+  const expectedToken = `Bearer ${process.env.CRON_SECRET}`;
+
+  if (authHeader !== expectedToken) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const stats = {
+    tickersProcessed: 0,
+    quotesUpserted: 0,
+    chartsUpserted: 0,
+    fundamentalsUpserted: 0,
+    errors: 0,
+  };
+
+  try {
+    const admin = createAdminClient();
+
+    // 1. Sync tickers from all user watchlists
+    log.info("start", "Syncing tracked tickers...");
+    const syncResult = await syncTrackedTickers();
+    log.info("sync", `Tickers synced: +${syncResult.added} -${syncResult.removed}`);
+
+    // 2. Read all tracked tickers
+    const { data: tracked } = await admin
+      .from("tracked_tickers")
+      .select("ticker")
+      .order("ticker");
+
+    const tickers = (tracked || []).map((r) => r.ticker);
+
+    if (tickers.length === 0) {
+      log.info("end", "No tickers to process");
+      return NextResponse.json({ success: true, message: "No tickers tracked", stats });
+    }
+
+    stats.tickersProcessed = tickers.length;
+    log.info("process", `Processing ${tickers.length} tickers`);
+
+    // 3. Batch fetch + upsert quotes (Yahoo handles batch in one request)
+    log.info("quotes", `Fetching quotes for ${tickers.length} tickers...`);
+    const quotes = await fetchStockQuotes(tickers);
+    const validQuotes = quotes.filter((q): q is NonNullable<typeof q> => q !== null);
+    if (validQuotes.length > 0) {
+      stats.quotesUpserted = await upsertStockQuotes(admin, validQuotes);
+      log.info("quotes", `Upserted ${stats.quotesUpserted} quotes`);
+    } else {
+      log.warn("quotes", "All quotes returned null");
+    }
+
+    // 4. Per-ticker: fetch chart data + fundamentals
+    for (let i = 0; i < tickers.length; i++) {
+      const ticker = tickers[i];
+      const idx = `[${i + 1}/${tickers.length}]`;
+
+      try {
+        // Charts — only fetch missing data
+        const latestDate = await getLatestPriceDate(admin, ticker);
+        let chartRange: string;
+        if (!latestDate) {
+          chartRange = "1y"; // First time: fetch full year
+        } else {
+          const daysAgo = Math.floor(
+            (Date.now() - new Date(latestDate).getTime()) / 86400000
+          );
+          chartRange = daysAgo > 30 ? "1y" : "1m"; // Incremental vs refresh
+        }
+
+        log.debug("chart", `${idx} ${ticker}: range=${chartRange} (latest=${latestDate || "none"})`);
+        const bars = await fetchStockChart(ticker, chartRange, "1d");
+        if (bars.length > 0) {
+          const upserted = await upsertStockPrices(admin, ticker, bars);
+          stats.chartsUpserted += upserted;
+        }
+
+        await new Promise((r) => setTimeout(r, 300)); // Rate limit
+      } catch (e) {
+        log.error("chart", `${idx} ${ticker} failed: ${e}`);
+        stats.errors++;
+      }
+
+      try {
+        // Fundamentals
+        const overview = await fetchCompanyOverview(ticker);
+        if (overview) {
+          await upsertStockFundamentals(admin, [overview]);
+          stats.fundamentalsUpserted++;
+        }
+
+        await new Promise((r) => setTimeout(r, 300)); // Rate limit
+      } catch (e) {
+        log.error("fundamental", `${idx} ${ticker} failed: ${e}`);
+        stats.errors++;
+      }
+    }
+
+    log.info("end", `Done: ${JSON.stringify(stats)}`);
+    return NextResponse.json({ success: true, stats });
+  } catch (error) {
+    log.error("fatal", String(error));
+    return NextResponse.json(
+      { error: "Cron job failed", details: String(error), stats },
+      { status: 500 }
+    );
+  }
+}

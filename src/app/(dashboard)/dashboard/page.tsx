@@ -5,6 +5,7 @@ import { TrendingUp, TrendingDown, Star, BarChart3, Plus } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { fetchStockQuotes } from "@/lib/stock-api";
+import { getCachedQuotes } from "@/lib/stock-cache";
 
 export const metadata = { title: "Dashboard" };
 
@@ -25,8 +26,10 @@ async function getWatchlistWithQuotes(userId: string) {
 
   if (tickers.length === 0) return { watchlistId: watchlist?.id, stocks: [] };
 
-  // Fetch quotes sequentially to respect API rate limits
-  const quotes = await fetchStockQuotes(tickers);
+  // Cache-first: read quotes from Supabase, fall back to live API
+  const cached = await getCachedQuotes(tickers);
+  const hasCached = cached.some((q) => q !== null);
+  const quotes = hasCached ? cached : await fetchStockQuotes(tickers);
 
   const stocks = quotes.map((q, i) => {
     const ticker = tickers[i];

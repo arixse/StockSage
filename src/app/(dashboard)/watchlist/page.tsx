@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { fetchStockQuotes } from "@/lib/stock-api";
+import { getCachedQuotes } from "@/lib/stock-cache";
 import { WatchlistClient } from "./WatchlistClient";
 
 export const metadata = { title: "Watchlist" };
@@ -34,8 +35,10 @@ async function getWatchlistData(userId: string) {
     return { watchlistId: watchlist.id, name: watchlist.name, stocks: [] };
   }
 
-  // Fetch quotes sequentially to respect API rate limits
-  const quotes = await fetchStockQuotes(tickers);
+  // Cache-first: read quotes from Supabase, fall back to live API
+  const cached = await getCachedQuotes(tickers);
+  const hasCached = cached.some((q) => q !== null);
+  const quotes = hasCached ? cached : await fetchStockQuotes(tickers);
 
   const stocks = quotes.map((q, i) => {
     const ticker = tickers[i];

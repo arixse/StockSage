@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { fetchStockChart } from "@/lib/stock-api";
+import { getCachedChart } from "@/lib/stock-cache";
 
 export async function GET(
   request: NextRequest,
@@ -12,7 +13,8 @@ export async function GET(
   const interval = searchParams.get("interval") || "1d";
 
   try {
-    const data = await fetchStockChart(upperTicker, range, interval);
+    const cached = await getCachedChart(upperTicker, range);
+    const data = cached.length > 0 ? cached : await fetchStockChart(upperTicker, range, interval);
     return NextResponse.json({ data });
   } catch (error) {
     console.error(`Chart data error for ${upperTicker}:`, error);
