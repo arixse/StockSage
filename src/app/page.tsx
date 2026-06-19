@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, BarChart3, Sparkles, Mail, ArrowRight, CheckCircle2 } from "lucide-react";
+import { getCachedQuotes } from "@/lib/stock-cache";
+import { fetchStockQuotes } from "@/lib/stock-api";
 
 const FEATURES = [
   {
@@ -29,14 +31,20 @@ const FEATURES = [
   },
 ];
 
-const POPULAR_STOCKS = [
-  { ticker: "AAPL", name: "Apple", price: "224.50", change: "+1.2%" },
-  { ticker: "MSFT", name: "Microsoft", price: "458.30", change: "+0.8%" },
-  { ticker: "NVDA", name: "NVIDIA", price: "135.80", change: "+3.2%" },
-  { ticker: "GOOGL", name: "Alphabet", price: "189.20", change: "-0.5%" },
-];
+const TRENDING_TICKERS = ["AAPL", "MSFT", "NVDA", "GOOGL", "AMZN", "META", "TSLA", "AMD"];
 
-export default function HomePage() {
+async function getTrendingStocks() {
+  try {
+    const cached = await getCachedQuotes(TRENDING_TICKERS);
+    if (cached.some((q) => q !== null)) return cached;
+    return await fetchStockQuotes(TRENDING_TICKERS);
+  } catch {
+    return TRENDING_TICKERS.map(() => null);
+  }
+}
+
+export default async function HomePage() {
+  const trendingQuotes = await getTrendingStocks();
   return (
     <div className="flex flex-col min-h-full">
       <Header />
@@ -70,27 +78,43 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Popular Stocks Ticker */}
+        {/* Trending Stocks Ticker */}
         <section className="border-y">
           <div className="container mx-auto px-4 py-4">
             <div className="flex items-center gap-6 overflow-x-auto">
               <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">
                 Trending:
               </span>
-              {POPULAR_STOCKS.map((stock) => (
-                <Link
-                  key={stock.ticker}
-                  href={`/stock/${stock.ticker}`}
-                  className="flex items-center gap-2 text-sm whitespace-nowrap hover:text-primary transition-colors"
-                >
-                  <span className="font-medium">{stock.ticker}</span>
-                  <span className="text-muted-foreground">{stock.name}</span>
-                  <span>{stock.price}</span>
-                  <span className={stock.change.startsWith("+") ? "text-green-500" : "text-red-500"}>
-                    {stock.change}
-                  </span>
-                </Link>
-              ))}
+              {trendingQuotes.map((quote, i) => {
+                const ticker = TRENDING_TICKERS[i];
+                if (!quote) {
+                  return (
+                    <Link
+                      key={ticker}
+                      href={`/stock/${ticker}`}
+                      className="flex items-center gap-2 text-sm whitespace-nowrap hover:text-primary transition-colors"
+                    >
+                      <span className="font-medium">{ticker}</span>
+                      <span className="text-muted-foreground">—</span>
+                    </Link>
+                  );
+                }
+                const changeStr = `${quote.change >= 0 ? "+" : ""}${quote.change.toFixed(2)} (${quote.changePercent >= 0 ? "+" : ""}${quote.changePercent.toFixed(1)}%)`;
+                return (
+                  <Link
+                    key={quote.ticker}
+                    href={`/stock/${quote.ticker}`}
+                    className="flex items-center gap-2 text-sm whitespace-nowrap hover:text-primary transition-colors"
+                  >
+                    <span className="font-medium">{quote.ticker}</span>
+                    <span className="text-muted-foreground">{quote.shortName}</span>
+                    <span className="font-mono">${quote.price.toFixed(2)}</span>
+                    <span className={quote.change >= 0 ? "text-green-500" : "text-red-500"}>
+                      {changeStr}
+                    </span>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </section>

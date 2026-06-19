@@ -342,6 +342,8 @@ export async function fetchStockChart(
   if (yh.length > 0) { log.info("chart", `${ticker} → Yahoo (${yh.length} bars, ${range})`); return yh; }
   const td = await twelveChart(ticker, range, interval);
   if (td.length > 0) { log.info("chart", `${ticker} → TwelveData (${td.length} bars)`); return td; }
+  const fh = await finnhubChart(ticker, range, interval);
+  if (fh.length > 0) { log.info("chart", `${ticker} → Finnhub (${fh.length} bars)`); return fh; }
   const av = await alphaChart(ticker, range);
   if (av.length > 0) { log.info("chart", `${ticker} → AlphaVantage (${av.length} bars)`); return av; }
   log.warn("chart", `${ticker} → ALL FAILED`);

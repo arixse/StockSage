@@ -38,7 +38,8 @@ export default async function StockPage({ params }: Props) {
       .then((c) => c ?? fetchCompanyOverview(upperTicker))
       .catch(() => null),
     getCachedChart(upperTicker, "1y")
-      .then((bars) => bars.length > 0 ? bars : fetchStockChart(upperTicker, "1y")),
+      .then((bars) => bars.length > 0 ? bars : fetchStockChart(upperTicker, "1y"))
+      .catch(() => [] as any[]),
   ]);
 
   if (!quote && !company && chartData.length === 0) {
