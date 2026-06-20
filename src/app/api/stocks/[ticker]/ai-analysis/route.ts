@@ -19,7 +19,9 @@ export async function GET(
       .limit(1)
       .single();
 
-    if (!data) {
+    const hasContent = data && !!(data.summary_text || data.overall_score != null);
+
+    if (!data || !hasContent) {
       return NextResponse.json({
         data: {
           ticker: upperTicker,

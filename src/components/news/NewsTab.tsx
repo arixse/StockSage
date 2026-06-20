@@ -54,9 +54,10 @@ export function NewsTab({ ticker }: { ticker: string }) {
     loadAnalysis();
   }, [loadAnalysis]);
 
-  // Auto-trigger generation when no analysis exists
+  // Auto-trigger generation when no real analysis exists
   useEffect(() => {
-    if (!loading && data && !data.hasAnalysis && !generating) {
+    const hasReal = data?.hasAnalysis && (data.summary || data.score);
+    if (!loading && !hasReal && !generating) {
       generateAnalysis();
     }
   }, [loading, data]);
@@ -124,8 +125,9 @@ export function NewsTab({ ticker }: { ticker: string }) {
     );
   }
 
-  // No analysis + error
-  if (!data?.hasAnalysis) {
+  // No analysis (or has empty row without real content)
+  const hasRealContent = data?.hasAnalysis && (data.summary || data.score);
+  if (!hasRealContent) {
     return (
       <Card>
         <CardContent className="flex flex-col items-center justify-center py-12 text-center">

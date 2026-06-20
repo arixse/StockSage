@@ -12,27 +12,39 @@ export async function POST(
   try {
     const result = await runDailyPipeline(upperTicker);
 
-    if (!result) {
-      return NextResponse.json(
-        { error: "AI pipeline failed — check LLM_API_KEY and FINNHUB_API_KEY" },
-        { status: 500 }
-      );
+    // Pipeline ran but produced no content (no API keys, no news, etc.)
+    if (!result.summary && !result.score) {
+      return NextResponse.json({
+        success: false,
+        data: {
+          ticker: upperTicker,
+          hasAnalysis: false,
+          message: result.articles === 0
+            ? "No news articles found for this ticker. Check FINNHUB_API_KEY."
+            : "LLM not configured. Set LLM_API_KEY to enable AI analysis.",
+        },
+      });
     }
 
     // Read back the persisted analysis
     const admin = createAdminClient();
+    const today = new Date().toISOString().split("T")[0];
     const { data } = await admin
       .from("ai_daily_analysis")
       .select("*")
       .eq("ticker", upperTicker)
-      .eq("analysis_date", new Date().toISOString().split("T")[0])
+      .eq("analysis_date", today)
       .single();
 
     if (!data) {
-      return NextResponse.json(
-        { error: "Analysis generated but not found in DB" },
-        { status: 500 }
-      );
+      return NextResponse.json({
+        success: false,
+        data: {
+          ticker: upperTicker,
+          hasAnalysis: false,
+          message: "Analysis generated but not found in DB.",
+        },
+      });
     }
 
     return NextResponse.json({
@@ -40,20 +52,24 @@ export async function POST(
       data: {
         ticker: data.ticker,
         analysisDate: data.analysis_date,
-        summary: {
-          text: data.summary_text,
-          keyPoints: data.key_points || [],
-          sentiment: data.sentiment,
-          confidence: data.confidence,
-        },
-        score: {
-          overallScore: data.overall_score,
-          technicalScore: data.technical_score,
-          fundamentalScore: data.fundamental_score,
-          sentimentScore: data.sentiment_score,
-          recommendation: data.recommendation,
-          summary: data.score_summary,
-        },
+        summary: data.summary_text
+          ? {
+              text: data.summary_text,
+              keyPoints: data.key_points || [],
+              sentiment: data.sentiment,
+              confidence: data.confidence,
+            }
+          : null,
+        score: data.overall_score != null
+          ? {
+              overallScore: data.overall_score,
+              technicalScore: data.technical_score,
+              fundamentalScore: data.fundamental_score,
+              sentimentScore: data.sentiment_score,
+              recommendation: data.recommendation,
+              summary: data.score_summary,
+            }
+          : null,
         articlesCount: data.articles_count,
         modelUsed: data.model_used,
         generatedAt: data.generated_at,

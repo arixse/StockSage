@@ -192,30 +192,33 @@ export async function runDailyPipeline(ticker: string) {
     : null;
   log.info("pipeline", `${ticker}: score → ${score?.recommendation || "skipped"}`);
 
-  // 4. Persist to Supabase
-  const { error } = await supabase.from("ai_daily_analysis").upsert(
-    {
-      ticker,
-      analysis_date: today,
-      summary_text: summary?.summaryText || null,
-      key_points: summary?.keyPoints || [],
-      sentiment: summary?.sentiment || null,
-      confidence: summary?.confidence || 0,
-      overall_score: score?.overallScore || null,
-      technical_score: score?.technicalScore || null,
-      fundamental_score: score?.fundamentalScore || null,
-      sentiment_score: score?.sentimentScore || null,
-      recommendation: score?.recommendation || null,
-      score_summary: score?.scoreSummary || null,
-      articles_count: articles.length,
-      model_used: summary || score ? LLM_MODEL : null,
-      generated_at: new Date().toISOString(),
-    },
-    { onConflict: "ticker,analysis_date" }
-  );
+  // 4. Persist to Supabase — only if we have actual content
+  const hasContent = !!(summary || score);
+  if (hasContent) {
+    const { error } = await supabase.from("ai_daily_analysis").upsert(
+      {
+        ticker,
+        analysis_date: today,
+        summary_text: summary?.summaryText || null,
+        key_points: summary?.keyPoints || [],
+        sentiment: summary?.sentiment || null,
+        confidence: summary?.confidence ?? 0,
+        overall_score: score?.overallScore ?? null,
+        technical_score: score?.technicalScore ?? null,
+        fundamental_score: score?.fundamentalScore ?? null,
+        sentiment_score: score?.sentimentScore ?? null,
+        recommendation: score?.recommendation || null,
+        score_summary: score?.scoreSummary || null,
+        articles_count: articles.length,
+        model_used: LLM_MODEL,
+        generated_at: new Date().toISOString(),
+      },
+      { onConflict: "ticker,analysis_date" }
+    );
 
-  if (error) {
-    console.error(`[Pipeline] DB error for ${ticker}:`, error);
+    if (error) {
+      console.error(`[Pipeline] DB error for ${ticker}:`, error);
+    }
   }
 
   return { ticker, articles: articles.length, summary: !!summary, score: !!score };
