@@ -255,7 +255,6 @@ export async function getCachedEarnings(
   from: string,
   to: string
 ): Promise<EarningsEventApi[]> {
-  const { createClient } = await import("@/lib/supabase/server");
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("earnings_calendar")

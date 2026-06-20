@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, memo } from "react";
-import { cn, cnColor } from "@/lib/utils";
+import { useEffect, useRef, useMemo, memo } from "react";
+import { cn } from "@/lib/utils";
 import type { OHLCV } from "@/types/stock";
 
 interface SparklineChartProps {
@@ -11,6 +11,11 @@ interface SparklineChartProps {
   height?: number;
   className?: string;
   lineColor?: string;
+}
+
+// Resolve CSS variable colors to actual canvas-compatible values
+function resolveColor(color: string): string {
+  return color.replace("rgb(var(--primary) / <alpha-value>)", "rgb(99 102 241)");
 }
 
 function drawSparkline(
@@ -36,7 +41,7 @@ function drawSparkline(
 
   const xStep = (width - 2) / (points.length - 1);
 
-  // Gradient fill
+  // Gradient fill from semi-transparent line color to transparent
   const gradient = ctx.createLinearGradient(0, 0, 0, height);
   gradient.addColorStop(0, color.replace(")", ",0.2)").replace("rgb", "rgba"));
   gradient.addColorStop(1, "transparent");
@@ -73,26 +78,34 @@ const SparklineChart = memo(function SparklineChart({
 }: SparklineChartProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const color =
-    lineColor ||
-    (change == null
-      ? "rgb(var(--primary) / <alpha-value>)"
-      : change >= 0
-        ? "rgb(34 197 94)"
-        : "rgb(239 68 68)");
+  const color = useMemo(() => {
+    const raw = lineColor ||
+      (change == null
+        ? "rgb(var(--primary) / <alpha-value>)"
+        : change >= 0
+          ? "rgb(34 197 94)"
+          : "rgb(239 68 68)");
+    return resolveColor(raw);
+  }, [lineColor, change]);
 
-  // Extract close-like values
-  const closes = data.map((d) => ("close" in d ? d.close : (d as { close: number }).close)).filter((v): v is number => v != null);
+  // Extract and memoize close values
+  const closes = useMemo(
+    () => data
+      .map((d) => ("close" in d ? d.close : (d as { close: number }).close))
+      .filter((v): v is number => v != null),
+    [data]
+  );
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || closes.length < 2) return;
 
+    drawSparkline(canvas, closes, color, width, height);
+
     const observer = new ResizeObserver(() => {
-      drawSparkline(canvas, closes, color.replace("rgb(var(--primary) / <alpha-value>)", "rgb(99 102 241)"), width, height);
+      drawSparkline(canvas, closes, color, width, height);
     });
     observer.observe(canvas);
-    drawSparkline(canvas, closes, color.replace("rgb(var(--primary) / <alpha-value>)", "rgb(99 102 241)"), width, height);
 
     return () => observer.disconnect();
   }, [closes, color, width, height]);

@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Tooltip, TooltipProvider } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
@@ -110,6 +110,7 @@ export function HeatmapClient() {
         <span>+3%</span>
       </div>
 
+      <TooltipProvider>
       {grouped.map(([group, groupStocks]) => (
         <div key={group}>
           <h3 className="text-sm font-semibold mb-2 text-muted-foreground">
@@ -120,10 +121,9 @@ export function HeatmapClient() {
             {groupStocks
               .sort((a, b) => (b.marketCap ?? 0) - (a.marketCap ?? 0))
               .map((stock) => (
-                <Link key={stock.ticker} href={`/stock/${stock.ticker}`}>
-                  <TooltipProvider>
+                <Tooltip key={stock.ticker}>
+                  <TooltipTrigger render={<Link href={`/stock/${stock.ticker}`} />}>
                     <div
-                      title={`${stock.ticker}: ${stock.changePercent >= 0 ? "+" : ""}${stock.changePercent.toFixed(2)}%`}
                       className={cn(
                         "rounded-lg p-2 text-center transition-transform hover:scale-105 hover:z-10 cursor-pointer border",
                         "h-20 flex flex-col items-center justify-center"
@@ -140,12 +140,17 @@ export function HeatmapClient() {
                         {stock.changePercent >= 0 ? "+" : ""}{stock.changePercent.toFixed(1)}%
                       </span>
                     </div>
-                  </TooltipProvider>
-                </Link>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {stock.ticker}: {stock.changePercent >= 0 ? "+" : ""}
+                    {stock.changePercent.toFixed(2)}%
+                  </TooltipContent>
+                </Tooltip>
               ))}
           </div>
         </div>
       ))}
+      </TooltipProvider>
     </div>
   );
 }

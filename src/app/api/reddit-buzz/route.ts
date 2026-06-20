@@ -36,19 +36,6 @@ function extractTickers(text: string): string[] {
   )];
 }
 
-const BULLISH_WORDS = ["bullish", "moon", "rocket", "buy", "long", "green", "growth", "beat", "upgrade", "strong"];
-const BEARISH_WORDS = ["bearish", "crash", "dump", "sell", "short", "red", "decline", "miss", "downgrade", "weak"];
-
-function getSentiment(text: string): "bullish" | "bearish" | "neutral" {
-  const lower = text.toLowerCase();
-  let score = 0;
-  BULLISH_WORDS.forEach((w) => { if (lower.includes(w)) score++; });
-  BEARISH_WORDS.forEach((w) => { if (lower.includes(w)) score--; });
-  if (score > 1) return "bullish";
-  if (score < -1) return "bearish";
-  return "neutral";
-}
-
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const subreddits = searchParams.get("subreddits")?.split(",") || SUBREDDITS;
@@ -70,7 +57,7 @@ export async function GET(request: NextRequest) {
       subreddits.map(async (sub) => {
         const res = await fetch(
           `https://www.reddit.com/r/${sub}/hot.json?limit=50`,
-          { headers: { "User-Agent": "StockSage/1.0" }, next: { revalidate: 3600 } }
+          { headers: { "User-Agent": "StockSage/1.0" } }
         );
         if (!res.ok) return [];
         const json = await res.json();

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { fetchEarningsCalendar } from "@/lib/stock-api";
+import { getCachedEarnings } from "@/lib/stock-cache";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -14,12 +15,17 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const events = await fetchEarningsCalendar(from, to);
+    // Cache-first strategy
+    let events = await getCachedEarnings(from, to);
+
+    if (events.length === 0) {
+      events = await fetchEarningsCalendar(from, to);
+    }
 
     // Group by date
     const grouped: Record<string, typeof events> = {};
     events.forEach((e) => {
-      const date = e.reportDate || "Unknown";
+      const date = e.reportDate || "TBD";
       if (!grouped[date]) grouped[date] = [];
       grouped[date].push(e);
     });

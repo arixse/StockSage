@@ -110,19 +110,15 @@ export default async function StockPage({ params }: Props) {
             <div>
               <div className="flex items-center gap-3">
                 <h1 className="text-3xl font-bold">{upperTicker}</h1>
-                {quote && (
-                  <Badge variant={changePositive ? "default" : "destructive"} className="text-sm">
-                    {changePositive ? <TrendingUp className="h-3 w-3 mr-1" /> : <TrendingDown className="h-3 w-3 mr-1" />}
-                    {quote.changePercent.toFixed(2)}%
-                  </Badge>
-                )}
+                <Badge variant={changePositive ? "default" : "destructive"} className="text-sm">
+                  {changePositive ? <TrendingUp className="h-3 w-3 mr-1" /> : <TrendingDown className="h-3 w-3 mr-1" />}
+                  {quote.changePercent.toFixed(2)}%
+                </Badge>
               </div>
-              <p className="text-muted-foreground text-lg mt-1">{upperTicker}</p>
+              <p className="text-muted-foreground text-lg mt-1">{quote.shortName || upperTicker}</p>
             </div>
             <div className="flex items-center gap-3">
-              {quote && (
-                <span className="text-3xl font-bold font-mono">${quote.price.toFixed(2)}</span>
-              )}
+              <span className="text-3xl font-bold font-mono">${quote.price.toFixed(2)}</span>
               <Button variant="outline" size="icon">
                 <Star className="h-4 w-4" />
               </Button>

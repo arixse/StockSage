@@ -106,7 +106,7 @@ export function PositionSizeClient() {
                 min={0.01}
                 step={0.01}
                 value={stopLossPrice}
-                onChange={(e) => setStopLossPrice(Math.max(0, parseFloat(e.target.value) || 0))}
+                onChange={(e) => setStopLossPrice(Math.max(0.01, parseFloat(e.target.value) || 0.01))}
                 className="pl-9 font-mono"
               />
             </div>
