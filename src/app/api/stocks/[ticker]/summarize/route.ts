@@ -14,7 +14,8 @@ export async function POST(
     }
 
     const llmKey = process.env.LLM_API_KEY;
-    const llmBase = process.env.LLM_BASE_URL || "https://api.openai.com/v1";
+    let llmBase = (process.env.LLM_BASE_URL || "https://api.openai.com/v1").trim().replace(/\/+$/, "");
+    if (!llmBase.endsWith("/v1")) llmBase += "/v1";
     const llmModel = process.env.LLM_MODEL || "gpt-4o-mini";
 
     if (!llmKey || llmKey === "sk-...") {
@@ -25,7 +26,7 @@ export async function POST(
     }
 
     const client = new OpenAI({
-      apiKey: llmKey,
+      apiKey: llmKey.trim(),
       baseURL: llmBase,
     });
 

@@ -13,11 +13,15 @@ function getLLMClient(): OpenAI | null {
     log.warn("llm", `LLM_API_KEY=${key ? `"${key.slice(0,8)}..." (placeholder/empty)` : "NOT SET"} — LLM disabled`);
     return null;
   }
-  const base = process.env.LLM_BASE_URL || "https://api.openai.com/v1";
+  // Normalize base URL: strip trailing slash, append /v1 if missing
+  let base = (process.env.LLM_BASE_URL || "https://api.openai.com/v1").trim().replace(/\/+$/, "");
+  if (!base.endsWith("/v1")) {
+    base += "/v1";
+  }
   log.info("llm", `Using ${LLM_MODEL} @ ${base} (key: ${key.slice(0,8)}...)`);
   return new OpenAI({
     apiKey: key.trim(),
-    baseURL: base.trim(),
+    baseURL: base,
   });
 }
 
