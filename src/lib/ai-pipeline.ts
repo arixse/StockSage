@@ -94,7 +94,7 @@ Respond with JSON:
       model: LLM_MODEL,
       messages: [{ role: "user", content: prompt }],
       temperature: 0.3,
-      max_tokens: 600,
+      max_tokens: 1200,
     });
 
     const content = response.choices[0].message.content || "{}";
@@ -155,7 +155,7 @@ Scores: 0-100`;
       model: LLM_MODEL,
       messages: [{ role: "user", content: prompt }],
       temperature: 0.3,
-      max_tokens: 400,
+      max_tokens: 1200,
     });
 
     const content = response.choices[0].message.content || "{}";
