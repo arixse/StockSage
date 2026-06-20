@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -36,6 +36,14 @@ export function NewsTab({ ticker }: { ticker: string }) {
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [genError, setGenError] = useState("");
+  const attemptedRef = useRef(false); // prevent infinite re-trigger
+
+  // Reset attempted flag when ticker changes
+  useEffect(() => {
+    attemptedRef.current = false;
+    setData(null);
+    setGenError("");
+  }, [ticker]);
 
   const loadAnalysis = useCallback(async () => {
     setLoading(true);
@@ -54,15 +62,10 @@ export function NewsTab({ ticker }: { ticker: string }) {
     loadAnalysis();
   }, [loadAnalysis]);
 
-  // Auto-trigger generation when no real analysis exists
-  useEffect(() => {
-    const hasReal = data?.hasAnalysis && (data.summary || data.score);
-    if (!loading && !hasReal && !generating) {
-      generateAnalysis();
-    }
-  }, [loading, data]);
+  const generateAnalysis = useCallback(async () => {
+    if (attemptedRef.current) return; // already tried
+    attemptedRef.current = true;
 
-  const generateAnalysis = async () => {
     setGenerating(true);
     setGenError("");
     try {
@@ -73,14 +76,24 @@ export function NewsTab({ ticker }: { ticker: string }) {
       if (json.data) {
         setData(json.data);
       } else {
-        setGenError(json.error || "Generation failed");
+        setGenError(json.data?.message || json.error || "Generation failed");
       }
     } catch (e) {
       setGenError(String(e));
     } finally {
       setGenerating(false);
     }
-  };
+  }, [ticker]);
+
+  // Auto-trigger generation when no real analysis exists
+  useEffect(() => {
+    const hasReal = data?.hasAnalysis && (data.summary || data.score);
+    if (!loading && !hasReal && !generating && !attemptedRef.current) {
+      generateAnalysis();
+    }
+  }, [loading, data, generating, generateAnalysis]);
+
+  // ─── Render ──────────────────────────────────────────────────────────
 
   // Loading skeleton
   if (loading) {
@@ -138,7 +151,7 @@ export function NewsTab({ ticker }: { ticker: string }) {
           </p>
           <Button
             variant="outline"
-            onClick={generateAnalysis}
+            onClick={() => { attemptedRef.current = false; generateAnalysis(); }}
             disabled={generating}
           >
             <Sparkles className="h-4 w-4 mr-2" />
