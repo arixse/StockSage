@@ -727,3 +727,43 @@ async function alphaCompanyOverview(ticker: string): Promise<CompanyOverview | n
     return null;
   }
 }
+
+// --------------- Earnings Calendar ---------------
+
+export interface EarningsEventApi {
+  ticker: string;
+  companyName?: string;
+  reportDate: string;
+  fiscalDateEnding?: string;
+  estimateEps?: number;
+  actualEps?: number;
+  surprisePercent?: number;
+  marketCap?: number;
+}
+
+export async function fetchEarningsCalendar(from: string, to: string): Promise<EarningsEventApi[]> {
+  const apiKey = process.env.FINNHUB_API_KEY;
+  if (apiKey) {
+    try {
+      const url = `https://finnhub.io/api/v1/calendar/earnings?from=${from}&to=${to}&token=${apiKey}`;
+      const res = await fetch(url, { next: { revalidate: 3600 } });
+      if (res.ok) {
+        const json = await res.json();
+        const earningList = json?.earningsCalendar || json || [];
+        if (Array.isArray(earningList)) {
+          return earningList.slice(0, 100).map((e: Record<string, unknown>) => ({
+            ticker: String(e.symbol || e.ticker || ""),
+            companyName: e.name as string | undefined,
+            reportDate: String(e.date || e.reportDate || ""),
+            fiscalDateEnding: e.fiscalDateEnding as string | undefined,
+            estimateEps: e.epsEstimate != null ? parseFloat(String(e.epsEstimate)) : undefined,
+            actualEps: e.epsActual != null ? parseFloat(String(e.epsActual)) : undefined,
+            surprisePercent: e.surprisePercent != null ? parseFloat(String(e.surprisePercent)) : undefined,
+            marketCap: e.marketCap ? parseFloat(String(e.marketCap)) * 1e6 : undefined,
+          }));
+        }
+      }
+    } catch { /* fall through */ }
+  }
+  return [];
+}

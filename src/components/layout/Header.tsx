@@ -38,7 +38,11 @@ export function Header() {
     pathname.startsWith("/portfolio") ||
     pathname.startsWith("/screener") ||
     pathname.startsWith("/settings") ||
-    pathname.startsWith("/newsletter");
+    pathname.startsWith("/newsletter") ||
+    pathname.startsWith("/position-size-calculator") ||
+    pathname.startsWith("/earnings") ||
+    pathname.startsWith("/reddit-buzz") ||
+    pathname.startsWith("/premarket");
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -54,8 +58,20 @@ export function Header() {
               <Link href="/stock/AAPL" className="text-muted-foreground hover:text-foreground transition-colors">
                 Stocks
               </Link>
+              <Link href="/compare" className="text-muted-foreground hover:text-foreground transition-colors">
+                Compare
+              </Link>
+              <Link href="/heat" className="text-muted-foreground hover:text-foreground transition-colors">
+                Heatmap
+              </Link>
+              <Link href="/learn" className="text-muted-foreground hover:text-foreground transition-colors">
+                Learn
+              </Link>
               <Link href="/pricing" className="text-muted-foreground hover:text-foreground transition-colors">
                 Pricing
+              </Link>
+              <Link href="/about" className="text-muted-foreground hover:text-foreground transition-colors">
+                About
               </Link>
             </nav>
           )}

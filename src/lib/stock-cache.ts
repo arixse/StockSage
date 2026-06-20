@@ -246,3 +246,66 @@ export async function getLatestPriceDate(
 
   return data?.[0]?.trade_date || null;
 }
+
+// --------------- Earnings Cache ---------------
+
+import type { EarningsEventApi } from "./stock-api";
+
+export async function getCachedEarnings(
+  from: string,
+  to: string
+): Promise<EarningsEventApi[]> {
+  const { createClient } = await import("@/lib/supabase/server");
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("earnings_calendar")
+    .select("*")
+    .gte("report_date", from)
+    .lte("report_date", to)
+    .order("report_date", { ascending: true })
+    .limit(200);
+
+  if (error || !data) return [];
+  return data.map((row: Record<string, unknown>) => ({
+    ticker: String(row.ticker || ""),
+    companyName: row.company_name as string | undefined,
+    reportDate: String(row.report_date || ""),
+    fiscalDateEnding: row.fiscal_date_ending as string | undefined,
+    estimateEps: row.estimate_eps != null ? parseFloat(String(row.estimate_eps)) : undefined,
+    actualEps: row.actual_eps != null ? parseFloat(String(row.actual_eps)) : undefined,
+    surprisePercent: row.surprise_percent != null ? parseFloat(String(row.surprise_percent)) : undefined,
+    marketCap: row.market_cap != null ? parseFloat(String(row.market_cap)) : undefined,
+  }));
+}
+
+export async function upsertEarnings(
+  admin: SupabaseClient,
+  events: EarningsEventApi[]
+): Promise<number> {
+  if (!events.length) return 0;
+  try {
+    const rows = events.map((e) => ({
+      ticker: e.ticker,
+      company_name: e.companyName || null,
+      report_date: e.reportDate,
+      fiscal_date_ending: e.fiscalDateEnding || null,
+      estimate_eps: e.estimateEps ?? null,
+      actual_eps: e.actualEps ?? null,
+      surprise_percent: e.surprisePercent ?? null,
+      market_cap: e.marketCap ?? null,
+    }));
+
+    const { error } = await admin
+      .from("earnings_calendar")
+      .upsert(rows, { onConflict: "ticker,report_date" });
+
+    if (error) {
+      console.error("[stock-cache] upsertEarnings error:", error);
+      return 0;
+    }
+    return rows.length;
+  } catch (error) {
+    console.error("[stock-cache] upsertEarnings error:", error);
+    return 0;
+  }
+}

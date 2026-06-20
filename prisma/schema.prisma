@@ -173,3 +173,20 @@ model EmailLog {
 
   @@map("email_logs")
 }
+
+model EarningsEvent {
+  id              BigInt   @id @default(autoincrement())
+  ticker          String
+  companyName     String?  @map("company_name")
+  reportDate      DateTime @map("report_date") @db.Date
+  fiscalDateEnd   DateTime? @map("fiscal_date_ending") @db.Date
+  estimateEps     Decimal? @map("estimate_eps") @db.Decimal(10, 4)
+  actualEps       Decimal? @map("actual_eps") @db.Decimal(10, 4)
+  surprisePercent Decimal? @map("surprise_percent") @db.Decimal(10, 4)
+  marketCap       BigInt?  @map("market_cap")
+  fetchedAt       DateTime @default(now()) @map("fetched_at")
+
+  @@unique([ticker, reportDate])
+  @@index([reportDate])
+  @@map("earnings_calendar")
+}

@@ -4,7 +4,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, BarChart3, Sparkles, Mail, ArrowRight, CheckCircle2 } from "lucide-react";
+import { TrendingUp, BarChart3, Sparkles, Mail, ArrowRight, CheckCircle2, Search, Flame, Calculator, GraduationCap } from "lucide-react";
 import { getCachedQuotes } from "@/lib/stock-cache";
 import { fetchStockQuotes } from "@/lib/stock-api";
 
@@ -144,6 +144,58 @@ export default async function HomePage() {
           </div>
         </section>
 
+        {/* Explore Tools */}
+        <section className="py-20 bg-muted/30">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold mb-4">Explore Our Tools</h2>
+              <p className="text-muted-foreground max-w-xl mx-auto">
+                Beyond AI analysis — a full suite of tools to research, compare, and size up every investment.
+              </p>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+              {[
+                {
+                  icon: Search,
+                  title: "Compare Stocks",
+                  description: "Compare up to 5 stocks side by side — prices, fundamentals, technicals, and AI scores.",
+                  href: "/compare",
+                },
+                {
+                  icon: Flame,
+                  title: "Market Heatmap",
+                  description: "Visualize S&P 500 market breadth with a live treemap colored by daily performance.",
+                  href: "/heat",
+                },
+                {
+                  icon: Calculator,
+                  title: "Position Calculator",
+                  description: "Calculate optimal position size based on your portfolio value and risk tolerance.",
+                  href: "/position-size-calculator",
+                },
+                {
+                  icon: GraduationCap,
+                  title: "Learning Center",
+                  description: "Free articles on portfolio building, market cycles, compound interest, and more.",
+                  href: "/learn",
+                },
+              ].map((tool) => (
+                <Link key={tool.href} href={tool.href}>
+                  <Card className="h-full border-muted hover:border-primary/30 hover:shadow-md transition-all cursor-pointer">
+                    <CardHeader>
+                      <tool.icon className="h-10 w-10 text-primary mb-2" />
+                      <CardTitle className="text-lg">{tool.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <CardDescription className="text-sm">{tool.description}</CardDescription>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* Pricing Preview */}
         <section className="py-20 bg-muted/30">
           <div className="container mx-auto px-4 text-center">
@@ -175,6 +227,20 @@ export default async function HomePage() {
             </div>
             <Button variant="outline" render={<Link href="/pricing" />}>
               View Full Pricing
+            </Button>
+          </div>
+        </section>
+
+        {/* Learn CTA */}
+        <section className="py-16 border-t">
+          <div className="container mx-auto px-4 max-w-2xl text-center">
+            <h3 className="text-xl font-bold mb-2">New to Investing?</h3>
+            <p className="text-muted-foreground mb-4">
+              Visit our free Learning Center for guides on portfolio building, market cycles, value investing, and more.
+            </p>
+            <Button variant="outline" render={<Link href="/learn" />}>
+              <GraduationCap className="h-4 w-4 mr-2" />
+              Browse Learning Center
             </Button>
           </div>
         </section>
