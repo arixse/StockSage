@@ -9,10 +9,15 @@ const log = createLogger("ai-pipeline");
 
 function getLLMClient(): OpenAI | null {
   const key = process.env.LLM_API_KEY;
-  if (!key || key === "sk-...") return null;
+  if (!key || key === "sk-...") {
+    log.warn("llm", `LLM_API_KEY=${key ? `"${key.slice(0,8)}..." (placeholder/empty)` : "NOT SET"} — LLM disabled`);
+    return null;
+  }
+  const base = process.env.LLM_BASE_URL || "https://api.openai.com/v1";
+  log.info("llm", `Using ${LLM_MODEL} @ ${base} (key: ${key.slice(0,8)}...)`);
   return new OpenAI({
-    apiKey: key,
-    baseURL: process.env.LLM_BASE_URL || "https://api.openai.com/v1",
+    apiKey: key.trim(),
+    baseURL: base.trim(),
   });
 }
 
@@ -30,17 +35,18 @@ interface NewsArticle {
 
 async function fetchNewsForTicker(ticker: string): Promise<NewsArticle[]> {
   const key = process.env.FINNHUB_API_KEY;
-  if (!key) { log.warn("news", `${ticker}: no Finnhub key`); return []; }
+  if (!key) { log.warn("news", `${ticker}: FINNHUB_API_KEY NOT SET`); return []; }
 
   try {
     const to = new Date().toISOString().split("T")[0];
     const from = new Date(Date.now() - 7 * 86400000).toISOString().split("T")[0];
     const url = `https://finnhub.io/api/v1/company-news?symbol=${ticker}&from=${from}&to=${to}&token=${key}`;
     const res = await fetch(url);
-    if (!res.ok) return [];
+    if (!res.ok) { log.warn("news", `${ticker}: Finnhub HTTP ${res.status}`); return []; }
     const data = await res.json();
-    if (!Array.isArray(data)) return [];
+    if (!Array.isArray(data)) { log.warn("news", `${ticker}: Finnhub returned non-array`); return []; }
 
+    log.info("news", `${ticker}: ${Math.min(data.length, 10)} articles fetched`);
     return data.slice(0, 10).map((item: any) => ({
       title: item.headline || "",
       url: item.url || "",
