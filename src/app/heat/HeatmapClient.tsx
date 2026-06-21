@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
+import { StockLogo } from "@/components/stock/StockLogo";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
@@ -125,18 +126,19 @@ export function HeatmapClient() {
                   <TooltipTrigger render={<Link href={`/stock/${stock.ticker}`} />}>
                     <div
                       className={cn(
-                        "rounded-lg p-2 text-center transition-transform hover:scale-105 hover:z-10 cursor-pointer border",
-                        "h-20 flex flex-col items-center justify-center"
+                        "rounded-lg p-1.5 text-center transition-transform hover:scale-105 hover:z-10 cursor-pointer border",
+                        "h-20 flex flex-col items-center justify-center gap-0.5"
                       )}
                       style={{
                         backgroundColor: getColor(stock.changePercent),
                         opacity: 0.85 + Math.min(0.15, Math.abs(stock.changePercent) / 10),
                       }}
                     >
+                      <StockLogo ticker={stock.ticker} size="sm" />
                       <span className="text-[10px] font-bold leading-tight truncate w-full">
                         {stock.ticker}
                       </span>
-                      <span className={cn("text-[11px] font-mono font-medium", stock.changePercent >= 0 ? "text-green-900" : "text-red-900")}>
+                      <span className={cn("text-[9px] font-mono font-medium", stock.changePercent >= 0 ? "text-green-900" : "text-red-900")}>
                         {stock.changePercent >= 0 ? "+" : ""}{stock.changePercent.toFixed(1)}%
                       </span>
                     </div>
