@@ -40,12 +40,23 @@ export function RegisterForm() {
     }
 
     // Auto sign-in after registration (if email confirmation is disabled)
-    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+    const { error: signInError, data: signInData } = await supabase.auth.signInWithPassword({ email, password });
 
     if (signInError) {
       // Email confirmation may be required
       router.push("/login?message=Check your email to confirm your account");
     } else {
+      // Create default email preferences (daily_digest on by default)
+      if (signInData.user) {
+        try {
+          await supabase.from("email_preferences").upsert(
+            { user_id: signInData.user.id, daily_digest: true },
+            { onConflict: "user_id" }
+          );
+        } catch {
+          // Non-critical — user can enable later in newsletter settings
+        }
+      }
       router.push("/dashboard");
       router.refresh();
     }
