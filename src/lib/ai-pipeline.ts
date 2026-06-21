@@ -112,7 +112,11 @@ Respond with JSON:
       confidence: result.confidence || 0.5,
     };
   } catch (e) {
-    console.error(`AI summarize failed for ${ticker}:`, e);
+    const errMsg = e instanceof Error ? `${e.name}: ${e.message}` : String(e);
+    console.error(`AI summarize failed for ${ticker}:`, errMsg);
+    // Log response details if available
+    if (e && typeof e === "object" && "status" in e) console.error(`  status=${(e as any).status}`);
+    if (e && typeof e === "object" && "response" in e) console.error(`  response=${JSON.stringify((e as any).response).slice(0, 500)}`);
     return null;
   }
 }
@@ -175,7 +179,8 @@ Scores: 0-100`;
       scoreSummary: result.scoreSummary || "",
     };
   } catch (e) {
-    console.error(`AI score failed for ${ticker}:`, e);
+    const errMsg = e instanceof Error ? `${e.name}: ${e.message}` : String(e);
+    console.error(`AI score failed for ${ticker}:`, errMsg);
     return null;
   }
 }

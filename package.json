@@ -12,6 +12,7 @@
     "@base-ui/react": "^1.6.0",
     "@prisma/client": "^7.8.0",
     "@react-email/components": "^1.0.11",
+    "@react-email/render": "^2.0.9",
     "@stripe/stripe-js": "^9.8.0",
     "@supabase/ssr": "^0.12.0",
     "@supabase/supabase-js": "^2.108.2",

@@ -156,13 +156,19 @@ export async function sendDailyDigests(): Promise<{
       // Replace template variable with actual URL
       const result = await sendEmail(user.email, `📈 Daily Stock Briefing — ${today}`, emailHtml);
 
+      const errorMsg = result.success
+        ? null
+        : typeof result.error === "object"
+          ? JSON.stringify(result.error)
+          : String(result.error);
+
       // Log to email_logs
       await admin.from("email_logs").insert({
         user_id: user.userId,
         email_type: "daily_digest",
         status: result.success ? "sent" : "failed",
         resend_id: result.id || null,
-        error_message: result.success ? null : String(result.error),
+        error_message: errorMsg,
       });
 
       if (result.success) {
@@ -170,8 +176,8 @@ export async function sendDailyDigests(): Promise<{
         log.debug("send", `✓ ${user.email} (${stocks.length} stocks)`);
       } else {
         failed++;
-        errors.push(`${user.email}: ${result.error}`);
-        log.warn("send", `✗ ${user.email}: ${result.error}`);
+        errors.push(`${user.email}: ${errorMsg}`);
+        log.warn("send", `✗ ${user.email}: ${errorMsg}`);
       }
     } catch (e) {
       failed++;
