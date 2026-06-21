@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, BarChart3, Sparkles, Mail, ArrowRight, CheckCircle2, Search, Flame, Calculator, GraduationCap } from "lucide-react";
+import { StockLogo } from "@/components/stock/StockLogo";
 import { getCachedQuotes } from "@/lib/stock-cache";
 import { fetchStockQuotes } from "@/lib/stock-api";
 
@@ -94,6 +95,7 @@ export default async function HomePage() {
                       href={`/stock/${ticker}`}
                       className="flex items-center gap-2 text-sm whitespace-nowrap hover:text-primary transition-colors"
                     >
+                      <StockLogo ticker={ticker} size="sm" />
                       <span className="font-medium">{ticker}</span>
                       <span className="text-muted-foreground">—</span>
                     </Link>
@@ -106,6 +108,7 @@ export default async function HomePage() {
                     href={`/stock/${quote.ticker}`}
                     className="flex items-center gap-2 text-sm whitespace-nowrap hover:text-primary transition-colors"
                   >
+                    <StockLogo ticker={quote.ticker} size="sm" />
                     <span className="font-medium">{quote.ticker}</span>
                     <span className="text-muted-foreground">{quote.shortName}</span>
                     <span className="font-mono">${quote.price.toFixed(2)}</span>

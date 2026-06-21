@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { TrendingUp, TrendingDown, Star, BarChart3, Plus } from "lucide-react";
+import { StockLogo } from "@/components/stock/StockLogo";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { fetchStockQuotes } from "@/lib/stock-api";
@@ -152,11 +153,7 @@ export default async function DashboardPage() {
                           href={`/stock/${stock.ticker}`}
                           className="font-medium hover:text-primary flex items-center gap-2"
                         >
-                          {stock.change >= 0 ? (
-                            <TrendingUp className="h-3.5 w-3.5 text-green-500" />
-                          ) : (
-                            <TrendingDown className="h-3.5 w-3.5 text-red-500" />
-                          )}
+                          <StockLogo ticker={stock.ticker} size="sm" />
                           {stock.ticker}
                         </Link>
                       </td>

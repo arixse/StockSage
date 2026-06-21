@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
+import { StockLogo } from "@/components/stock/StockLogo";
 import { Input } from "@/components/ui/input";
 import {
   CommandDialog,
@@ -87,6 +88,7 @@ export function TickerSearch() {
                 }}
               >
                 <div className="flex items-center gap-2">
+                  <StockLogo ticker={stock.ticker} size="sm" />
                   <span className="font-medium">{stock.ticker}</span>
                   <span className="text-sm text-muted-foreground">{stock.name}</span>
                 </div>

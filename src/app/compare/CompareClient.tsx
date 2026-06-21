@@ -9,6 +9,7 @@ import { MetricBadge } from "@/components/shared/MetricBadge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { Search, X, ArrowRight, BarChart3, Sparkles } from "lucide-react";
+import { StockLogo } from "@/components/stock/StockLogo";
 import { cn, formatPrice, formatPercent, formatMarketCap } from "@/lib/utils";
 import Link from "next/link";
 
@@ -201,7 +202,10 @@ export function CompareClient() {
                   {results.map((r) => (
                     <th key={r.ticker} className="px-4 py-3 text-center font-medium">
                       <Link href={`/stock/${r.ticker}`} className="hover:text-primary transition-colors">
-                        {r.ticker}
+                        <div className="flex flex-col items-center gap-2">
+                          <StockLogo ticker={r.ticker} size="lg" />
+                          <span>{r.ticker}</span>
+                        </div>
                       </Link>
                       {r.company?.companyName && (
                         <p className="text-xs text-muted-foreground font-normal mt-0.5 truncate max-w-[120px] mx-auto">

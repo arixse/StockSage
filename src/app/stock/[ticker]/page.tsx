@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { NewsTab } from "@/components/news/NewsTab";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Star, TrendingUp, TrendingDown, Newspaper } from "lucide-react";
+import { StockLogo } from "@/components/stock/StockLogo";
 import Link from "next/link";
 import { fetchStockQuote } from "@/lib/stock-api";
 import { getCachedQuotes } from "@/lib/stock-cache";
@@ -109,6 +110,7 @@ export default async function StockPage({ params }: Props) {
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-3">
+                <StockLogo ticker={upperTicker} size="xl" />
                 <h1 className="text-3xl font-bold">{upperTicker}</h1>
                 <Badge variant={changePositive ? "default" : "destructive"} className="text-sm">
                   {changePositive ? <TrendingUp className="h-3 w-3 mr-1" /> : <TrendingDown className="h-3 w-3 mr-1" />}
