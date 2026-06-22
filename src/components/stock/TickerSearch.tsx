@@ -49,13 +49,29 @@ export function TickerSearch() {
       setResults(POPULAR_TICKERS);
       return;
     }
-    // Simple client-side filter on popular tickers
-    const filtered = POPULAR_TICKERS.filter(
-      (s) =>
-        s.ticker.toLowerCase().includes(query.toLowerCase()) ||
-        s.name.toLowerCase().includes(query.toLowerCase())
-    );
-    setResults(filtered.slice(0, 10));
+    // Call real stock search API
+    try {
+      const res = await fetch(`/api/stocks?q=${encodeURIComponent(query)}`);
+      const json = await res.json();
+      if (json.data && Array.isArray(json.data)) {
+        setResults(
+          json.data.map((s: { ticker: string; companyName: string }) => ({
+            ticker: s.ticker,
+            name: s.companyName || s.ticker,
+          }))
+        );
+      } else {
+        setResults([]);
+      }
+    } catch {
+      // Fallback to client-side filter
+      const filtered = POPULAR_TICKERS.filter(
+        (s) =>
+          s.ticker.toLowerCase().includes(query.toLowerCase()) ||
+          s.name.toLowerCase().includes(query.toLowerCase())
+      );
+      setResults(filtered.slice(0, 10));
+    }
   };
 
   return (

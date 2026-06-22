@@ -12,6 +12,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
@@ -22,7 +23,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { Star, Plus, TrendingUp, TrendingDown, X, Loader2, Search } from "lucide-react";
+import { Star, Plus, TrendingUp, TrendingDown, X, Loader2, Search, Crown, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 
 const POPULAR_TICKERS = [
@@ -68,19 +69,49 @@ export function WatchlistClient({ watchlistId, initialStocks }: Props) {
   const [stocks, setStocks] = useState<StockItem[]>(initialStocks);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState(POPULAR_TICKERS);
+  const [searching, setSearching] = useState(false);
   const [adding, setAdding] = useState<string | null>(null);
   const [removing, setRemoving] = useState<string | null>(null);
+  const [tierDialog, setTierDialog] = useState<{ open: boolean; message: string; tier: string; limit: number }>({
+    open: false,
+    message: "",
+    tier: "free",
+    limit: 5,
+  });
 
-  const filteredTickers = searchQuery.length > 0
-    ? POPULAR_TICKERS.filter(
-        (s) =>
-          s.ticker.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          s.name.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : POPULAR_TICKERS;
+  const handleSearch = async (query: string) => {
+    setSearchQuery(query);
+    if (query.length < 1) {
+      setSearchResults(POPULAR_TICKERS);
+      return;
+    }
+    setSearching(true);
+    try {
+      const res = await fetch(`/api/stocks?q=${encodeURIComponent(query)}`);
+      const json = await res.json();
+      if (json.data && Array.isArray(json.data)) {
+        setSearchResults(
+          json.data.map((s: { ticker: string; companyName: string }) => ({
+            ticker: s.ticker,
+            name: s.companyName || s.ticker,
+          }))
+        );
+      }
+    } catch {
+      // Fallback to client-side filter
+      setSearchResults(
+        POPULAR_TICKERS.filter(
+          (s) =>
+            s.ticker.toLowerCase().includes(query.toLowerCase()) ||
+            s.name.toLowerCase().includes(query.toLowerCase())
+        )
+      );
+    }
+    setSearching(false);
+  };
 
-  // Filter out already-added tickers
-  const availableTickers = filteredTickers.filter(
+  const filteredTickers = searchResults.filter(
     (s) => !stocks.find((existing) => existing.ticker === s.ticker)
   );
 
@@ -114,6 +145,19 @@ export function WatchlistClient({ watchlistId, initialStocks }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ticker }),
       });
+
+      if (res.status === 402) {
+        // Tier limit reached
+        const body = await res.json();
+        setTierDialog({
+          open: true,
+          message: body.error || "Tier limit reached",
+          tier: body.tier || "free",
+          limit: body.limit || 5,
+        });
+        return;
+      }
+
       if (!res.ok) throw new Error("Failed to add stock");
 
       // Add optimistically
@@ -174,12 +218,12 @@ export function WatchlistClient({ watchlistId, initialStocks }: Props) {
               <CommandInput
                 placeholder="Search by ticker or name..."
                 value={searchQuery}
-                onValueChange={setSearchQuery}
+                onValueChange={handleSearch}
               />
               <CommandList>
-                <CommandEmpty>No stocks found.</CommandEmpty>
+                <CommandEmpty>{searching ? "Searching..." : "No stocks found."}</CommandEmpty>
                 <CommandGroup heading="US Stocks">
-                  {availableTickers.slice(0, 15).map((stock) => (
+                  {filteredTickers.slice(0, 15).map((stock) => (
                     <CommandItem
                       key={stock.ticker}
                       onSelect={() => {
@@ -274,7 +318,8 @@ export function WatchlistClient({ watchlistId, initialStocks }: Props) {
                           <span className="text-muted-foreground">—</span>
                         ) : (
                           <Badge
-                            variant={stock.changePercent >= 0 ? "default" : "destructive"}
+                            className={stock.changePercent >= 0 ? "bg-green-500/15 text-green-600 hover:bg-green-500/20" : ""}
+                            variant={stock.changePercent >= 0 ? "outline" : "destructive"}
                           >
                             {stock.changePercent >= 0 ? "+" : ""}
                             {stock.changePercent.toFixed(2)}%
@@ -304,6 +349,44 @@ export function WatchlistClient({ watchlistId, initialStocks }: Props) {
           )}
         </CardContent>
       </Card>
+
+      {/* Tier Limit Upgrade Dialog */}
+      <Dialog open={tierDialog.open} onOpenChange={(v) => setTierDialog((prev) => ({ ...prev, open: v }))}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Crown className="h-5 w-5 text-amber-500" />
+              {tierDialog.tier === "free" ? "Free Tier Limit Reached" : "Tier Limit Reached"}
+            </DialogTitle>
+            <DialogDescription className="pt-2">
+              {tierDialog.message}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="bg-muted/50 rounded-lg p-4 text-sm">
+              <p className="font-medium mb-2">
+                {tierDialog.tier === "free"
+                  ? "🔓 Free: 5 stocks · Weekly AI summary"
+                  : "Upgrade for more capacity"}
+              </p>
+              <ul className="space-y-1 text-muted-foreground text-xs">
+                <li className="flex items-center gap-1"><span className="text-green-500">✓</span> Basic ($9.99/mo): 50 stocks, daily AI</li>
+                <li className="flex items-center gap-1"><span className="text-green-500">✓</span> Pro ($29.99/mo): Unlimited, real-time data</li>
+              </ul>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" className="flex-1" onClick={() => setTierDialog((prev) => ({ ...prev, open: false }))}>
+                Maybe Later
+              </Button>
+              <Button className="flex-1" render={<Link href="/pricing" />}>
+                <Crown className="h-4 w-4 mr-1" />
+                Upgrade Now
+                <ArrowRight className="h-4 w-4 ml-1" />
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

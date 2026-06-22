@@ -172,7 +172,10 @@ export default async function DashboardPage() {
                         {stock.change >= 0 ? "+" : ""}{stock.change.toFixed(2)}
                       </td>
                       <td className="py-3 text-right">
-                        <Badge variant={stock.changePercent >= 0 ? "default" : "destructive"}>
+                        <Badge
+                          className={stock.changePercent >= 0 ? "bg-green-500/15 text-green-600 hover:bg-green-500/20" : ""}
+                          variant={stock.changePercent >= 0 ? "outline" : "destructive"}
+                        >
                           {stock.changePercent >= 0 ? "+" : ""}{stock.changePercent.toFixed(2)}%
                         </Badge>
                       </td>
