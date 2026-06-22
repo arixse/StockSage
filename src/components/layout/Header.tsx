@@ -13,18 +13,30 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { TickerSearch } from "@/components/stock/TickerSearch";
+import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
-import { TrendingUp } from "lucide-react";
+import { TrendingUp, Crown } from "lucide-react";
 
 export function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const [user, setUser] = useState<User | null>(null);
+  const [tier, setTier] = useState<string>("free");
   const supabase = createClient();
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+    supabase.auth.getUser().then(async ({ data }) => {
+      setUser(data.user);
+      if (data.user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("tier")
+          .eq("id", data.user.id)
+          .single();
+        if (profile?.tier) setTier(profile.tier);
+      }
+    });
   }, []);
 
   const handleSignOut = async () => {
@@ -101,6 +113,13 @@ export function Header() {
                 <div className="flex items-center justify-start gap-2 p-2">
                   <div className="flex flex-col space-y-0.5">
                     <p className="text-sm font-medium">{user.email}</p>
+                    <Badge
+                      variant={tier === "pro" ? "default" : tier === "basic" ? "secondary" : "outline"}
+                      className="text-xs w-fit"
+                    >
+                      {tier === "pro" && <Crown className="h-3 w-3 mr-1" />}
+                      {tier.charAt(0).toUpperCase() + tier.slice(1)}
+                    </Badge>
                   </div>
                 </div>
                 <DropdownMenuSeparator />

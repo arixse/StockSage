@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { syncTrackedTickers } from "@/lib/ticker-sync";
+import { getTierConfig } from "@/lib/tiers";
 
 // POST — Add a stock to the watchlist
 export async function POST(
@@ -28,6 +29,33 @@ export async function POST(
 
   if (!watchlist) {
     return NextResponse.json({ error: "Watchlist not found" }, { status: 404 });
+  }
+
+  // ── Tier limit enforcement ──
+  // Get user tier and current stock count
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("tier")
+    .eq("id", user.id)
+    .single();
+
+  const tierConfig = getTierConfig(profile?.tier || "free");
+
+  const { count } = await supabase
+    .from("watchlist_items")
+    .select("*", { count: "exact", head: true })
+    .eq("watchlist_id", watchlistId);
+
+  if (count !== null && count >= tierConfig.limits.watchlistStocks) {
+    return NextResponse.json(
+      {
+        error: `Tier limit reached: ${tierConfig.label} allows ${tierConfig.limits.watchlistStocks} stocks. Upgrade to add more.`,
+        limit: tierConfig.limits.watchlistStocks,
+        current: count,
+        tier: tierConfig.name,
+      },
+      { status: 402 }
+    );
   }
 
   const { data, error } = await supabase
