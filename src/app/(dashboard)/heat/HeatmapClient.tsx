@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { StockLogo } from "@/components/stock/StockLogo";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -111,7 +111,6 @@ export function HeatmapClient() {
         <span>+3%</span>
       </div>
 
-      <TooltipProvider>
       {grouped.map(([group, groupStocks]) => (
         <div key={group}>
           <h3 className="text-sm font-semibold mb-2 text-muted-foreground">
@@ -152,7 +151,6 @@ export function HeatmapClient() {
           </div>
         </div>
       ))}
-      </TooltipProvider>
     </div>
   );
 }

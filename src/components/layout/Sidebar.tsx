@@ -10,7 +10,6 @@ import {
   Mail,
   ChevronLeft,
   Flame,
-  GraduationCap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -23,10 +22,6 @@ const coreItems = [
 
 const marketItems = [
   { href: "/heat", label: "Heatmap", icon: Flame },
-];
-
-const learnItems = [
-  { href: "/learn", label: "Learn", icon: GraduationCap },
 ];
 
 const settingsItems = [
@@ -92,14 +87,6 @@ export function Sidebar() {
         </div>
 
         <Separator />
-
-        {/* Learn */}
-        <div className="space-y-1">
-          {!collapsed && <p className="px-3 text-xs font-medium text-muted-foreground/60">Learn</p>}
-          {learnItems.map((item) => (
-            <NavItem key={item.href} {...item} />
-          ))}
-        </div>
 
         {/* Spacer */}
         <div className="flex-1" />
