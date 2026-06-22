@@ -47,23 +47,18 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Tools */}
+          {/* Market */}
           <div>
-            <h4 className="font-medium text-sm mb-3">Tools</h4>
+            <h4 className="font-medium text-sm mb-3">Market</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>
-                <Link href="/compare" className="hover:text-foreground transition-colors">
-                  Compare Stocks
-                </Link>
-              </li>
               <li>
                 <Link href="/heat" className="hover:text-foreground transition-colors">
                   Market Heatmap
                 </Link>
               </li>
               <li>
-                <Link href="/position-size-calculator" className="hover:text-foreground transition-colors">
-                  Position Size Calculator
+                <Link href="/compare" className="hover:text-foreground transition-colors">
+                  Compare Stocks
                 </Link>
               </li>
               <li>

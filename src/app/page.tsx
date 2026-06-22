@@ -4,7 +4,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, BarChart3, Sparkles, Mail, ArrowRight, CheckCircle2, Search, Flame, Calculator, GraduationCap } from "lucide-react";
+import { TrendingUp, BarChart3, Sparkles, Mail, ArrowRight, CheckCircle2, Flame, GraduationCap } from "lucide-react";
 import { StockLogo } from "@/components/stock/StockLogo";
 import { getCachedQuotes } from "@/lib/stock-cache";
 import { fetchStockQuotes } from "@/lib/stock-api";
@@ -147,34 +147,22 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* Explore Tools */}
+        {/* Market Tools */}
         <section className="py-20 bg-muted/30">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4">Explore Our Tools</h2>
+              <h2 className="text-3xl font-bold mb-4">Market at a Glance</h2>
               <p className="text-muted-foreground max-w-xl mx-auto">
-                Beyond AI analysis — a full suite of tools to research, compare, and size up every investment.
+                Visualize the market and build your investing knowledge.
               </p>
             </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
               {[
-                {
-                  icon: Search,
-                  title: "Compare Stocks",
-                  description: "Compare up to 5 stocks side by side — prices, fundamentals, technicals, and AI scores.",
-                  href: "/compare",
-                },
                 {
                   icon: Flame,
                   title: "Market Heatmap",
                   description: "Visualize S&P 500 market breadth with a live treemap colored by daily performance.",
                   href: "/heat",
-                },
-                {
-                  icon: Calculator,
-                  title: "Position Calculator",
-                  description: "Calculate optimal position size based on your portfolio value and risk tolerance.",
-                  href: "/position-size-calculator",
                 },
                 {
                   icon: GraduationCap,
