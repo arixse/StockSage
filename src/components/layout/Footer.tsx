@@ -57,11 +57,6 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/compare" className="hover:text-foreground transition-colors">
-                  Compare Stocks
-                </Link>
-              </li>
-              <li>
                 <Link href="/pricing" className="hover:text-foreground transition-colors">
                   Pricing
                 </Link>
