@@ -1,6 +1,16 @@
 import type { MetadataRoute } from "next";
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+// Resolve production URL: env var → Vercel system → localhost
+function getBaseUrl(): string {
+  if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL;
+  // Vercel production domain (e.g. stocksage.xyz)
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  // Vercel preview/deploy URL
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return "http://localhost:3000";
+}
+
+const BASE_URL = getBaseUrl();
 
 // Top US stocks for sitemap coverage
 const TOP_STOCKS = [
