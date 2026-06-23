@@ -194,9 +194,8 @@ export default async function HomePage() {
             <p className="text-muted-foreground mb-8">Start free, upgrade when you need more.</p>
             <div className="flex flex-wrap justify-center gap-4 mb-8">
               {[
-                { tier: "Free", price: "$0", features: ["5 stocks", "K-line charts", "Weekly AI summary"] },
-                { tier: "Basic", price: "$9.99/mo", features: ["50 stocks", "All indicators", "Daily AI summary"] },
-                { tier: "Pro", price: "$29.99/mo", features: ["Unlimited stocks", "Real-time data", "AI + Alerts"] },
+                { tier: "Free", price: "$0", features: ["5 stocks watchlist", "AI summaries & scoring", "K-line charts", "Weekly email digest"] },
+                { tier: "Pro", price: "$29.99/mo", features: ["Unlimited stocks", "Real-time data", "Unlimited AI analysis", "Daily email + alerts"] },
               ].map((plan) => (
                 <Card key={plan.tier} className="w-64 border-muted">
                   <CardHeader>

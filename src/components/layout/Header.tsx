@@ -79,11 +79,9 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-3">
-          {isDashboard && (
-            <div className="hidden sm:block w-64">
-              <TickerSearch />
-            </div>
-          )}
+          <div className="hidden sm:block w-48 lg:w-64">
+            <TickerSearch />
+          </div>
 
           {user ? (
             <DropdownMenu>

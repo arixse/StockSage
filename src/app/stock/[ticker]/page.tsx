@@ -6,8 +6,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { NewsTab } from "@/components/news/NewsTab";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { Star, TrendingUp, TrendingDown, Newspaper } from "lucide-react";
+import { TrendingUp, TrendingDown, Newspaper } from "lucide-react";
 import { StockLogo } from "@/components/stock/StockLogo";
+import { AddToWatchlistButton } from "@/components/stock/AddToWatchlistButton";
 import Link from "next/link";
 import { fetchStockQuote } from "@/lib/stock-api";
 import { getCachedQuotes } from "@/lib/stock-cache";
@@ -121,9 +122,7 @@ export default async function StockPage({ params }: Props) {
             </div>
             <div className="flex items-center gap-3">
               <span className="text-3xl font-bold font-mono">${quote.price.toFixed(2)}</span>
-              <Button variant="outline" size="icon">
-                <Star className="h-4 w-4" />
-              </Button>
+              <AddToWatchlistButton ticker={upperTicker} />
             </div>
           </div>
 

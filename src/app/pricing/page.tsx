@@ -11,57 +11,37 @@ const TIERS = [
     name: "Free",
     price: "$0",
     period: "forever",
-    description: "Get started with basic stock analysis.",
+    description: "Get started with AI-powered stock analysis.",
     features: [
       "5 stocks in watchlist",
-      "K-line charts (delayed 15 min)",
-      "Moving averages (MA5/10/20)",
       "AI news summaries (3/week)",
-      "AI stock score (weekly)",
+      "AI stock scoring (weekly)",
+      "K-line charts with MACD, RSI, Bollinger Bands",
+      "Market heatmap (delayed 15 min)",
       "Weekly email digest",
+      "Learning center access",
     ],
     highlighted: false,
-    cta: "Get Started",
+    cta: "Get Started Free",
     ctaVariant: "outline" as const,
-  },
-  {
-    name: "Basic",
-    price: "$9.99",
-    period: "/month",
-    description: "For active individual investors.",
-    features: [
-      "50 stocks in watchlist",
-      "K-line charts (delayed 5 min)",
-      "All technical indicators (MACD, RSI, BB)",
-      "AI news summaries (daily)",
-      "AI stock score (daily)",
-      "Daily email digest",
-      "1 portfolio tracker",
-      "Basic stock screener",
-    ],
-    highlighted: true,
-    cta: "Start Free Trial",
-    ctaVariant: "default" as const,
   },
   {
     name: "Pro",
     price: "$29.99",
     period: "/month",
-    description: "For professional traders and analysts.",
+    description: "For active traders who need real-time data and unlimited access.",
     features: [
       "Unlimited watchlist stocks",
-      "Real-time data access",
-      "All technical + custom indicators",
-      "AI news summaries (real-time)",
-      "AI stock score (real-time + history)",
-      "Daily + alert emails",
-      "Unlimited portfolios",
-      "Advanced stock screener",
+      "Real-time market data",
+      "AI news summaries (unlimited)",
+      "AI stock scoring (unlimited + history)",
+      "All technical indicators",
+      "Daily email digest + price alerts",
       "Priority support",
     ],
-    highlighted: false,
+    highlighted: true,
     cta: "Start Free Trial",
-    ctaVariant: "outline" as const,
+    ctaVariant: "default" as const,
   },
 ];
 
@@ -79,7 +59,7 @@ export default function PricingPage() {
               Start free. Upgrade when you're ready for more data, deeper analysis, and faster insights.
             </p>
           </div>
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
             {TIERS.map((tier) => (
               <Card
                 key={tier.name}
