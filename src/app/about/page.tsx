@@ -66,8 +66,8 @@ export default function AboutPage() {
             <div className="grid md:grid-cols-2 gap-4">
               {[
                 "AI-generated stock summaries and sentiment analysis",
-                "Technical indicators with interactive K-line charts",
-                "Fundamental data including P/E ratios, EPS, revenue, and margins",
+                "Real-time stock price, change, and volume data",
+                "AI composite scoring with buy/hold/sell signals",
                 "Composite AI scoring (0-100) with buy/hold/sell signals",
                 "Personalized watchlists with email alerts",
                 "Daily AI-powered newsletter delivered to your inbox",

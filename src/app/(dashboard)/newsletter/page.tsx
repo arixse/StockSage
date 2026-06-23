@@ -24,7 +24,7 @@ const PREFERENCES = [
     key: "price_alerts",
     label: "Price Alerts",
     icon: Bell,
-    desc: "Get notified when stocks hit extreme RSI or MACD crossover signals.",
+    desc: "Get notified when AI detects significant changes in your tracked stocks.",
   },
 ] as const;
 

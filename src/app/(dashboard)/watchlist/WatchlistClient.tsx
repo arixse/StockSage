@@ -371,7 +371,7 @@ export function WatchlistClient({ watchlistId, initialStocks }: Props) {
               </p>
               <ul className="space-y-1 text-muted-foreground text-xs">
                 <li className="flex items-center gap-1"><span className="text-green-500">✓</span> Basic ($9.99/mo): 50 stocks, daily AI</li>
-                <li className="flex items-center gap-1"><span className="text-green-500">✓</span> Pro ($29.99/mo): Unlimited, real-time data</li>
+                <li className="flex items-center gap-1"><span className="text-green-500">✓</span> Pro ($29.99/mo): Unlimited stocks, daily AI analysis</li>
               </ul>
             </div>
             <div className="flex gap-2">

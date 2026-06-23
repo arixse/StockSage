@@ -17,8 +17,8 @@ const FEATURES = [
   },
   {
     icon: BarChart3,
-    title: "Technical & Fundamental",
-    description: "View interactive K-line charts with MACD, RSI, Bollinger Bands. Access P/E ratios, EPS, revenue, and more.",
+    title: "Market Heatmap",
+    description: "Visualize S&P 500 breadth with a live treemap. See which sectors are leading and lagging at a glance.",
   },
   {
     icon: TrendingUp,
@@ -194,8 +194,8 @@ export default async function HomePage() {
             <p className="text-muted-foreground mb-8">Start free, upgrade when you need more.</p>
             <div className="flex flex-wrap justify-center gap-4 mb-8">
               {[
-                { tier: "Free", price: "$0", features: ["5 stocks watchlist", "AI summaries & scoring", "K-line charts", "Weekly email digest"] },
-                { tier: "Pro", price: "$29.99/mo", features: ["Unlimited stocks", "Real-time data", "Unlimited AI analysis", "Daily email + alerts"] },
+                { tier: "Free", price: "$0", features: ["5 stocks watchlist", "AI summaries & scoring", "Market heatmap", "Weekly email digest"] },
+                { tier: "Pro", price: "$29.99/mo", features: ["Unlimited watchlist", "Unlimited AI analysis", "Daily email digest", "Market heatmap"] },
               ].map((plan) => (
                 <Card key={plan.tier} className="w-64 border-muted">
                   <CardHeader>
