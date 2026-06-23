@@ -94,14 +94,56 @@ export default async function StockPage({ params }: Props) {
   return (
     <div className="flex flex-col min-h-full">
       <Header />
+      {/* Structured Data: Breadcrumb + FAQ + WebApplication */}
       <JsonLd
         data={{
           "@context": "https://schema.org",
-          "@type": "WebApplication",
-          name: `${upperTicker} Stock Analysis - StockSage`,
-          description: `AI-powered stock analysis for ${upperTicker} including technical charts, fundamentals, AI brief, and smart scoring.`,
-          url: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/stock/${upperTicker}`,
-          applicationCategory: "FinanceApplication",
+          "@graph": [
+            {
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                { "@type": "ListItem", position: 1, name: "Home", item: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000" },
+                { "@type": "ListItem", position: 2, name: "Stocks", item: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/stock/AAPL` },
+                { "@type": "ListItem", position: 3, name: `${upperTicker} Stock Analysis`, item: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/stock/${upperTicker}` },
+              ],
+            },
+            {
+              "@type": "FAQPage",
+              mainEntity: [
+                {
+                  "@type": "Question",
+                  name: `What is the current price of ${upperTicker} stock?`,
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: `As of the latest data, ${upperTicker} is trading at $${quote.price.toFixed(2)} with a daily change of ${quote.changePercent >= 0 ? "+" : ""}${quote.changePercent.toFixed(2)}%.`,
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: `What is the AI score for ${upperTicker}?`,
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: `StockSage provides an AI composite score (0-100) for ${upperTicker} based on news sentiment, technical indicators, and fundamental analysis. Visit the page to see the latest AI rating and buy/hold/sell recommendation.`,
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: `Should I buy ${upperTicker} stock?`,
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: `StockSage provides AI-powered analysis to help you evaluate ${upperTicker}, but does not provide personalized financial advice. Our AI summarizes recent news, scores the stock, and identifies key catalysts and risks. Always consult a qualified financial advisor before making investment decisions.`,
+                  },
+                },
+              ],
+            },
+            {
+              "@type": "WebApplication",
+              name: `${upperTicker} Stock Analysis - StockSage`,
+              description: `AI-powered stock analysis for ${upperTicker} including price data, AI news summary, sentiment scoring, and smart buy/hold/sell signals.`,
+              url: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/stock/${upperTicker}`,
+              applicationCategory: "FinanceApplication",
+            },
+          ],
         }}
       />
       <main className="flex-1">

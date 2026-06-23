@@ -16,22 +16,29 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "StockSage - AI-Powered US Stock Analysis",
+    default: "StockSage - AI-Powered US Stock Analysis & Scoring",
     template: "%s | StockSage",
   },
   description:
-    "AI-powered US stock market analysis platform. Get daily AI stock summaries, technical analysis, fundamentals, and smart scoring for NYSE and NASDAQ stocks.",
+    "StockSage provides AI-powered US stock analysis: get daily AI summaries, stock scores (0-100), market heatmaps, and personalized watchlists. Free for 5 stocks. Covers NYSE and NASDAQ equities with news sentiment, fundamentals, and buy/hold/sell signals.",
   keywords: [
     "stock analysis",
-    "AI stock picks",
+    "AI stock analysis",
     "US stocks",
-    "investment research",
     "stock scoring",
     "market heatmap",
     "AI stock summary",
     "stock watchlist",
+    "investment research",
+    "NYSE analysis",
+    "NASDAQ analysis",
+    "stock market AI",
+    "buy sell hold signals",
   ],
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     title: "StockSage · Stock Calls & Radar",
     description:
