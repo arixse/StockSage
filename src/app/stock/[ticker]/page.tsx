@@ -2,11 +2,10 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { NewsTab } from "@/components/news/NewsTab";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { TrendingUp, TrendingDown, Newspaper } from "lucide-react";
+import { TrendingUp, TrendingDown } from "lucide-react";
 import { StockLogo } from "@/components/stock/StockLogo";
 import { AddToWatchlistButton } from "@/components/stock/AddToWatchlistButton";
 import Link from "next/link";
@@ -126,19 +125,8 @@ export default async function StockPage({ params }: Props) {
             </div>
           </div>
 
-          {/* Content Tabs */}
-          <Tabs defaultValue="news" className="w-full">
-            <TabsList>
-              <TabsTrigger value="news">
-                <Newspaper className="h-4 w-4 mr-2" />
-                News & AI
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="news" className="mt-4">
-              <NewsTab ticker={upperTicker} />
-            </TabsContent>
-          </Tabs>
+          {/* AI Analysis */}
+          <NewsTab ticker={upperTicker} />
         </div>
       </main>
       <Footer />

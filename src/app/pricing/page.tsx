@@ -3,7 +3,6 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { CheckCircle2 } from "lucide-react";
 
 const TIERS = [
@@ -20,7 +19,6 @@ const TIERS = [
       "Weekly email digest",
       "Learning center access",
     ],
-    highlighted: false,
     cta: "Get Started Free",
     ctaVariant: "outline" as const,
   },
@@ -30,14 +28,13 @@ const TIERS = [
     period: "/month",
     description: "For active traders who need unlimited AI analysis and more stocks.",
     features: [
-      "Unlimited watchlist stocks",
+      "Unlimited stocks in watchlist",
       "AI news summaries (unlimited)",
       "AI stock scoring (unlimited)",
-      "Daily email digest",
       "Market heatmap",
+      "Daily email digest",
       "Learning center access",
     ],
-    highlighted: true,
     cta: "Start Free Trial",
     ctaVariant: "default" as const,
   },
@@ -61,11 +58,8 @@ export default function PricingPage() {
             {TIERS.map((tier) => (
               <Card
                 key={tier.name}
-                className={`relative ${tier.highlighted ? "border-primary shadow-lg" : "border-muted"}`}
+                className={tier.ctaVariant === "default" ? "border-primary shadow-lg" : "border-muted"}
               >
-                {tier.highlighted && (
-                  <Badge className="absolute -top-2.5 left-1/2 -translate-x-1/2">Popular</Badge>
-                )}
                 <CardHeader className="text-center">
                   <CardTitle>{tier.name}</CardTitle>
                   <div className="mt-2">
