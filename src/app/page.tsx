@@ -4,7 +4,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, BarChart3, Sparkles, Mail, ArrowRight, CheckCircle2, Flame, GraduationCap } from "lucide-react";
+import { TrendingUp, BarChart3, Sparkles, Mail, ArrowRight, Flame, GraduationCap } from "lucide-react";
 import { StockLogo } from "@/components/stock/StockLogo";
 import { getCachedQuotes } from "@/lib/stock-cache";
 import { fetchStockQuotes } from "@/lib/stock-api";
@@ -187,36 +187,15 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* Pricing Preview */}
+        {/* CTA — no pricing yet */}
         <section className="py-20 bg-muted/30">
           <div className="container mx-auto px-4 text-center">
-            <h2 className="text-3xl font-bold mb-4">Simple Pricing</h2>
-            <p className="text-muted-foreground mb-8">Start free, upgrade when you need more.</p>
-            <div className="flex flex-wrap justify-center gap-4 mb-8">
-              {[
-                { tier: "Free", price: "$0", features: ["5 stocks watchlist", "AI summaries & scoring", "Market heatmap", "Weekly email digest"] },
-                { tier: "Pro", price: "$29.99/mo", features: ["Unlimited watchlist", "Unlimited AI analysis", "Daily email digest", "Market heatmap"] },
-              ].map((plan) => (
-                <Card key={plan.tier} className="w-64 border-muted">
-                  <CardHeader>
-                    <CardTitle>{plan.tier}</CardTitle>
-                    <p className="text-2xl font-bold">{plan.price}</p>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-2 text-sm">
-                      {plan.features.map((f) => (
-                        <li key={f} className="flex items-center gap-2">
-                          <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
-                          {f}
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-            <Button variant="outline" render={<Link href="/pricing" />}>
-              View Full Pricing
+            <h2 className="text-3xl font-bold mb-4">Start Free Today</h2>
+            <p className="text-muted-foreground mb-8">
+              Track 5 stocks with AI analysis — no credit card required.
+            </p>
+            <Button size="lg" render={<Link href="/register" />}>
+              Get Started Free
             </Button>
           </div>
         </section>

@@ -1,44 +1,7 @@
-import Link from "next/link";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { CheckCircle2 } from "lucide-react";
-
-const TIERS = [
-  {
-    name: "Free",
-    price: "$0",
-    period: "forever",
-    description: "Get started with AI-powered stock analysis.",
-    features: [
-      "5 stocks in watchlist",
-      "AI news summaries (3/week)",
-      "AI stock scoring (weekly)",
-      "Market heatmap",
-      "Weekly email digest",
-      "Learning center access",
-    ],
-    cta: "Get Started Free",
-    ctaVariant: "outline" as const,
-  },
-  {
-    name: "Pro",
-    price: "$29.99",
-    period: "/month",
-    description: "For active traders who need unlimited AI analysis and more stocks.",
-    features: [
-      "Unlimited stocks in watchlist",
-      "AI news summaries (unlimited)",
-      "AI stock scoring (unlimited)",
-      "Market heatmap",
-      "Daily email digest",
-      "Learning center access",
-    ],
-    cta: "Start Free Trial",
-    ctaVariant: "default" as const,
-  },
-];
+import { Card, CardContent } from "@/components/ui/card";
+import { Clock } from "lucide-react";
 
 export const metadata = { title: "Pricing" };
 
@@ -46,51 +9,17 @@ export default function PricingPage() {
   return (
     <div className="flex flex-col min-h-full">
       <Header />
-      <main className="flex-1 py-20">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h1 className="text-3xl font-bold mb-4">Simple, Transparent Pricing</h1>
-            <p className="text-muted-foreground max-w-xl mx-auto">
-              Start free. Upgrade when you're ready for more data, deeper analysis, and faster insights.
+      <main className="flex-1 flex items-center justify-center py-20">
+        <Card className="max-w-md mx-auto border-muted">
+          <CardContent className="pt-12 pb-12 text-center">
+            <Clock className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+            <h1 className="text-xl font-bold mb-2">Pricing Coming Soon</h1>
+            <p className="text-muted-foreground text-sm">
+              We&apos;re finalizing our payment processing. StockSage is free to use in the meantime —
+              track 5 stocks with AI-powered analysis.
             </p>
-          </div>
-          <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
-            {TIERS.map((tier) => (
-              <Card
-                key={tier.name}
-                className={tier.ctaVariant === "default" ? "border-primary shadow-lg" : "border-muted"}
-              >
-                <CardHeader className="text-center">
-                  <CardTitle>{tier.name}</CardTitle>
-                  <div className="mt-2">
-                    <span className="text-3xl font-bold">{tier.price}</span>
-                    <span className="text-muted-foreground text-sm">{tier.period}</span>
-                  </div>
-                  <CardDescription>{tier.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2.5">
-                    {tier.features.map((feature) => (
-                      <li key={feature} className="flex items-start gap-2 text-sm">
-                        <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-                <CardFooter>
-                  <Button
-                    variant={tier.ctaVariant}
-                    className="w-full"
-                    render={<Link href={tier.name === "Free" ? "/register" : "/register"} />}
-                  >
-                    {tier.cta}
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </main>
       <Footer />
     </div>
