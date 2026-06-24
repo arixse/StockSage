@@ -35,13 +35,13 @@ export const DailyDigest = ({
   return (
     <Html>
       <Head />
-      <Preview>Your daily stock briefing for {date}</Preview>
+      <Preview>AI-powered stock analysis for your watchlist — {date}</Preview>
       <Body style={main}>
         <Container style={container}>
-          <Heading style={h1}>📈 StockSage Daily Briefing</Heading>
-          <Text style={text}>Good morning, {userName}!</Text>
+          <Heading style={h1}>StockSage Daily Briefing</Heading>
+          <Text style={text}>Hi {userName},</Text>
           <Text style={text}>
-            Here&apos;s your AI-powered stock summary for {date}.
+            Here is your AI-powered stock summary for {date}.
           </Text>
 
           {stocks.map((stock) => (
@@ -84,11 +84,20 @@ export const DailyDigest = ({
 
           <Section style={footer}>
             <Text style={footerText}>
-              You received this email because you subscribed to StockSage.
+              You received this email because you subscribed to StockSage daily digest.
             </Text>
-            <Link href="{{appUrl}}/newsletter" style={footerLink}>
-              Manage preferences
-            </Link>
+            <Text style={footerText}>
+              <Link href="{{appUrl}}/newsletter" style={footerLink}>
+                Unsubscribe or manage preferences
+              </Link>
+              {" · "}
+              <Link href="{{appUrl}}/legal/privacy" style={footerLink}>
+                Privacy
+              </Link>
+            </Text>
+            <Text style={footerText}>
+              StockSage · AI-Powered Stock Analysis
+            </Text>
           </Section>
         </Container>
       </Body>

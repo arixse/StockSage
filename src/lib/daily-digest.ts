@@ -154,7 +154,7 @@ export async function sendDailyDigests(): Promise<{
       });
 
       // Replace template variable with actual URL
-      const result = await sendEmail(user.email, `📈 Daily Stock Briefing — ${today}`, emailHtml);
+      const result = await sendEmail(user.email, `StockSage Daily Briefing — ${today}`, emailHtml);
 
       const errorMsg = result.success
         ? null
