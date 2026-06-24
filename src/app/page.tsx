@@ -79,48 +79,36 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* Trending Stocks */}
-        <section className="border-y">
-          <div className="container mx-auto px-4 py-4">
-            <p className="text-sm font-medium text-muted-foreground mb-3">Trending</p>
-            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
-              {trendingQuotes.map((quote, i) => {
-                const ticker = TRENDING_TICKERS[i];
-                if (!quote) {
+        {/* Trending Stocks — only show if we have data */}
+        {trendingQuotes.some((q) => q !== null) && (
+          <section className="border-y">
+            <div className="container mx-auto px-4 py-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+                {trendingQuotes.map((quote, i) => {
+                  if (!quote) return null;
                   return (
                     <Link
-                      key={ticker}
-                      href={`/stock/${ticker}`}
+                      key={quote.ticker}
+                      href={`/stock/${quote.ticker}`}
                       className="flex items-center gap-2 rounded-lg border px-3 py-2 hover:border-primary/30 transition-colors"
                     >
-                      <StockLogo ticker={ticker} size="sm" />
-                      <span className="font-medium text-sm">{ticker}</span>
-                      <span className="text-muted-foreground text-xs">—</span>
+                      <StockLogo ticker={quote.ticker} size="sm" />
+                      <div className="min-w-0">
+                        <div className="font-medium text-sm leading-tight">{quote.ticker}</div>
+                        <div className={quote.change >= 0 ? "text-green-500" : "text-red-500"}>
+                          <span className="text-xs font-mono">
+                            {quote.change >= 0 ? "+" : ""}{quote.changePercent.toFixed(1)}%
+                          </span>
+                        </div>
+                      </div>
+                      <span className="font-mono text-sm ml-auto">${quote.price.toFixed(2)}</span>
                     </Link>
                   );
-                }
-                return (
-                  <Link
-                    key={quote.ticker}
-                    href={`/stock/${quote.ticker}`}
-                    className="flex items-center gap-2 rounded-lg border px-3 py-2 hover:border-primary/30 transition-colors"
-                  >
-                    <StockLogo ticker={quote.ticker} size="sm" />
-                    <div className="min-w-0">
-                      <div className="font-medium text-sm leading-tight">{quote.ticker}</div>
-                      <div className={quote.change >= 0 ? "text-green-500" : "text-red-500"}>
-                        <span className="text-xs font-mono">
-                          {quote.change >= 0 ? "+" : ""}{quote.changePercent.toFixed(1)}%
-                        </span>
-                      </div>
-                    </div>
-                    <span className="font-mono text-sm ml-auto">${quote.price.toFixed(2)}</span>
-                  </Link>
-                );
-              })}
+                })}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
         {/* Features Grid */}
         <section className="py-20">
