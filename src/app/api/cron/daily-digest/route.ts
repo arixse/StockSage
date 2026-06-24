@@ -3,11 +3,26 @@ import { runDailyPipelineForAll } from "@/lib/ai-pipeline";
 import { sendDailyDigests } from "@/lib/daily-digest";
 
 export async function GET(request: NextRequest) {
+  // Vercel Cron automatically passes CRON_SECRET as Authorization header
+  // Also accept ?secret= query param for manual testing
   const authHeader = request.headers.get("authorization");
-  const expectedToken = `Bearer ${process.env.CRON_SECRET}`;
+  const { searchParams } = new URL(request.url);
+  const querySecret = searchParams.get("secret");
+  const cronSecret = process.env.CRON_SECRET;
 
-  if (authHeader !== expectedToken) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const isVercelCron = authHeader === `Bearer ${cronSecret}`;
+  const isQueryAuth = querySecret === cronSecret;
+  const hasSecret = !!cronSecret && cronSecret !== "dev-cron-secret-change-in-production";
+
+  // In production with Vercel Cron, the CRON_SECRET env var must be set
+  // Vercel automatically passes it as Authorization: Bearer <CRON_SECRET>
+  if (!isVercelCron && !isQueryAuth) {
+    return NextResponse.json({
+      error: "Unauthorized",
+      hint: hasSecret
+        ? "Vercel Cron should pass Authorization header automatically"
+        : "CRON_SECRET not set in environment variables",
+    }, { status: 401 });
   }
 
   try {
