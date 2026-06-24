@@ -62,7 +62,7 @@ export const termsContent: LegalPage = {
     },
     {
       heading: "11. Contact",
-      content: "For questions about these Terms of Service, please contact us at newsletter@stocksage.xyz.",
+      content: "For questions about these Terms of Service, please contact us at support@stocksage.xyz.",
     },
   ],
 };
@@ -107,7 +107,7 @@ export const privacyContent: LegalPage = {
     },
     {
       heading: "8. Your Rights",
-      content: "You have the right to access, correct, or delete your personal data. You can export your data or request account deletion. To exercise these rights, contact us at newsletter@stocksage.xyz.",
+      content: "You have the right to access, correct, or delete your personal data. You can export your data or request account deletion. To exercise these rights, contact us at support@stocksage.xyz.",
     },
     {
       heading: "9. Children's Privacy",
@@ -119,7 +119,7 @@ export const privacyContent: LegalPage = {
     },
     {
       heading: "11. Contact",
-      content: "For privacy-related inquiries, contact us at newsletter@stocksage.xyz.",
+      content: "For privacy-related inquiries, contact us at support@stocksage.xyz.",
     },
   ],
 };
@@ -195,7 +195,7 @@ export const disclaimerContent: LegalPage = {
     },
     {
       heading: "Contact",
-      content: "If you have questions about this disclaimer, contact us at newsletter@stocksage.xyz.",
+      content: "If you have questions about this disclaimer, contact us at support@stocksage.xyz.",
     },
   ],
 };
