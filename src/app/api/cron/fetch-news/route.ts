@@ -6,7 +6,8 @@ export async function GET(request: NextRequest) {
   const querySecret = searchParams.get("secret");
   const cronSecret = process.env.CRON_SECRET;
 
-  if (authHeader !== `Bearer ${cronSecret}` && querySecret !== cronSecret) {
+  // Vercel sends Authorization: <CRON_SECRET> (no Bearer prefix)
+  if (authHeader !== cronSecret && querySecret !== cronSecret) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
