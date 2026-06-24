@@ -83,14 +83,14 @@ export default async function HomePage() {
         {trendingQuotes.some((q) => q !== null) && (
           <section className="border-y">
             <div className="container mx-auto px-4 py-4">
-              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+              <div className="flex flex-wrap justify-center gap-3">
                 {trendingQuotes.map((quote, i) => {
                   if (!quote) return null;
                   return (
                     <Link
                       key={quote.ticker}
                       href={`/stock/${quote.ticker}`}
-                      className="flex items-center gap-2 rounded-lg border px-3 py-2 hover:border-primary/30 transition-colors"
+                      className="flex items-center gap-2 rounded-lg border px-3 py-2 hover:border-primary/30 transition-colors w-[calc(50%-0.375rem)] sm:w-[calc(25%-0.5625rem)] lg:w-[180px]"
                     >
                       <StockLogo ticker={quote.ticker} size="sm" />
                       <div className="min-w-0">
