@@ -103,7 +103,7 @@ export default function RootLayout({
                 logo: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/icon.svg`,
                 contactPoint: {
                   "@type": "ContactPoint",
-                  email: "support@stocksage.app",
+                  email: "support@stocksage.xyz",
                   contactType: "customer support",
                 },
               },
