@@ -18,9 +18,12 @@ const log = createLogger("stock-cron");
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get("authorization");
-  const expectedToken = `Bearer ${process.env.CRON_SECRET}`;
+  const { searchParams } = new URL(request.url);
+  const querySecret = searchParams.get("secret");
+  const cronSecret = process.env.CRON_SECRET;
 
-  if (authHeader !== expectedToken) {
+  // Vercel sends Authorization: <CRON_SECRET> (no Bearer prefix)
+  if (authHeader !== cronSecret && querySecret !== cronSecret) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

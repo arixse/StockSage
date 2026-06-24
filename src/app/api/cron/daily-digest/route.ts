@@ -3,11 +3,24 @@ import { runDailyPipelineForAll } from "@/lib/ai-pipeline";
 import { sendDailyDigests } from "@/lib/daily-digest";
 
 export async function GET(request: NextRequest) {
+  // Vercel Cron passes CRON_SECRET as raw Authorization header value (NOT Bearer-prefixed)
+  // Also accept ?secret= query param for manual testing
   const authHeader = request.headers.get("authorization");
-  const expectedToken = `Bearer ${process.env.CRON_SECRET}`;
+  const { searchParams } = new URL(request.url);
+  const querySecret = searchParams.get("secret");
+  const cronSecret = process.env.CRON_SECRET;
 
-  if (authHeader !== expectedToken) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  // Vercel sends: Authorization: <CRON_SECRET> (no Bearer prefix)
+  const isVercelCron = authHeader === cronSecret;
+  const isQueryAuth = querySecret === cronSecret;
+
+  if (!isVercelCron && !isQueryAuth) {
+    return NextResponse.json({
+      error: "Unauthorized",
+      hasSecret: !!cronSecret,
+      authHeaderPreview: authHeader ? `${authHeader.slice(0, 4)}...` : "MISSING",
+      expectedFormat: "Vercel Cron: Authorization: <CRON_SECRET>  |  Manual: ?secret=<CRON_SECRET>",
+    }, { status: 401 });
   }
 
   try {

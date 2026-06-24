@@ -12,7 +12,11 @@ export async function GET() {
     LLM_BASE_URL: process.env.LLM_BASE_URL || "DEFAULT: https://api.openai.com/v1",
     LLM_MODEL: process.env.LLM_MODEL || "DEFAULT: gpt-4o-mini",
     FINNHUB_API_KEY: mask(process.env.FINNHUB_API_KEY),
-    hasLLM: process.env.LLM_API_KEY ? true : false,
+    RESEND_API_KEY: mask(process.env.RESEND_API_KEY),
+    CRON_SECRET: mask(process.env.CRON_SECRET),
+    hasLLM: !!process.env.LLM_API_KEY,
+    hasResend: !!(process.env.RESEND_API_KEY && process.env.RESEND_API_KEY !== "re_..."),
+    hasCronSecret: !!(process.env.CRON_SECRET && process.env.CRON_SECRET !== "dev-cron-secret-change-in-production"),
     nodeEnv: process.env.NODE_ENV || "not set",
   });
 }
