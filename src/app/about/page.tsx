@@ -118,10 +118,10 @@ export default function AboutPage() {
             </p>
             <p className="text-sm">
               <a
-                href="mailto:support@stocksage.app"
+                href="mailto:newsletter@stocksage.xyz"
                 className="text-primary hover:underline font-medium"
               >
-                support@stocksage.app
+                newsletter@stocksage.xyz
               </a>
             </p>
           </section>
