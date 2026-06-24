@@ -79,13 +79,11 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* Trending Stocks Ticker */}
+        {/* Trending Stocks */}
         <section className="border-y">
           <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center gap-6 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">
-                Trending:
-              </span>
+            <p className="text-sm font-medium text-muted-foreground mb-3">Trending</p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
               {trendingQuotes.map((quote, i) => {
                 const ticker = TRENDING_TICKERS[i];
                 if (!quote) {
@@ -93,28 +91,30 @@ export default async function HomePage() {
                     <Link
                       key={ticker}
                       href={`/stock/${ticker}`}
-                      className="flex items-center gap-2 text-sm whitespace-nowrap hover:text-primary transition-colors"
+                      className="flex items-center gap-2 rounded-lg border px-3 py-2 hover:border-primary/30 transition-colors"
                     >
                       <StockLogo ticker={ticker} size="sm" />
-                      <span className="font-medium">{ticker}</span>
-                      <span className="text-muted-foreground">—</span>
+                      <span className="font-medium text-sm">{ticker}</span>
+                      <span className="text-muted-foreground text-xs">—</span>
                     </Link>
                   );
                 }
-                const changeStr = `${quote.change >= 0 ? "+" : ""}${quote.change.toFixed(2)} (${quote.changePercent >= 0 ? "+" : ""}${quote.changePercent.toFixed(1)}%)`;
                 return (
                   <Link
                     key={quote.ticker}
                     href={`/stock/${quote.ticker}`}
-                    className="flex items-center gap-2 text-sm whitespace-nowrap hover:text-primary transition-colors"
+                    className="flex items-center gap-2 rounded-lg border px-3 py-2 hover:border-primary/30 transition-colors"
                   >
                     <StockLogo ticker={quote.ticker} size="sm" />
-                    <span className="font-medium">{quote.ticker}</span>
-                    <span className="text-muted-foreground">{quote.shortName}</span>
-                    <span className="font-mono">${quote.price.toFixed(2)}</span>
-                    <span className={quote.change >= 0 ? "text-green-500" : "text-red-500"}>
-                      {changeStr}
-                    </span>
+                    <div className="min-w-0">
+                      <div className="font-medium text-sm leading-tight">{quote.ticker}</div>
+                      <div className={quote.change >= 0 ? "text-green-500" : "text-red-500"}>
+                        <span className="text-xs font-mono">
+                          {quote.change >= 0 ? "+" : ""}{quote.changePercent.toFixed(1)}%
+                        </span>
+                      </div>
+                    </div>
+                    <span className="font-mono text-sm ml-auto">${quote.price.toFixed(2)}</span>
                   </Link>
                 );
               })}
