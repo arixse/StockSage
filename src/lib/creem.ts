@@ -3,10 +3,18 @@
  * Creem handles tax, payment processing, and checkout UI.
  */
 
-const BASE_URL =
-  process.env.NODE_ENV === "production"
-    ? "https://api.creem.io"
-    : "https://test-api.creem.io";
+// Use test API for dev/preview, production for main site
+function getBaseUrl(): string {
+  const vercelEnv = process.env.VERCEL_ENV;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "";
+  // Preview/development → test API; Production → live API
+  if (vercelEnv === "production" && appUrl.includes("stocksage.xyz")) {
+    return "https://api.creem.io";
+  }
+  return "https://test-api.creem.io";
+}
+
+const BASE_URL = getBaseUrl();
 
 function getHeaders(): Record<string, string> {
   return {

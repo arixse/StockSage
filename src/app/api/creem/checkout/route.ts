@@ -27,9 +27,16 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ url: checkout.checkout_url });
   } catch (error) {
-    console.error("Creem checkout error:", error);
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error("Creem checkout error:", msg);
     return NextResponse.json(
-      { error: "Checkout failed" },
+      {
+        error: "Checkout failed",
+        detail: msg,
+        hint: process.env.CREEM_API_KEY
+          ? "API key is set. Check CREEM_PRODUCT_ID."
+          : "CREEM_API_KEY is not set.",
+      },
       { status: 500 }
     );
   }
