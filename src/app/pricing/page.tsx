@@ -36,7 +36,7 @@ const TIERS = [
       "Daily email digest",
       "Learning center access",
     ],
-    cta: "Start Free Trial",
+    cta: "Upgrade to Pro",
     ctaVariant: "default" as const,
   },
 ];

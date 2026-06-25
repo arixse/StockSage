@@ -48,7 +48,7 @@ export function CheckoutButton({ variant = "default", className }: Props) {
   return (
     <Button variant={variant} className={className} onClick={handleCheckout} disabled={loading}>
       {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-      Start Free Trial
+      Upgrade to Pro
     </Button>
   );
 }
