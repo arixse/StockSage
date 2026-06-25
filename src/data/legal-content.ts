@@ -38,7 +38,7 @@ export const termsContent: LegalPage = {
     },
     {
       heading: "5. Subscription and Payments",
-      content: "Free tier users have access to limited features. Paid subscriptions (Basic and Pro tiers) are billed monthly via Stripe. You may cancel at any time, and cancellation takes effect at the end of the current billing period. Refunds are not provided for partial months. We reserve the right to change pricing with 30 days notice.",
+      content: "Free tier users have access to limited features. Paid subscriptions (Basic and Pro tiers) are billed monthly via Creem. You may cancel at any time, and cancellation takes effect at the end of the current billing period. Refunds are not provided for partial months. We reserve the right to change pricing with 30 days notice.",
     },
     {
       heading: "6. Data Accuracy and Availability",
@@ -78,7 +78,7 @@ export const privacyContent: LegalPage = {
         "Account information: email, name, authentication provider",
         "Usage data: pages viewed, features used, time spent",
         "Watchlist and portfolio data: stocks you track (but not your actual holdings or brokerage data)",
-        "Payment information: processed securely by Stripe (we do not store credit card numbers)",
+        "Payment information: processed securely by Creem (we do not store credit card numbers)",
       ],
     },
     {
@@ -95,11 +95,11 @@ export const privacyContent: LegalPage = {
     },
     {
       heading: "5. Third-Party Services",
-      content: "We integrate with several third-party services to provide the Service: Supabase (database and authentication), Stripe (payment processing), Resend (email delivery), Finnhub and Alpha Vantage (market data), and OpenRouter/DeepSeek (AI analysis). Each service has its own privacy policy.",
+      content: "We integrate with several third-party services to provide the Service: Supabase (database and authentication), Creem (payment processing), Resend (email delivery), Finnhub and Alpha Vantage (market data), and OpenRouter/DeepSeek (AI analysis). Each service has its own privacy policy.",
     },
     {
       heading: "6. Data Sharing",
-      content: "We do not sell your personal data. We do not share your data with third parties except as necessary to provide the Service (e.g., Stripe for payments, Resend for emails). We may disclose information if required by law or to protect our rights.",
+      content: "We do not sell your personal data. We do not share your data with third parties except as necessary to provide the Service (e.g., Creem for payments, Resend for emails). We may disclose information if required by law or to protect our rights.",
     },
     {
       heading: "7. Data Retention",

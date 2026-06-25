@@ -4,6 +4,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { CheckCircle2 } from "lucide-react";
+import { CheckoutButton } from "@/components/payment/CheckoutButton";
 
 const TIERS = [
   {
@@ -79,13 +80,13 @@ export default function PricingPage() {
                   </ul>
                 </CardContent>
                 <CardFooter>
-                  <Button
-                    variant={tier.ctaVariant}
-                    className="w-full"
-                    render={<Link href={tier.name === "Free" ? "/register" : "/register"} />}
-                  >
-                    {tier.cta}
-                  </Button>
+                  {tier.name === "Free" ? (
+                    <Button variant="outline" className="w-full" render={<Link href="/register" />}>
+                      Get Started Free
+                    </Button>
+                  ) : (
+                    <CheckoutButton className="w-full" />
+                  )}
                 </CardFooter>
               </Card>
             ))}
