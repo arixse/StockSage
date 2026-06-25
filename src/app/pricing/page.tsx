@@ -24,7 +24,7 @@ const TIERS = [
   },
   {
     name: "Pro",
-    price: "$29.99",
+    price: "$9.99",
     period: "/month",
     description: "For active traders who need unlimited AI analysis and more stocks.",
     features: [

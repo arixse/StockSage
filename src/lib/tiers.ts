@@ -50,7 +50,7 @@ export const TIERS: Record<string, TierConfig> = {
   pro: {
     name: "pro",
     label: "Pro",
-    price: 29.99,
+    price: 9.99,
     features: [
       "Unlimited watchlist stocks",
       "Real-time data",

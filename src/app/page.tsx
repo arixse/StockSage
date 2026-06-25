@@ -183,7 +183,7 @@ export default async function HomePage() {
             <div className="flex flex-wrap justify-center gap-4 mb-8">
               {[
                 { tier: "Free", price: "$0", features: ["5 stocks watchlist", "AI summaries & scoring", "Market heatmap", "Weekly email digest"] },
-                { tier: "Pro", price: "$29.99/mo", features: ["Unlimited watchlist", "Unlimited AI analysis", "Daily email digest", "Market heatmap"] },
+                { tier: "Pro", price: "$9.99/mo", features: ["Unlimited watchlist", "Unlimited AI analysis", "Daily email digest", "Market heatmap"] },
               ].map((plan) => (
                 <Card key={plan.tier} className="w-64 border-muted">
                   <CardHeader>
