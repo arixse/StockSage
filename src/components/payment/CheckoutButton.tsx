@@ -37,10 +37,12 @@ export function CheckoutButton({ variant = "default", className }: Props) {
       if (json.url) {
         window.location.href = json.url;
       } else {
-        toast.error(json.error || "Checkout failed");
+        const msg = json.detail || json.error || "Checkout failed";
+        const hint = json.hint || "";
+        toast.error(hint ? `${msg}\n${hint}` : msg, { duration: 8000 });
       }
     } catch {
-      toast.error("Failed to start checkout");
+      toast.error("Failed to start checkout. Check your connection.");
     }
     setLoading(false);
   };
