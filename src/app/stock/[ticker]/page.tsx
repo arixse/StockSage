@@ -10,6 +10,9 @@ import Link from "next/link";
 import { fetchStockQuote } from "@/lib/stock-api";
 import { getCachedQuotes } from "@/lib/stock-cache";
 
+// Stock prices change constantly — never cache this page
+export const dynamic = "force-dynamic";
+
 interface Props {
   params: Promise<{ ticker: string }>;
 }

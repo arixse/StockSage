@@ -9,6 +9,8 @@ import { fetchStockQuotes } from "@/lib/stock-api";
 import { getCachedQuotes } from "@/lib/stock-cache";
 import { getMarketStatus } from "@/lib/market-status";
 
+// Stock data changes throughout the day — never cache
+export const dynamic = "force-dynamic";
 export const metadata = { title: "Dashboard" };
 
 async function getWatchlistWithQuotes(userId: string) {
