@@ -3,6 +3,7 @@ import { fetchStockQuote, fetchCompanyOverview, fetchStockChart } from "@/lib/st
 import { getCachedQuotes, getCachedChart, getCachedCompanyOverview } from "@/lib/stock-cache";
 import { latestTechnicals } from "@/lib/technicals";
 import type { OHLCVBar } from "@/lib/technicals";
+import { createClient } from "@/lib/supabase/server";
 
 export async function GET(
   request: NextRequest,
@@ -10,6 +11,11 @@ export async function GET(
 ) {
   const { ticker } = await params;
   const upperTicker = ticker.toUpperCase();
+
+  // Auth check
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
     // Cache-first: read from Supabase, fall back to live API
