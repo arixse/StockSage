@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { fetchStockQuote, fetchCompanyOverview } from "@/lib/stock-api";
 import { getCachedQuotes, getCachedCompanyOverview } from "@/lib/stock-cache";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ ticker: string }> }

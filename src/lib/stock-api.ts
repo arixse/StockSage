@@ -81,7 +81,7 @@ async function getYahooCrumb(): Promise<{ crumb: string; cookie: string } | null
   try {
     const ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0";
 
-    const r1 = await fetch("https://fc.yahoo.com/", { headers: { "User-Agent": ua } });
+    const r1 = await fetch("https://fc.yahoo.com/", { headers: { "User-Agent": ua }, cache: "no-store" });
     const setCookie = r1.headers.get("set-cookie") || "";
     const m = setCookie.match(/A3=[^;]+/);
     if (!m) { log.warn("Yahoo", "crumb: no A3 cookie"); return null; }
@@ -112,7 +112,7 @@ async function yahooFetch(path: string): Promise<any> {
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0",
       Cookie: auth.cookie,
     },
-    next: { revalidate: 60 },
+    cache: "no-store",
   });
   if (!res.ok) return null;
   return res.json();
@@ -218,7 +218,7 @@ async function twelveQuote(ticker: string): Promise<StockQuote | null> {
     const key = getTwelveDataKey();
     const res = await fetch(
       `${TWELVE_DATA_BASE}/quote?symbol=${ticker}&apikey=${key}`,
-      { next: { revalidate: 60 } }
+      { cache: "no-store" }
     );
     if (!res.ok) return null;
     const d = await res.json();
@@ -249,7 +249,7 @@ async function finnhubQuote(ticker: string): Promise<StockQuote | null> {
     const key = getFinnhubKey();
     const [quoteRes, profileRes] = await Promise.all([
       fetch(`${FINNHUB_BASE}/quote?symbol=${ticker}&token=${key}`, {
-        next: { revalidate: 30 },
+        cache: "no-store",
       }),
       fetch(`${FINNHUB_BASE}/stock/profile2?symbol=${ticker}&token=${key}`, {
         next: { revalidate: 86400 },
@@ -293,7 +293,8 @@ async function finnhubQuote(ticker: string): Promise<StockQuote | null> {
 async function alphaQuote(ticker: string): Promise<StockQuote | null> {
   try {
     const res = await fetch(
-      `${ALPHA_VANTAGE_BASE}?function=GLOBAL_QUOTE&symbol=${ticker}&apikey=${getAvKey()}`
+      `${ALPHA_VANTAGE_BASE}?function=GLOBAL_QUOTE&symbol=${ticker}&apikey=${getAvKey()}`,
+      { cache: "no-store" }
     );
     if (!res.ok) return null;
     const data = await res.json();

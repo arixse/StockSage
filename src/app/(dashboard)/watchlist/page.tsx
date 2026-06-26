@@ -3,6 +3,7 @@ import { fetchStockQuotes } from "@/lib/stock-api";
 import { getCachedQuotes } from "@/lib/stock-cache";
 import { WatchlistClient } from "./WatchlistClient";
 
+export const dynamic = "force-dynamic";
 export const metadata = { title: "Watchlist" };
 
 async function getWatchlistData(userId: string) {
