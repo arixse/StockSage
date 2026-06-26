@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -32,6 +33,7 @@ interface AiAnalysis {
 }
 
 export function NewsTab({ ticker }: { ticker: string }) {
+  const router = useRouter();
   const [data, setData] = useState<AiAnalysis | null>(null);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
@@ -49,6 +51,7 @@ export function NewsTab({ ticker }: { ticker: string }) {
     setLoading(true);
     try {
       const res = await fetch(`/api/stocks/${ticker}/ai-analysis`);
+      if (res.status === 401) { router.push("/login"); return; }
       const json = await res.json();
       setData(json.data);
     } catch (e) {
@@ -56,7 +59,7 @@ export function NewsTab({ ticker }: { ticker: string }) {
     } finally {
       setLoading(false);
     }
-  }, [ticker]);
+  }, [ticker, router]);
 
   useEffect(() => {
     loadAnalysis();
@@ -72,6 +75,7 @@ export function NewsTab({ ticker }: { ticker: string }) {
       const res = await fetch(`/api/stocks/${ticker}/generate-analysis`, {
         method: "POST",
       });
+      if (res.status === 401) { router.push("/login"); return; }
       const json = await res.json();
       if (json.data) {
         setData(json.data);
