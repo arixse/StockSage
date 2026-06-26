@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { runDailyPipelineForAll } from "@/lib/ai-pipeline";
 import { sendDailyDigests } from "@/lib/daily-digest";
 
+// Vercel Pro allows up to 300s; AI pipeline + email sending can take 2-4 min
+export const maxDuration = 300;
+
 export async function GET(request: NextRequest) {
   // Vercel Cron passes CRON_SECRET as raw Authorization header value (NOT Bearer-prefixed)
   // Also accept ?secret= query param for manual testing

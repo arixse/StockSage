@@ -241,6 +241,7 @@ export async function runDailyPipeline(ticker: string) {
 
 export async function runDailyPipelineForAll() {
   const supabase = createAdminClient();
+  const today = new Date().toISOString().split("T")[0];
 
   // Get all tracked tickers from watchlists
   const { data: items } = await supabase
@@ -254,14 +255,28 @@ export async function runDailyPipelineForAll() {
     return { processed: 0 };
   }
 
-  console.log(`[Pipeline] Processing ${tickers.length} tickers...`);
+  // Check which tickers already have today's analysis
+  const { data: existing } = await supabase
+    .from("ai_daily_analysis")
+    .select("ticker")
+    .eq("analysis_date", today)
+    .in("ticker", tickers);
+
+  const alreadyDone = new Set((existing || []).map((r) => r.ticker));
+  const toProcess = tickers.filter((t) => !alreadyDone.has(t));
+
+  if (alreadyDone.size > 0) {
+    console.log(`[Pipeline] Skipping ${alreadyDone.size} already-analyzed tickers`);
+  }
+
+  console.log(`[Pipeline] Processing ${toProcess.length}/${tickers.length} tickers...`);
 
   const results = [];
-  for (const ticker of tickers) {
+  for (const ticker of toProcess) {
     const result = await runDailyPipeline(ticker);
     results.push(result);
-    // Small delay between tickers to avoid rate limits
-    await new Promise((r) => setTimeout(r, 2000));
+    // Small delay between tickers to avoid LLM rate limits
+    await new Promise((r) => setTimeout(r, 500));
   }
 
   console.log(`[Pipeline] Done. Processed ${results.length} tickers.`);

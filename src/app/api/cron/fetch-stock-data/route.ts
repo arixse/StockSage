@@ -14,6 +14,9 @@ import {
 } from "@/lib/stock-api";
 import { createLogger } from "@/lib/logger";
 
+// Vercel Pro allows up to 300s; chart data fetch per-ticker can add up
+export const maxDuration = 300;
+
 const log = createLogger("stock-cron");
 
 export async function GET(request: NextRequest) {
