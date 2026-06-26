@@ -2,11 +2,12 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Bot, TrendingUp, TrendingDown, Minus, Loader2, Sparkles } from "lucide-react";
+import { Bot, TrendingUp, TrendingDown, Minus, Loader2, Sparkles, LogIn } from "lucide-react";
 
 interface AiAnalysis {
   ticker: string;
@@ -34,11 +35,26 @@ interface AiAnalysis {
 
 export function NewsTab({ ticker }: { ticker: string }) {
   const router = useRouter();
+  const supabase = createClient();
   const [data, setData] = useState<AiAnalysis | null>(null);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [genError, setGenError] = useState("");
+  const [authenticated, setAuthenticated] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
   const attemptedRef = useRef(false); // prevent infinite re-trigger
+
+  // Check auth first — redirect if not logged in
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) {
+        router.replace("/login");
+      } else {
+        setAuthenticated(true);
+      }
+      setAuthChecked(true);
+    });
+  }, []);
 
   // Reset attempted flag when ticker changes
   useEffect(() => {
@@ -48,10 +64,10 @@ export function NewsTab({ ticker }: { ticker: string }) {
   }, [ticker]);
 
   const loadAnalysis = useCallback(async () => {
+    if (!authenticated) return;
     setLoading(true);
     try {
       const res = await fetch(`/api/stocks/${ticker}/ai-analysis`);
-      if (res.status === 401) { router.push("/login"); return; }
       const json = await res.json();
       setData(json.data);
     } catch (e) {
@@ -59,14 +75,14 @@ export function NewsTab({ ticker }: { ticker: string }) {
     } finally {
       setLoading(false);
     }
-  }, [ticker, router]);
+  }, [ticker, authenticated]);
 
   useEffect(() => {
-    loadAnalysis();
+    if (authenticated) loadAnalysis();
   }, [loadAnalysis]);
 
   const generateAnalysis = useCallback(async () => {
-    if (attemptedRef.current) return; // already tried
+    if (!authenticated || attemptedRef.current) return;
     attemptedRef.current = true;
 
     setGenerating(true);
@@ -75,7 +91,6 @@ export function NewsTab({ ticker }: { ticker: string }) {
       const res = await fetch(`/api/stocks/${ticker}/generate-analysis`, {
         method: "POST",
       });
-      if (res.status === 401) { router.push("/login"); return; }
       const json = await res.json();
       if (json.data) {
         setData(json.data);
@@ -87,17 +102,47 @@ export function NewsTab({ ticker }: { ticker: string }) {
     } finally {
       setGenerating(false);
     }
-  }, [ticker]);
+  }, [ticker, authenticated]);
 
   // Auto-trigger generation when no real analysis exists
   useEffect(() => {
+    if (!authenticated) return;
     const hasReal = data?.hasAnalysis && (data.summary || data.score);
     if (!loading && !hasReal && !generating && !attemptedRef.current) {
       generateAnalysis();
     }
-  }, [loading, data, generating, generateAnalysis]);
+  }, [loading, data, generating, generateAnalysis, authenticated]);
 
   // ─── Render ──────────────────────────────────────────────────────────
+
+  // Auth check in progress — show nothing
+  if (!authChecked) {
+    return (
+      <Card>
+        <CardContent className="p-6 flex items-center justify-center">
+          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Not authenticated — show login prompt (shouldn't normally render, redirect happens)
+  if (!authenticated) {
+    return (
+      <Card>
+        <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+          <LogIn className="h-12 w-12 text-muted-foreground/30 mb-4" />
+          <p className="text-muted-foreground mb-2">Sign in Required</p>
+          <p className="text-sm text-muted-foreground mb-4">
+            Please sign in to access AI-powered stock analysis.
+          </p>
+          <Button variant="default" onClick={() => router.push("/login")}>
+            Sign In
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
 
   // Loading skeleton
   if (loading) {
