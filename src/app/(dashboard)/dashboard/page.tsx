@@ -7,6 +7,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { fetchStockQuotes } from "@/lib/stock-api";
 import { getCachedQuotes } from "@/lib/stock-cache";
+import { getMarketStatus } from "@/lib/market-status";
 
 export const metadata = { title: "Dashboard" };
 
@@ -58,6 +59,7 @@ export default async function DashboardPage() {
 
   const { watchlistId, stocks } = await getWatchlistWithQuotes(user.id);
 
+  const market = getMarketStatus();
   const gainers = stocks.filter((s) => s.change > 0 && !(s as any).error).length;
   const avgChange = stocks.length > 0
     ? stocks.reduce((sum, s) => sum + s.changePercent, 0) / stocks.length
@@ -110,8 +112,8 @@ export default async function DashboardPage() {
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-500">Open</div>
-            <p className="text-xs text-muted-foreground">NYSE / NASDAQ</p>
+            <div className={`text-2xl font-bold ${market.color}`}>{market.label}</div>
+            <p className="text-xs text-muted-foreground">{market.sublabel}</p>
           </CardContent>
         </Card>
       </div>
