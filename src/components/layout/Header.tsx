@@ -23,6 +23,7 @@ export function Header() {
   const pathname = usePathname();
   const [user, setUser] = useState<User | null>(null);
   const [tier, setTier] = useState<string>("free");
+  const [expiresAt, setExpiresAt] = useState<string | null>(null);
   const supabase = createClient();
 
   useEffect(() => {
@@ -34,10 +35,30 @@ export function Header() {
           .select("tier")
           .eq("id", data.user.id)
           .single();
-        if (profile?.tier) setTier(profile.tier);
+        if (profile?.tier) {
+          setTier(profile.tier);
+          // Fetch subscription expiration for Pro users
+          if (profile.tier === "pro") {
+            const { data: sub } = await supabase
+              .from("subscriptions")
+              .select("current_period_end")
+              .eq("user_id", data.user.id)
+              .eq("status", "active")
+              .single();
+            if (sub?.current_period_end) setExpiresAt(sub.current_period_end);
+          }
+        }
       }
     });
   }, []);
+
+  const formatExpiry = (date: string) => {
+    return new Date(date).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -100,7 +121,7 @@ export function Header() {
               />
               <DropdownMenuContent align="end" className="w-56">
                 <div className="flex items-center justify-start gap-2 p-2">
-                  <div className="flex flex-col space-y-0.5">
+                  <div className="flex flex-col space-y-1">
                     <p className="text-sm font-medium">{user.email}</p>
                     <Badge
                       variant={tier === "pro" ? "default" : tier === "basic" ? "secondary" : "outline"}
@@ -109,6 +130,11 @@ export function Header() {
                       {tier === "pro" && <Crown className="h-3 w-3 mr-1" />}
                       {tier.charAt(0).toUpperCase() + tier.slice(1)}
                     </Badge>
+                    {tier === "pro" && expiresAt && (
+                      <p className="text-[10px] text-muted-foreground">
+                        Renews {formatExpiry(expiresAt)}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <DropdownMenuSeparator />

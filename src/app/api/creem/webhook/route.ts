@@ -31,6 +31,7 @@ export async function POST(request: NextRequest) {
         customer_id: string;
         subscription_id?: string;
         product_id: string;
+        current_period_end?: string;
         metadata?: { userId?: string };
       };
       const userId = obj.metadata?.userId;
@@ -43,6 +44,7 @@ export async function POST(request: NextRequest) {
         stripe_price_id: obj.product_id,
         status: "active",
         tier: "pro",
+        current_period_end: obj.current_period_end || null,
       });
 
       await supabase.from("profiles").update({ tier: "pro" }).eq("id", userId);
