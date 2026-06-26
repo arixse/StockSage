@@ -16,7 +16,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Creem not configured" }, { status: 500 });
     }
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    // Use env var, fallback to Vercel auto-injected preview URL, then localhost
+    const appUrl =
+      process.env.NEXT_PUBLIC_APP_URL ||
+      (process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : undefined) ||
+      "http://localhost:3000";
 
     const checkout = await createCheckout({
       productId,
