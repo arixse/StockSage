@@ -30,10 +30,32 @@ async function getWatchlistWithQuotes(userId: string) {
 
   if (tickers.length === 0) return { watchlistId: watchlist?.id, stocks: [] };
 
-  // Cache-first: read quotes from Supabase, fall back to live API
+  // During market hours: skip stale cache, fetch live quotes
+  const market = getMarketStatus();
+  const isTrading = market.status === "open" || market.status === "pre-market" || market.status === "after-hours";
+
   const cached = await getCachedQuotes(tickers);
-  const hasCached = cached.some((q) => q !== null);
-  const quotes = hasCached ? cached : await fetchStockQuotes(tickers);
+  const staleTickers = isTrading
+    ? cached
+        .map((q, i) => {
+          if (!q?.timestamp) return tickers[i];
+          const ageMin = (Date.now() - new Date(q.timestamp).getTime()) / 60000;
+          return ageMin > 5 ? tickers[i] : null;
+        })
+        .filter(Boolean) as string[]
+    : [];
+
+  let quotes = cached;
+  if (staleTickers.length > 0) {
+    const fresh = await fetchStockQuotes(staleTickers);
+    // Merge fresh quotes into cached results
+    const freshMap = new Map(fresh.filter((q): q is NonNullable<typeof q> => q !== null).map((q) => [q.ticker, q]));
+    const tickerSet = new Set(staleTickers);
+    quotes = cached.map((q, i) => {
+      if (q && !tickerSet.has(tickers[i])) return q;
+      return freshMap.get(tickers[i]) ?? q;
+    });
+  }
 
   const stocks = quotes.map((q, i) => {
     const ticker = tickers[i];
