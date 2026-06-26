@@ -1,5 +1,3 @@
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -73,18 +71,14 @@ export default async function StockPage({ params }: Props) {
 
   if (!quote) {
     return (
-      <div className="flex flex-col min-h-full">
-        <Header />
-        <main className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <p className="text-destructive mb-2">Failed to load {upperTicker}</p>
-            <p className="text-sm text-muted-foreground">No data available from API. Try again later.</p>
-            <Button variant="outline" className="mt-4" render={<Link href="/" />}>
-              Go Home
-            </Button>
-          </div>
-        </main>
-        <Footer />
+      <div className="flex items-center justify-center py-20">
+        <div className="text-center">
+          <p className="text-destructive mb-2">Failed to load {upperTicker}</p>
+          <p className="text-sm text-muted-foreground">No data available from API. Try again later.</p>
+          <Button variant="outline" className="mt-4" render={<Link href="/" />}>
+            Go Home
+          </Button>
+        </div>
       </div>
     );
   }
@@ -92,8 +86,7 @@ export default async function StockPage({ params }: Props) {
   const changePositive = quote.change >= 0;
 
   return (
-    <div className="flex flex-col min-h-full">
-      <Header />
+    <>
       {/* Structured Data: Breadcrumb + FAQ + WebApplication */}
       <JsonLd
         data={{
@@ -171,7 +164,6 @@ export default async function StockPage({ params }: Props) {
           <NewsTab ticker={upperTicker} />
         </div>
       </main>
-      <Footer />
-    </div>
+    </>
   );
 }
