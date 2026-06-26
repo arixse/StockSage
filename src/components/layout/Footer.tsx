@@ -1,7 +1,25 @@
+"use client";
+
 import Link from "next/link";
 import { TrendingUp } from "lucide-react";
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 export function Footer() {
+  const [tier, setTier] = useState<string | null>(null);
+  const supabase = createClient();
+
+  useEffect(() => {
+    supabase.auth.getUser().then(async ({ data }) => {
+      if (!data.user) { setTier("free"); return; }
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("tier")
+        .eq("id", data.user.id)
+        .single();
+      setTier(profile?.tier || "free");
+    });
+  }, []);
   return (
     <footer className="border-t py-10 mt-auto bg-muted/20">
       <div className="container mx-auto px-4">
@@ -56,11 +74,13 @@ export function Footer() {
                   Market Heatmap
                 </Link>
               </li>
-              <li>
-                <Link href="/pricing" className="hover:text-foreground transition-colors">
-                  Pricing
-                </Link>
-              </li>
+              {tier !== "pro" && (
+                <li>
+                  <Link href="/pricing" className="hover:text-foreground transition-colors">
+                    Pricing
+                  </Link>
+                </li>
+              )}
             </ul>
           </div>
 

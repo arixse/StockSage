@@ -1,10 +1,15 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Loader2 } from "lucide-react";
 import { CheckoutButton } from "@/components/payment/CheckoutButton";
+import { createClient } from "@/lib/supabase/client";
 
 const TIERS = [
   {
@@ -41,9 +46,40 @@ const TIERS = [
   },
 ];
 
-export const metadata = { title: "Pricing" };
-
 export default function PricingPage() {
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const supabase = createClient();
+
+  useEffect(() => {
+    supabase.auth.getUser().then(async ({ data }) => {
+      if (data.user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("tier")
+          .eq("id", data.user.id)
+          .single();
+        if (profile?.tier === "pro") {
+          router.replace("/dashboard");
+          return;
+        }
+      }
+      setLoading(false);
+    });
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col min-h-full">
+        <Header />
+        <main className="flex-1 flex items-center justify-center">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col min-h-full">
       <Header />
