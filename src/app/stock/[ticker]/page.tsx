@@ -9,6 +9,32 @@ import { AddToWatchlistButton } from "@/components/stock/AddToWatchlistButton";
 import Link from "next/link";
 import { fetchStockQuote } from "@/lib/stock-api";
 import { getCachedQuotes } from "@/lib/stock-cache";
+import { getMarketStatus } from "@/lib/market-status";
+
+/** Skip cache if market is open and cached quote is older than N minutes */
+async function getFreshQuote(ticker: string) {
+  const market = getMarketStatus();
+  const cachedArr = await getCachedQuotes([ticker]);
+  const cached = cachedArr[0];
+
+  // During market hours, require freshness
+  if (market.status === "open" || market.status === "pre-market" || market.status === "after-hours") {
+    if (cached?.timestamp) {
+      const ageMinutes = (Date.now() - new Date(cached.timestamp).getTime()) / 60000;
+      if (ageMinutes > 5) {
+        // Cache is stale — fetch live and return it (don't wait for cron)
+        const live = await fetchStockQuote(ticker);
+        if (live) return live;
+      }
+    } else if (!cached) {
+      // No cache at all — fetch live
+      const live = await fetchStockQuote(ticker);
+      if (live) return live;
+    }
+  }
+
+  return cached ?? await fetchStockQuote(ticker);
+}
 
 // Stock prices change constantly — never cache this page
 export const dynamic = "force-dynamic";
@@ -24,9 +50,8 @@ export async function generateMetadata({ params }: Props) {
 
   let quote = null;
   try {
-    quote = await getCachedQuotes([upperTicker])
-      .then((arr) => arr[0] ?? fetchStockQuote(upperTicker))
-      .catch(() => null);
+    quote = await getFreshQuote(upperTicker);
+  } catch { /* metadata fetch can fail silently */ }
   } catch {
     // metadata fetch can fail silently
   }
@@ -68,9 +93,7 @@ export default async function StockPage({ params }: Props) {
   const upperTicker = ticker.toUpperCase();
 
   // Fetch quote for header display
-  const quote = await getCachedQuotes([upperTicker])
-    .then((arr) => arr[0] ?? fetchStockQuote(upperTicker))
-    .catch(() => null);
+  const quote = await getFreshQuote(upperTicker).catch(() => null);
 
   if (!quote) {
     return (

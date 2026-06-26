@@ -13,6 +13,7 @@ import {
   fetchCompanyOverview,
 } from "@/lib/stock-api";
 import { createLogger } from "@/lib/logger";
+import { getMarketStatus } from "@/lib/market-status";
 
 // Vercel Pro allows up to 300s; chart data fetch per-ticker can add up
 export const maxDuration = 300;
@@ -60,7 +61,11 @@ export async function GET(request: NextRequest) {
     }
 
     stats.tickersProcessed = tickers.length;
-    log.info("process", `Processing ${tickers.length} tickers`);
+
+    // Market-hours check: only refresh quotes intraday; full pipeline at close
+    const market = getMarketStatus();
+    const isTrading = market.status === "open" || market.status === "pre-market" || market.status === "after-hours";
+    log.info("process", `Processing ${tickers.length} tickers (market: ${market.status})`);
 
     // 3. Batch fetch + upsert quotes (Yahoo handles batch in one request)
     log.info("quotes", `Fetching quotes for ${tickers.length} tickers...`);
@@ -78,7 +83,8 @@ export async function GET(request: NextRequest) {
       log.warn("quotes", "All quotes returned null or zero");
     }
 
-    // 4. Per-ticker: fetch chart data + fundamentals
+    // 4. Per-ticker: fetch chart data + fundamentals (skip intraday — only at close)
+    if (!isTrading) {
     for (let i = 0; i < tickers.length; i++) {
       const ticker = tickers[i];
       const idx = `[${i + 1}/${tickers.length}]`;
@@ -124,7 +130,8 @@ export async function GET(request: NextRequest) {
         log.error("fundamental", `${idx} ${ticker} failed: ${e}`);
         stats.errors++;
       }
-    }
+      }
+    } // end !isTrading (charts + fundamentals)
 
     log.info("end", `Done: ${JSON.stringify(stats)}`);
     return NextResponse.json({ success: true, stats });
