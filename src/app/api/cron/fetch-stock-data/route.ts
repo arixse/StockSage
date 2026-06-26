@@ -62,12 +62,17 @@ export async function GET(request: NextRequest) {
     // 3. Batch fetch + upsert quotes (Yahoo handles batch in one request)
     log.info("quotes", `Fetching quotes for ${tickers.length} tickers...`);
     const quotes = await fetchStockQuotes(tickers);
-    const validQuotes = quotes.filter((q): q is NonNullable<typeof q> => q !== null);
+    const validQuotes = quotes.filter(
+      (q): q is NonNullable<typeof q> => q !== null && q.price > 0
+    );
+    if (quotes.length !== validQuotes.length) {
+      log.warn("quotes", `Filtered out ${quotes.length - validQuotes.length} null/zero-price quotes`);
+    }
     if (validQuotes.length > 0) {
       stats.quotesUpserted = await upsertStockQuotes(admin, validQuotes);
       log.info("quotes", `Upserted ${stats.quotesUpserted} quotes`);
     } else {
-      log.warn("quotes", "All quotes returned null");
+      log.warn("quotes", "All quotes returned null or zero");
     }
 
     // 4. Per-ticker: fetch chart data + fundamentals
@@ -105,8 +110,10 @@ export async function GET(request: NextRequest) {
         // Fundamentals
         const overview = await fetchCompanyOverview(ticker);
         if (overview) {
-          await upsertStockFundamentals(admin, [overview]);
-          stats.fundamentalsUpserted++;
+          const upserted = await upsertStockFundamentals(admin, [overview]);
+          if (upserted > 0) {
+            stats.fundamentalsUpserted++;
+          }
         }
 
         await new Promise((r) => setTimeout(r, 300)); // Rate limit

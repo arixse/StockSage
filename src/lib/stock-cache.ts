@@ -148,7 +148,7 @@ export async function upsertStockQuotes(
     low: q.low,
     open: q.open,
     prev_close: q.prevClose,
-    volume: q.volume,
+    volume: Math.round(q.volume), // Ensure integer for DB compatibility
     currency: q.currency || "USD",
     exchange_name: q.exchangeName || "",
     short_name: q.shortName || "",
@@ -161,7 +161,8 @@ export async function upsertStockQuotes(
   // Batch upsert — on conflict update quote fields only
   const { error } = await admin.from("stocks").upsert(rows, { onConflict: "ticker" });
   if (error) {
-    console.error("[stock-cache] upsertStockQuotes error:", error);
+    const tickers = rows.map((r) => r.ticker).join(",");
+    console.error(`[stock-cache] upsertStockQuotes error for [${tickers.slice(0, 100)}...]:`, error);
     return 0;
   }
   return rows.length;
@@ -182,7 +183,7 @@ export async function upsertStockPrices(
     low: b.low,
     close: b.close,
     adj_close: b.close, // Yahoo already returns adjusted close as `close`
-    volume: b.volume,
+    volume: Math.round(b.volume),
   }));
 
   const { error } = await admin
@@ -208,15 +209,15 @@ export async function upsertStockFundamentals(
     sector: o.sector || null,
     industry: o.industry || null,
     exchange: o.exchange || null,
-    market_cap: o.marketCap ?? null,
+    market_cap: o.marketCap != null ? Math.round(o.marketCap) : null,
     pe_ratio: o.peRatio ?? null,
     forward_pe: o.forwardPE ?? null,
     eps_ttm: o.epsTTM ?? null,
     pb_ratio: o.pbRatio ?? null,
     dividend_yield: o.dividendYield ?? null,
     beta: o.beta ?? null,
-    revenue_ttm: o.revenueTTM ?? null,
-    net_income_ttm: o.netIncomeTTM ?? null,
+    revenue_ttm: o.revenueTTM != null ? Math.round(o.revenueTTM) : null,
+    net_income_ttm: o.netIncomeTTM != null ? Math.round(o.netIncomeTTM) : null,
     roe: o.roe ?? null,
     roa: o.roa ?? null,
     gross_margin: o.grossMargin ?? null,
@@ -227,7 +228,8 @@ export async function upsertStockFundamentals(
 
   const { error } = await admin.from("stocks").upsert(rows, { onConflict: "ticker" });
   if (error) {
-    console.error("[stock-cache] upsertStockFundamentals error:", error);
+    const tickers = rows.map((r) => r.ticker).join(",");
+    console.error(`[stock-cache] upsertStockFundamentals error for [${tickers}]:`, error);
     return 0;
   }
   return rows.length;
