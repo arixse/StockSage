@@ -505,13 +505,46 @@ export interface SearchResult {
 }
 
 export async function searchStocks(query: string): Promise<SearchResult[]> {
-  const yh = await yahooSearch(query);
-  if (yh.length > 0) { log.info("search", `"${query}" → Yahoo (${yh.length} results)`); return yh; }
-  const fh = await finnhubSearch(query);
-  if (fh.length > 0) { log.info("search", `"${query}" → Finnhub (${fh.length} results)`); return fh; }
-  const av = await alphaSearch(query);
-  log.info("search", `"${query}" → AlphaVantage (${av.length} results)`);
-  return av;
+  // Run Yahoo + Finnhub in parallel, then merge and deduplicate
+  const [yh, fh] = await Promise.all([
+    yahooSearch(query).catch(() => []),
+    finnhubSearch(query).catch(() => []),
+  ]);
+
+  // Merge results, deduplicate by ticker (case-insensitive)
+  const seen = new Set<string>();
+  const merged: SearchResult[] = [];
+  for (const r of [...yh, ...fh]) {
+    const key = r.ticker.toUpperCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      merged.push(r);
+    }
+  }
+
+  if (merged.length > 0) {
+    log.info("search", `"${query}" → ${merged.length} results (Yahoo:${yh.length} Finnhub:${fh.length})`);
+    return merged.slice(0, 10);
+  }
+
+  // Last resort: Alpha Vantage
+  const av = await alphaSearch(query).catch(() => []);
+  if (av.length > 0) {
+    log.info("search", `"${query}" → AlphaVantage (${av.length} results)`);
+    return av.slice(0, 10);
+  }
+
+  // Final fallback: if query looks like a ticker, try direct quote lookup
+  const upperQuery = query.toUpperCase().replace(/[^A-Z0-9]/g, "");
+  if (/^[A-Z]{1,5}$/.test(upperQuery)) {
+    const q = await fetchStockQuote(upperQuery);
+    if (q && q.price > 0) {
+      log.info("search", `"${query}" → direct quote lookup ($${q.price})`);
+      return [{ ticker: upperQuery, companyName: q.shortName || upperQuery, type: "EQUITY", exchange: q.exchangeName || "" }];
+    }
+  }
+
+  return [];
 }
 
 async function yahooSearch(query: string): Promise<SearchResult[]> {
