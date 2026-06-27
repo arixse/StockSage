@@ -102,7 +102,7 @@ async function getYahooCrumb(): Promise<{ crumb: string; cookie: string } | null
       // Last resort: grab all cookies
       cookie = setCookie.split(",").map((c) => c.split(";")[0].trim()).filter((c) => c.startsWith("A")).join("; ");
     }
-    if (!cookie) { log.warn("Yahoo", "crumb: no cookie found", setCookie.slice(0, 200)); return null; }
+    if (!cookie) { log.warn("Yahoo", `crumb: no cookie found (set-cookie: ${setCookie.slice(0, 200)})`); return null; }
 
     // Step 2: get crumb
     const crumbHeaders = { ...headers, Cookie: cookie };
