@@ -518,7 +518,10 @@ async function yahooSearch(query: string): Promise<SearchResult[]> {
   const data = await yahooFetch(`/v1/finance/search?q=${encodeURIComponent(query)}&quotesCount=10`);
   if (!data?.quotes) return [];
   return data.quotes
-    .filter((q: any) => q.quoteType === "EQUITY" || q.quoteType === "ETF")
+    .filter((q: any) => {
+      const t = q.quoteType || "";
+      return t === "EQUITY" || t === "ETF" || t === "INDEX" || t === "MUTUALFUND" || !t;
+    })
     .map((q: any) => ({
       ticker: q.symbol, companyName: q.shortname || q.longname || "",
       type: q.quoteType || "", exchange: q.exchange || "",
@@ -535,7 +538,7 @@ async function finnhubSearch(query: string): Promise<SearchResult[]> {
     const data = await res.json();
 
     return (data.result || [])
-      .filter((r: any) => r.type === "Common Stock")
+      .filter((r: any) => r.type === "Common Stock" || r.type === "ETF" || r.type === "INDEX")
       .slice(0, 10)
       .map((r: any) => ({
         ticker: r.symbol,
