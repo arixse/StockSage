@@ -3,6 +3,8 @@ import { getSP500Tickers, sp500Stocks } from "@/data/sp500-tickers";
 import { getCachedQuotes } from "@/lib/stock-cache";
 import { fetchStockQuotes } from "@/lib/stock-api";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const group = searchParams.get("group") || "sector";

@@ -5,6 +5,8 @@ import { latestTechnicals } from "@/lib/technicals";
 import type { OHLCVBar } from "@/lib/technicals";
 import { createClient } from "@/lib/supabase/server";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ ticker: string }> }
@@ -26,8 +28,8 @@ export async function GET(
       getCachedCompanyOverview(upperTicker)
         .then((c) => c ?? fetchCompanyOverview(upperTicker))
         .catch(() => null),
-      getCachedChart(upperTicker, "compact")
-        .then((bars) => bars.length > 0 ? bars : fetchStockChart(upperTicker, "compact"))
+      getCachedChart(upperTicker, "1m")
+        .then((bars) => bars.length > 0 ? bars : fetchStockChart(upperTicker, "1m"))
         .catch(() => []),
     ]);
 

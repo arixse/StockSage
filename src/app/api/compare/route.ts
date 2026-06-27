@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { fetchStockQuotes, fetchCompanyOverview } from "@/lib/stock-api";
 import { getCachedQuotes, getCachedCompanyOverview } from "@/lib/stock-cache";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const tickersParam = searchParams.get("tickers");
