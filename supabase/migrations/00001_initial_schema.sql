@@ -131,47 +131,47 @@ CREATE TABLE IF NOT EXISTS public.email_logs (
 
 -- Profiles
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Users can read own profile" ON profiles FOR SELECT USING (auth.uid() = id);
-CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
+CREATE POLICY IF NOT EXISTS "Users can read own profile" ON profiles FOR SELECT USING (auth.uid() = id);
+CREATE POLICY IF NOT EXISTS "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
 
 -- Subscriptions
 ALTER TABLE public.subscriptions ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Users can read own subscription" ON subscriptions FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY IF NOT EXISTS "Users can read own subscription" ON subscriptions FOR SELECT USING (auth.uid() = user_id);
 
 -- Watchlists
 ALTER TABLE public.watchlists ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Users can CRUD own watchlists" ON watchlists FOR ALL USING (auth.uid() = user_id);
+CREATE POLICY IF NOT EXISTS "Users can CRUD own watchlists" ON watchlists FOR ALL USING (auth.uid() = user_id);
 
 ALTER TABLE public.watchlist_items ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Users can CRUD own watchlist items" ON watchlist_items
+CREATE POLICY IF NOT EXISTS "Users can CRUD own watchlist items" ON watchlist_items
   FOR ALL USING (
     auth.uid() = (SELECT user_id FROM watchlists WHERE id = watchlist_id)
   );
 
 -- Portfolios
 ALTER TABLE public.portfolios ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Users can CRUD own portfolios" ON portfolios FOR ALL USING (auth.uid() = user_id);
+CREATE POLICY IF NOT EXISTS "Users can CRUD own portfolios" ON portfolios FOR ALL USING (auth.uid() = user_id);
 
 -- Email preferences
 ALTER TABLE public.email_preferences ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Users can manage own email prefs" ON email_preferences FOR ALL USING (auth.uid() = user_id);
+CREATE POLICY IF NOT EXISTS "Users can manage own email prefs" ON email_preferences FOR ALL USING (auth.uid() = user_id);
 
 -- Email logs
 ALTER TABLE public.email_logs ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Users can read own email logs" ON email_logs FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY IF NOT EXISTS "Users can read own email logs" ON email_logs FOR SELECT USING (auth.uid() = user_id);
 
 -- Stocks are public read
 ALTER TABLE public.stocks ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Stocks are publicly readable" ON stocks FOR SELECT USING (true);
+CREATE POLICY IF NOT EXISTS "Stocks are publicly readable" ON stocks FOR SELECT USING (true);
 
 ALTER TABLE public.stock_prices ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Stock prices are publicly readable" ON stock_prices FOR SELECT USING (true);
+CREATE POLICY IF NOT EXISTS "Stock prices are publicly readable" ON stock_prices FOR SELECT USING (true);
 
 ALTER TABLE public.news_articles ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "News articles are publicly readable" ON news_articles FOR SELECT USING (true);
+CREATE POLICY IF NOT EXISTS "News articles are publicly readable" ON news_articles FOR SELECT USING (true);
 
 ALTER TABLE public.ai_analyses ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "AI analyses are publicly readable" ON ai_analyses FOR SELECT USING (true);
+CREATE POLICY IF NOT EXISTS "AI analyses are publicly readable" ON ai_analyses FOR SELECT USING (true);
 
 -- Auto-create profile on signup
 CREATE OR REPLACE FUNCTION public.handle_new_user()
