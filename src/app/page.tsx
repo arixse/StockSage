@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -8,6 +9,23 @@ import { TrendingUp, BarChart3, Sparkles, Mail, ArrowRight, Flame, GraduationCap
 import { StockLogo } from "@/components/stock/StockLogo";
 import { getCachedQuotes } from "@/lib/stock-cache";
 import { fetchStockQuotes } from "@/lib/stock-api";
+
+export const metadata: Metadata = {
+  description:
+    "Free AI-powered US stock analysis platform. Get daily AI summaries, stock scores (0-100), market heatmaps, and personalized watchlists. Track NYSE and NASDAQ stocks with news sentiment and buy/hold/sell signals.",
+  openGraph: {
+    title: "StockSage — AI-Powered Stock Analysis & Scoring",
+    description:
+      "Free AI-powered US stock analysis. Daily AI summaries, smart scoring, market heatmaps, and personalized watchlists for NYSE & NASDAQ stocks.",
+    url: "/",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "StockSage — AI-Powered Stock Analysis & Scoring",
+    description:
+      "Free AI-powered US stock analysis. Daily AI summaries, smart scoring, and buy/hold/sell signals.",
+  },
+};
 
 const FEATURES = [
   {

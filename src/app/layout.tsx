@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Providers } from "@/components/layout/Providers";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -36,9 +36,6 @@ export const metadata: Metadata = {
     "buy sell hold signals",
   ],
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
-  alternates: {
-    canonical: "/",
-  },
   openGraph: {
     title: "StockSage · Stock Calls & Radar",
     description:
@@ -76,6 +73,12 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#09090b",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -101,10 +104,28 @@ export default function RootLayout({
                 description:
                   "AI-powered stock analysis platform providing daily AI summaries, technical analysis, fundamentals, and smart scoring for US stocks.",
                 logo: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/icon.svg`,
+                sameAs: [
+                  "https://twitter.com/stocksage",
+                  "https://github.com/arixse/StockSage",
+                ],
                 contactPoint: {
                   "@type": "ContactPoint",
                   email: "support@stocksage.xyz",
                   contactType: "customer support",
+                },
+              },
+              {
+                "@type": "WebSite",
+                "@id": `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/#website`,
+                name: "StockSage",
+                url: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+                potentialAction: {
+                  "@type": "SearchAction",
+                  target: {
+                    "@type": "EntryPoint",
+                    urlTemplate: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/stock/{search_term_string}`,
+                  },
+                  "query-input": "required name=search_term_string",
                 },
               },
               {

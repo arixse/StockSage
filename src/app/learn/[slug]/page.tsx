@@ -1,9 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { getLearnArticle, getLearnSlugs } from "@/data/learn-articles";
 import { ChevronLeft } from "lucide-react";
 
@@ -15,14 +17,49 @@ export function generateStaticParams() {
   return getLearnSlugs().map((slug) => ({ slug }));
 }
 
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const article = getLearnArticle(slug);
+  if (!article) return {};
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  return {
+    title: article.title,
+    description: article.description,
+    openGraph: {
+      title: `${article.title} | StockSage Learn`,
+      description: article.description,
+      type: "article",
+      url: `${appUrl}/learn/${slug}`,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: article.title,
+      description: article.description,
+    },
+  };
+}
+
 export default async function LearnArticlePage({ params }: Props) {
   const { slug } = await params;
   const article = getLearnArticle(slug);
 
   if (!article) notFound();
 
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
   return (
     <div className="flex flex-col min-h-full">
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "Article",
+          headline: article.title,
+          description: article.description,
+          url: `${appUrl}/learn/${slug}`,
+          author: { "@type": "Organization", name: "StockSage" },
+          publisher: { "@type": "Organization", name: "StockSage", logo: { "@type": "ImageObject", url: `${appUrl}/icon.svg` } },
+        }}
+      />
       <Header />
       <main className="flex-1">
         <article className="container mx-auto px-4 py-12 max-w-3xl">
