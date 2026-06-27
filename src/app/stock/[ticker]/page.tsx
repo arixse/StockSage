@@ -17,22 +17,21 @@ async function getFreshQuote(ticker: string) {
   const cachedArr = await getCachedQuotes([ticker]);
   const cached = cachedArr[0];
 
-  // During market hours, require freshness
+  // During market hours, skip stale cache (or no timestamp at all)
   if (market.status === "open" || market.status === "pre-market" || market.status === "after-hours") {
-    if (cached?.timestamp) {
-      const ageMinutes = (Date.now() - new Date(cached.timestamp).getTime()) / 60000;
-      if (ageMinutes > 5) {
-        // Cache is stale — fetch live and return it (don't wait for cron)
-        const live = await fetchStockQuote(ticker);
-        if (live) return live;
-      }
-    } else if (!cached) {
-      // No cache at all — fetch live
+    const ageMinutes = cached?.timestamp
+      ? (Date.now() - new Date(cached.timestamp).getTime()) / 60000
+      : Infinity; // no timestamp = treat as stale
+
+    if (ageMinutes > 5) {
       const live = await fetchStockQuote(ticker);
       if (live) return live;
     }
+    // If cache is fresh (<5 min), return it
+    if (cached) return cached;
   }
 
+  // Fallback: cached (even if old) or live
   return cached ?? await fetchStockQuote(ticker);
 }
 
