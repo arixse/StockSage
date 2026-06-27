@@ -1,0 +1,16 @@
+name: Daily Digest
+
+on:
+  schedule:
+    # 13:00 UTC — daily AI digest (9am EDT, before market open)
+    - cron: "0 13 * * 1-5"
+  workflow_dispatch:
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run daily digest
+        run: |
+          curl -s -o /dev/null -w "HTTP %{http_code}" \
+            "${{ secrets.APP_URL }}/api/cron/daily-digest?secret=${{ secrets.CRON_SECRET }}"
