@@ -26,6 +26,7 @@ CREATE INDEX IF NOT EXISTS idx_ai_daily_ticker_date ON ai_daily_analysis(ticker,
 
 -- Public read access
 ALTER TABLE public.ai_daily_analysis ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "AI analysis publicly readable" ON ai_daily_analysis;
 CREATE POLICY "AI analysis publicly readable" ON ai_daily_analysis FOR SELECT USING (true);
 
 -- Ticker tracking table for cron job
@@ -41,4 +42,5 @@ FROM public.watchlist_items wi
 ON CONFLICT (ticker) DO NOTHING;
 
 ALTER TABLE public.tracked_tickers ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Tracked tickers publicly readable" ON tracked_tickers;
 CREATE POLICY "Tracked tickers publicly readable" ON tracked_tickers FOR SELECT USING (true);
