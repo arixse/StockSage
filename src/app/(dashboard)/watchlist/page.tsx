@@ -42,14 +42,13 @@ async function getWatchlistData(userId: string) {
   const isTrading = market.status === "open" || market.status === "pre-market" || market.status === "after-hours";
 
   const cached = await getCachedQuotes(tickers);
-  const staleTickers = isTrading
-    ? tickers.filter((t, i) => {
-        const q = cached[i];
-        if (!q?.timestamp) return true; // no cache at all
-        const ageMin = (Date.now() - new Date(q.timestamp).getTime()) / 60000;
-        return ageMin > 5;
-      })
-    : [];
+  const staleTickers = tickers.filter((t, i) => {
+    const q = cached[i];
+    if (!q?.timestamp) return true; // no cache at all — always fetch
+    if (!isTrading) return false;   // outside trading, cached is fine
+    const ageMin = (Date.now() - new Date(q.timestamp).getTime()) / 60000;
+    return ageMin > 5;
+  });
 
   // Fetch live for stale/missing tickers, merge with fresh cached ones
   let quotes = cached;
