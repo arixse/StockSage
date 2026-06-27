@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getWatchlistInsights } from "@/lib/dashboard";
 import type { StockInsight } from "@/lib/dashboard";
 import { generatePortfolioBrief, isLlmConfigured } from "@/lib/ai";
@@ -105,7 +106,10 @@ export async function POST() {
 
   const tickersSnapshot = insights.stocks.map((s) => s.ticker).sort();
 
-  const { error } = await supabase.from("portfolio_briefs").upsert(
+  // Use admin client for the write — RLS on upsert can be flaky in API routes.
+  // The authenticated user.id is passed explicitly, so data integrity is preserved.
+  const admin = createAdminClient();
+  const { error } = await admin.from("portfolio_briefs").upsert(
     {
       user_id: user.id,
       brief_date: today(),
