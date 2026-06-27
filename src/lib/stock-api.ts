@@ -89,6 +89,7 @@ async function getYahooCrumb(): Promise<{ crumb: string; cookie: string } | null
 
     const r2 = await fetch(`https://query2.finance.yahoo.com/v1/test/getcrumb`, {
       headers: { "User-Agent": ua, Cookie: cookie },
+      cache: "no-store",
     });
     const crumb = (await r2.text()).trim();
     if (!crumb || crumb.length > 20) { log.warn("Yahoo", `crumb: invalid (len=${crumb.length})`); return null; }
@@ -432,7 +433,8 @@ async function alphaChart(ticker: string, range: string): Promise<OHLCVBar[]> {
   try {
     const outputSize = range === "max" || range === "5y" ? "full" : "compact";
     const res = await fetch(
-      `${ALPHA_VANTAGE_BASE}?function=TIME_SERIES_DAILY&symbol=${ticker}&outputsize=${outputSize}&apikey=${getAvKey()}`
+      `${ALPHA_VANTAGE_BASE}?function=TIME_SERIES_DAILY&symbol=${ticker}&outputsize=${outputSize}&apikey=${getAvKey()}`,
+      { next: { revalidate: 300 } }
     );
     if (!res.ok) return [];
     const data = await res.json();
@@ -510,7 +512,8 @@ async function finnhubSearch(query: string): Promise<SearchResult[]> {
 async function alphaSearch(query: string): Promise<SearchResult[]> {
   try {
     const res = await fetch(
-      `${ALPHA_VANTAGE_BASE}?function=SYMBOL_SEARCH&keywords=${query}&apikey=${getAvKey()}`
+      `${ALPHA_VANTAGE_BASE}?function=SYMBOL_SEARCH&keywords=${query}&apikey=${getAvKey()}`,
+      { next: { revalidate: 3600 } }
     );
     if (!res.ok) return [];
     const data = await res.json();
@@ -593,8 +596,8 @@ async function twelveOverview(ticker: string): Promise<CompanyOverview | null> {
   try {
     const key = getTwelveDataKey();
     const [statRes, profileRes] = await Promise.all([
-      fetch(`${TWELVE_DATA_BASE}/statistics?symbol=${ticker}&apikey=${key}`),
-      fetch(`${TWELVE_DATA_BASE}/quote?symbol=${ticker}&apikey=${key}`),
+      fetch(`${TWELVE_DATA_BASE}/statistics?symbol=${ticker}&apikey=${key}`, { next: { revalidate: 86400 } }),
+      fetch(`${TWELVE_DATA_BASE}/quote?symbol=${ticker}&apikey=${key}`, { cache: "no-store" }),
     ]);
     if (!statRes.ok) return null;
     const s = await statRes.json();
@@ -704,7 +707,8 @@ async function finnhubMetrics(ticker: string): Promise<Partial<CompanyOverview>>
 async function alphaCompanyOverview(ticker: string): Promise<CompanyOverview | null> {
   try {
     const res = await fetch(
-      `${ALPHA_VANTAGE_BASE}?function=OVERVIEW&symbol=${ticker}&apikey=${getAvKey()}`
+      `${ALPHA_VANTAGE_BASE}?function=OVERVIEW&symbol=${ticker}&apikey=${getAvKey()}`,
+      { next: { revalidate: 86400 } }
     );
     if (!res.ok) return null;
     const d = await res.json();

@@ -51,7 +51,6 @@ export async function generateMetadata({ params }: Props) {
   let quote = null;
   try {
     quote = await getFreshQuote(upperTicker);
-  } catch { /* metadata fetch can fail silently */ }
   } catch {
     // metadata fetch can fail silently
   }

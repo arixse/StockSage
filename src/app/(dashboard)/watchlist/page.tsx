@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { fetchStockQuotes } from "@/lib/stock-api";
 import { getCachedQuotes } from "@/lib/stock-cache";
+import { getMarketStatus } from "@/lib/market-status";
 import { WatchlistClient } from "./WatchlistClient";
 
 export const dynamic = "force-dynamic";
@@ -36,10 +37,33 @@ async function getWatchlistData(userId: string) {
     return { watchlistId: watchlist.id, name: watchlist.name, stocks: [] };
   }
 
-  // Cache-first: read quotes from Supabase, fall back to live API
+  // During trading hours, skip stale cache and fetch live for stale tickers
+  const market = getMarketStatus();
+  const isTrading = market.status === "open" || market.status === "pre-market" || market.status === "after-hours";
+
   const cached = await getCachedQuotes(tickers);
-  const hasCached = cached.some((q) => q !== null);
-  const quotes = hasCached ? cached : await fetchStockQuotes(tickers);
+  const staleTickers = isTrading
+    ? tickers.filter((t, i) => {
+        const q = cached[i];
+        if (!q?.timestamp) return true; // no cache at all
+        const ageMin = (Date.now() - new Date(q.timestamp).getTime()) / 60000;
+        return ageMin > 5;
+      })
+    : [];
+
+  // Fetch live for stale/missing tickers, merge with fresh cached ones
+  let quotes = cached;
+  if (staleTickers.length > 0) {
+    const fresh = await fetchStockQuotes(staleTickers);
+    const freshMap = new Map(
+      fresh.filter((q): q is NonNullable<typeof q> => q !== null).map((q) => [q.ticker, q])
+    );
+    const staleSet = new Set(staleTickers);
+    quotes = cached.map((q, i) => {
+      if (staleSet.has(tickers[i])) return freshMap.get(tickers[i]) ?? q;
+      return q;
+    });
+  }
 
   const stocks = quotes.map((q, i) => {
     const ticker = tickers[i];
