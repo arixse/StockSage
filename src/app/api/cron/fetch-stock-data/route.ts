@@ -9,6 +9,7 @@ import {
 } from "@/lib/stock-cache";
 import {
   fetchStockQuotes,
+  fetchStockQuote,
   fetchStockChart,
   fetchCompanyOverview,
 } from "@/lib/stock-api";
@@ -133,8 +134,22 @@ export async function GET(request: NextRequest) {
       }
     } // end !isTrading (charts + fundamentals)
 
+    // Diagnostic: test a live quote directly to verify API chain
+    let diag: { ticker: string; price: number; timestamp: string } | null = null;
+    if (tickers.length > 0) {
+      const testQuote = await fetchStockQuote(tickers[0]);
+      if (testQuote) {
+        diag = { ticker: testQuote.ticker, price: testQuote.price, timestamp: testQuote.timestamp };
+      }
+    }
+
     log.info("end", `Done: ${JSON.stringify(stats)}`);
-    return NextResponse.json({ success: true, stats });
+    return NextResponse.json({
+      success: true,
+      stats,
+      market: { status: market.status, label: market.label },
+      diag,
+    });
   } catch (error) {
     log.error("fatal", String(error));
     return NextResponse.json(

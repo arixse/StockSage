@@ -78,24 +78,59 @@ async function getYahooCrumb(): Promise<{ crumb: string; cookie: string } | null
     return { crumb: yahooCrumb.crumb, cookie: yahooCrumb.cookie };
   }
 
+  const ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
+  const headers = {
+    "User-Agent": ua,
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9",
+  };
+
   try {
-    const ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0";
-
-    const r1 = await fetch("https://fc.yahoo.com/", { headers: { "User-Agent": ua }, cache: "no-store" });
+    // Step 1: get cookie from Yahoo
+    const r1 = await fetch("https://fc.yahoo.com/", { headers, cache: "no-store" });
     const setCookie = r1.headers.get("set-cookie") || "";
-    const m = setCookie.match(/A3=[^;]+/);
-    if (!m) { log.warn("Yahoo", "crumb: no A3 cookie"); return null; }
-    const cookie = m[0];
 
-    const r2 = await fetch(`https://query2.finance.yahoo.com/v1/test/getcrumb`, {
-      headers: { "User-Agent": ua, Cookie: cookie },
+    // Try A3 cookie first, then A1 as fallback
+    let cookie = "";
+    let m = setCookie.match(/A3=[^;]+/);
+    if (m) { cookie = m[0]; }
+    if (!cookie) {
+      m = setCookie.match(/A1=[^;]+/);
+      if (m) { cookie = m[0]; }
+    }
+    if (!cookie) {
+      // Last resort: grab all cookies
+      cookie = setCookie.split(",").map((c) => c.split(";")[0].trim()).filter((c) => c.startsWith("A")).join("; ");
+    }
+    if (!cookie) { log.warn("Yahoo", "crumb: no cookie found", setCookie.slice(0, 200)); return null; }
+
+    // Step 2: get crumb
+    const crumbHeaders = { ...headers, Cookie: cookie };
+    const r2 = await fetch(`https://query1.finance.yahoo.com/v1/test/getcrumb`, {
+      headers: crumbHeaders,
       cache: "no-store",
     });
     const crumb = (await r2.text()).trim();
-    if (!crumb || crumb.length > 20) { log.warn("Yahoo", `crumb: invalid (len=${crumb.length})`); return null; }
+
+    // If query1 fails, try query2
+    if (!crumb || crumb.length > 20) {
+      log.warn("Yahoo", `crumb query1 failed (len=${crumb.length}), trying query2`);
+      const r3 = await fetch(`https://query2.finance.yahoo.com/v1/test/getcrumb`, {
+        headers: crumbHeaders,
+        cache: "no-store",
+      });
+      const crumb2 = (await r3.text()).trim();
+      if (!crumb2 || crumb2.length > 20) {
+        log.warn("Yahoo", `crumb: all endpoints failed`);
+        return null;
+      }
+      yahooCrumb = { crumb: crumb2, cookie, expires: Date.now() + 20 * 60 * 1000 };
+      log.info("Yahoo", "crumb obtained (query2)");
+      return { crumb: crumb2, cookie };
+    }
 
     yahooCrumb = { crumb, cookie, expires: Date.now() + 20 * 60 * 1000 };
-    log.info("Yahoo", "crumb obtained successfully");
+    log.info("Yahoo", "crumb obtained (query1)");
     return { crumb, cookie };
   } catch (e) {
     log.error("Yahoo", `crumb exception: ${e}`);
@@ -110,7 +145,11 @@ async function yahooFetch(path: string): Promise<any> {
   const url = `https://query2.finance.yahoo.com${path}${sep}crumb=${auth.crumb}`;
   const res = await fetch(url, {
     headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+      "Accept": "*/*",
+      "Accept-Language": "en-US,en;q=0.9",
+      "Referer": "https://finance.yahoo.com/",
+      "Origin": "https://finance.yahoo.com",
       Cookie: auth.cookie,
     },
     cache: "no-store",
