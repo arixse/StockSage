@@ -111,6 +111,32 @@ export async function getCachedCompanyOverview(ticker: string): Promise<CompanyO
   return rowToOverview(data);
 }
 
+/**
+ * Batch version of getCachedCompanyOverview — one query for many tickers.
+ * Returns overviews in the same order as the input tickers (null when missing).
+ * Unlike the single version, does not require company_name to be present, so
+ * sector/fundamental fields are still surfaced when available.
+ */
+export async function getCachedCompanyOverviewsBatch(
+  tickers: string[]
+): Promise<(CompanyOverview | null)[]> {
+  if (tickers.length === 0) return [];
+
+  const supabase = await createClient();
+  const upper = tickers.map((t) => t.toUpperCase());
+
+  const { data } = await supabase
+    .from("stocks")
+    .select("*")
+    .in("ticker", upper);
+
+  const map = new Map<string, any>((data || []).map((r) => [r.ticker, r]));
+  return upper.map((t) => {
+    const row = map.get(t);
+    return row ? rowToOverview(row) : null;
+  });
+}
+
 export async function getCachedChart(
   ticker: string,
   range: string = "1y"
