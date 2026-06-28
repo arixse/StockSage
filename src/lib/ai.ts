@@ -252,12 +252,25 @@ Return a JSON object with this exact structure:
 }`;
 
   const result = await jsonChat(systemPrompt, userPrompt);
-  const brief: PortfolioBrief = {
-    summary: (result.summary as string) || "No summary available.",
-    highlights: Array.isArray(result.highlights) ? (result.highlights as string[]) : [],
-    risks: Array.isArray(result.risks) ? (result.risks as string[]) : [],
-    actionItems: Array.isArray(result.actionItems) ? (result.actionItems as string[]) : [],
-  };
+
+  const summary = (result.summary as string) || "";
+  const highlights = Array.isArray(result.highlights) ? (result.highlights as string[]) : [];
+  const risks = Array.isArray(result.risks) ? (result.risks as string[]) : [];
+  const actionItems = Array.isArray(result.actionItems) ? (result.actionItems as string[]) : [];
+
+  // If the LLM returned nothing useful, return null so the caller can show an error
+  // rather than saving an empty brief that reads "No summary available."
+  const hasContent =
+    summary.length > 10 &&
+    !summary.startsWith("No summary available") &&
+    (highlights.length > 0 || risks.length > 0 || actionItems.length > 0);
+
+  if (!hasContent) {
+    console.error("[ai] generatePortfolioBrief returned empty/invalid content:", JSON.stringify(result).slice(0, 300));
+    return null;
+  }
+
+  const brief: PortfolioBrief = { summary, highlights, risks, actionItems };
   return brief;
 }
 
