@@ -349,7 +349,6 @@ const briefHeading = {
   fontSize: "15px",
   fontWeight: "700",
   color: "#4338ca",
-  padding: "0 32px",
   margin: "0 0 8px 0",
 };
 
@@ -357,7 +356,7 @@ const briefTable = {
   background: "#eef2ff",
   borderRadius: "8px",
   border: "1px solid #e0e7ff",
-  margin: "0 32px 20px 32px",
+  marginBottom: "20px",
 };
 
 const briefSummaryCell: React.CSSProperties = {
