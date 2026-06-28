@@ -50,15 +50,15 @@ function trendBadge(trend: StockSignals["trend"]) {
   if (trend === "bullish")
     return (
       <Badge className="bg-green-500/10 text-green-600 border-green-500/20" variant="outline">
-        ↑ 多头
+        ↑ Bullish
       </Badge>
     );
   if (trend === "bearish")
     return (
-      <Badge variant="destructive">↓ 空头</Badge>
+      <Badge variant="destructive">↓ Bearish</Badge>
     );
   return (
-    <Badge variant="secondary">→ 震荡</Badge>
+    <Badge variant="secondary">→ Mixed</Badge>
   );
 }
 
@@ -71,11 +71,11 @@ function rsiCell(rsi: number | null) {
 function macdCell(s: StockSignals) {
   if (s.macd === "unknown") return <span className="text-muted-foreground">—</span>;
   if (s.macdCross === "golden")
-    return <Badge className="bg-green-500/10 text-green-600 border-green-500/20" variant="outline">金叉</Badge>;
-  if (s.macdCross === "death") return <Badge variant="destructive">死叉</Badge>;
+    return <Badge className="bg-green-500/10 text-green-600 border-green-500/20" variant="outline">Golden Cross</Badge>;
+  if (s.macdCross === "death") return <Badge variant="destructive">Death Cross</Badge>;
   return (
     <span className={s.macd === "bullish" ? "text-green-500 text-xs" : "text-red-500 text-xs"}>
-      {s.macd === "bullish" ? "多头" : "空头"}
+      {s.macd === "bullish" ? "Bullish" : "Bearish"}
     </span>
   );
 }
@@ -217,7 +217,7 @@ export default async function DashboardPage() {
                 {health.concentratedSector && (
                   <p className="text-xs text-amber-600 mt-2 flex items-center gap-1">
                     <AlertTriangle className="h-3 w-3" />
-                    {health.concentratedSector.sector} 占比 {health.concentratedSector.percent}%，分散度不足
+                    {health.concentratedSector.sector} {health.concentratedSector.percent}% — low diversification
                   </p>
                 )}
               </div>

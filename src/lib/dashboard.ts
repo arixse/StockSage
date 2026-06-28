@@ -164,7 +164,7 @@ function deriveSignals(
   };
   if (!t) return base;
 
-  // Trend: price vs MA20/MA60/MA200 — 多头排列 or 均线下方
+  // Trend: price vs MA20/MA60/MA200 — bullish alignment or bearish breakdown
   if (t.ma20 != null && t.ma60 != null) {
     const aboveMa20 = price > t.ma20;
     const ma20AboveMa60 = t.ma20 > t.ma60;
@@ -208,13 +208,13 @@ function deriveSignals(
 /** Collect notable signals into human-readable labels for the "Today's Signals" card. */
 function collectAlertLabels(s: StockSignals): string[] {
   const labels: string[] = [];
-  if (s.volumeAnomaly) labels.push("量能放大");
-  if (s.rsi === "overbought") labels.push("RSI 超买");
-  if (s.rsi === "oversold") labels.push("RSI 超卖");
-  if (s.macdCross === "golden") labels.push("MACD 金叉");
-  if (s.macdCross === "death") labels.push("MACD 死叉");
-  if (s.nearBollinger === "upper") labels.push("逼近布林上轨");
-  if (s.nearBollinger === "lower") labels.push("逼近布林下轨");
+  if (s.volumeAnomaly) labels.push("High Volume");
+  if (s.rsi === "overbought") labels.push("RSI Overbought");
+  if (s.rsi === "oversold") labels.push("RSI Oversold");
+  if (s.macdCross === "golden") labels.push("MACD Golden Cross");
+  if (s.macdCross === "death") labels.push("MACD Death Cross");
+  if (s.nearBollinger === "upper") labels.push("Near Upper BB");
+  if (s.nearBollinger === "lower") labels.push("Near Lower BB");
   return labels;
 }
 
