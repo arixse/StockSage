@@ -25,12 +25,19 @@ interface DailyDigestProps {
     summary: string;
     keyPoints: string[];
   }[];
+  portfolioBrief?: {
+    summary: string;
+    highlights: string[];
+    risks: string[];
+    actionItems: string[];
+  } | null;
 }
 
 export const DailyDigest = ({
   userName = "Investor",
   date,
   stocks,
+  portfolioBrief,
 }: DailyDigestProps) => {
   return (
     <Html>
@@ -43,6 +50,37 @@ export const DailyDigest = ({
           <Text style={text}>
             Here is your AI-powered stock summary for {date}.
           </Text>
+
+          {portfolioBrief && (
+            <Section style={briefCard}>
+              <Text style={briefHeading}>Portfolio Overview</Text>
+              <Text style={briefSummary}>{portfolioBrief.summary}</Text>
+              {portfolioBrief.highlights.length > 0 && (
+                <Section style={briefSection}>
+                  <Text style={briefSubheading}>Highlights</Text>
+                  {portfolioBrief.highlights.map((h, i) => (
+                    <Text key={i} style={briefItem}>• {h}</Text>
+                  ))}
+                </Section>
+              )}
+              {portfolioBrief.risks.length > 0 && (
+                <Section style={briefSection}>
+                  <Text style={briefSubheading}>Risks</Text>
+                  {portfolioBrief.risks.map((r, i) => (
+                    <Text key={i} style={briefItem}>• {r}</Text>
+                  ))}
+                </Section>
+              )}
+              {portfolioBrief.actionItems.length > 0 && (
+                <Section style={briefSection}>
+                  <Text style={briefSubheading}>Action Items</Text>
+                  {portfolioBrief.actionItems.map((a, i) => (
+                    <Text key={i} style={briefItem}>• {a}</Text>
+                  ))}
+                </Section>
+              )}
+            </Section>
+          )}
 
           {stocks.map((stock) => (
             <Section key={stock.ticker} style={stockCard}>
@@ -179,6 +217,45 @@ const keyPointsSection = {
 };
 
 const keyPoint = {
+  fontSize: "13px",
+  color: "#475569",
+  margin: "2px 0",
+};
+
+const briefCard = {
+  background: "#eef2ff",
+  borderRadius: "8px",
+  padding: "16px",
+  marginBottom: "16px",
+  border: "1px solid #c7d2fe",
+};
+
+const briefHeading = {
+  fontSize: "16px",
+  fontWeight: "700",
+  color: "#4338ca",
+  marginBottom: "8px",
+};
+
+const briefSummary = {
+  fontSize: "14px",
+  color: "#334155",
+  lineHeight: "20px",
+  marginBottom: "12px",
+};
+
+const briefSection = {
+  marginTop: "8px",
+};
+
+const briefSubheading = {
+  fontSize: "13px",
+  fontWeight: "600",
+  color: "#475569",
+  marginBottom: "4px",
+};
+
+const briefItem = {
   fontSize: "13px",
   color: "#475569",
   margin: "2px 0",

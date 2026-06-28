@@ -115,7 +115,16 @@ export async function sendDailyDigests(): Promise<{
 
   const stockMap = new Map((stockRows || []).map((s) => [s.ticker, s]));
 
-  // 5. Compose and send email for each user
+  // 5. Get today's portfolio briefs
+  const { data: briefRows } = await admin
+    .from("portfolio_briefs")
+    .select("user_id, content")
+    .eq("brief_date", today)
+    .in("user_id", userIds);
+
+  const briefMap = new Map((briefRows || []).map((b: any) => [b.user_id, b.content]));
+
+  // 6. Compose and send email for each user
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
   for (const user of users) {
@@ -147,10 +156,18 @@ export async function sendDailyDigests(): Promise<{
 
       if (stocks.length === 0) continue;
 
+      const portfolioBrief = (briefMap.get(user.userId) || null) as {
+        summary: string;
+        highlights: string[];
+        risks: string[];
+        actionItems: string[];
+      } | null;
+
       const emailHtml = DailyDigest({
         userName: user.name || undefined,
         date: today,
         stocks,
+        portfolioBrief,
       });
 
       // Replace template variable with actual URL
