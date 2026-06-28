@@ -518,16 +518,17 @@ export interface SearchResult {
 }
 
 export async function searchStocks(query: string): Promise<SearchResult[]> {
-  // Run Yahoo + Finnhub in parallel, then merge and deduplicate
-  const [yh, fh] = await Promise.all([
+  // Run Yahoo + Finnhub + TwelveData in parallel, then merge and deduplicate
+  const [yh, fh, td] = await Promise.all([
     yahooSearch(query).catch(() => []),
     finnhubSearch(query).catch(() => []),
+    twelveSearch(query).catch(() => []),
   ]);
 
   // Merge results, deduplicate by ticker (case-insensitive)
   const seen = new Set<string>();
   const merged: SearchResult[] = [];
-  for (const r of [...yh, ...fh]) {
+  for (const r of [...yh, ...fh, ...td]) {
     const key = r.ticker.toUpperCase();
     if (!seen.has(key)) {
       seen.add(key);
@@ -536,15 +537,15 @@ export async function searchStocks(query: string): Promise<SearchResult[]> {
   }
 
   if (merged.length > 0) {
-    log.info("search", `"${query}" → ${merged.length} results (Yahoo:${yh.length} Finnhub:${fh.length})`);
-    return merged.slice(0, 10);
+    log.info("search", `"${query}" → ${merged.length} results (Yahoo:${yh.length} Finnhub:${fh.length} Twelve:${td.length})`);
+    return merged.slice(0, 15);
   }
 
   // Last resort: Alpha Vantage
   const av = await alphaSearch(query).catch(() => []);
   if (av.length > 0) {
     log.info("search", `"${query}" → AlphaVantage (${av.length} results)`);
-    return av.slice(0, 10);
+    return av.slice(0, 15);
   }
 
   // Final fallback: if query looks like a ticker, try direct quote lookup
@@ -584,13 +585,52 @@ async function finnhubSearch(query: string): Promise<SearchResult[]> {
     const data = await res.json();
 
     return (data.result || [])
-      .filter((r: any) => r.type === "Common Stock" || r.type === "ETF" || r.type === "INDEX")
+      .filter((r: any) => {
+        const t = r.type || "";
+        // Accept all equity-like types (Finnhub uses various categories)
+        return (
+          t === "Common Stock" || t === "ETF" || t === "INDEX" ||
+          t === "ADR" || t === "REIT" || t === "Closed-End Fund" ||
+          t === "Preferred Stock" || t === "Unit" || t === "Warrant" ||
+          !t // If no type, still include (best-effort)
+        );
+      })
       .slice(0, 10)
       .map((r: any) => ({
         ticker: r.symbol,
         companyName: r.description || "",
         type: r.type || "",
         exchange: r.exchangeDisplay || r.primaryExchange || "",
+      }));
+  } catch {
+    return [];
+  }
+}
+
+async function twelveSearch(query: string): Promise<SearchResult[]> {
+  try {
+    const key = getTwelveDataKey();
+    if (!key || key === "demo") return []; // demo key has no search access
+
+    const res = await fetch(
+      `${TWELVE_DATA_BASE}/symbol_search?symbol=${encodeURIComponent(query)}&outputsize=10&apikey=${key}`,
+      { next: { revalidate: 3600 } }
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+    if (data.code || data.status === "error") return [];
+
+    const US_EXCHANGES = new Set(["NASDAQ", "NYSE", "NYSE ARCA", "NYSE MKT", "BATS", "IEXG"]);
+    return (data.data || [])
+      .filter((r: any) => {
+        const ex = (r.exchange || "").toUpperCase();
+        return US_EXCHANGES.has(ex) || r.country === "United States";
+      })
+      .map((r: any) => ({
+        ticker: r.symbol,
+        companyName: r.instrument_name || r.symbol,
+        type: r.instrument_type || "EQUITY",
+        exchange: r.exchange || r.country || "",
       }));
   } catch {
     return [];
