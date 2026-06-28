@@ -114,36 +114,30 @@ export const DailyDigest = ({
               <Text style={briefSummary}>{portfolioBrief.summary}</Text>
 
               {portfolioBrief.highlights.length > 0 && (
-                <table width="100%" cellPadding={0} cellSpacing={0} border={0} style={{ marginTop: "12px" }}>
-                  <tr>
-                    <td style={briefCol} width="48%" valign="top">
-                      <Text style={briefColTitle}>✨ Highlights</Text>
-                      {portfolioBrief.highlights.slice(0, 2).map((h, i) => (
-                        <Text key={i} style={briefItem}>{h}</Text>
-                      ))}
-                    </td>
-                    <td width="4%">&nbsp;</td>
-                    <td style={briefCol} width="48%" valign="top">
-                      <Text style={briefColTitle}>⚠️ Risks</Text>
-                      {portfolioBrief.risks.slice(0, 2).map((r, i) => (
-                        <Text key={i} style={briefItem}>{r}</Text>
-                      ))}
-                    </td>
-                  </tr>
-                </table>
+                <Section style={briefBlock}>
+                  <Text style={briefColTitle}>✨ Highlights</Text>
+                  {portfolioBrief.highlights.map((h, i) => (
+                    <Text key={i} style={briefItem}>{h}</Text>
+                  ))}
+                </Section>
+              )}
+
+              {portfolioBrief.risks.length > 0 && (
+                <Section style={briefBlock}>
+                  <Text style={briefColTitle}>⚠️ Risks</Text>
+                  {portfolioBrief.risks.map((r, i) => (
+                    <Text key={i} style={briefItem}>{r}</Text>
+                  ))}
+                </Section>
               )}
 
               {portfolioBrief.actionItems.length > 0 && (
-                <table width="100%" cellPadding={0} cellSpacing={0} border={0} style={{ marginTop: "12px" }}>
-                  <tr>
-                    <td style={actionCard}>
-                      <Text style={briefColTitle}>🎯 Action Items</Text>
-                      {portfolioBrief.actionItems.map((a, i) => (
-                        <Text key={i} style={briefItem}>{a}</Text>
-                      ))}
-                    </td>
-                  </tr>
-                </table>
+                <Section style={briefBlock}>
+                  <Text style={briefColTitle}>🎯 Action Items</Text>
+                  {portfolioBrief.actionItems.map((a, i) => (
+                    <Text key={i} style={briefItem}>{a}</Text>
+                  ))}
+                </Section>
               )}
             </Section>
           )}
@@ -347,6 +341,15 @@ const briefCard = {
   padding: "20px",
   margin: "0 32px 20px 32px",
   border: "1px solid #e0e7ff",
+  maxWidth: "100%",
+  overflow: "hidden",
+};
+
+const briefBlock = {
+  background: "rgba(255,255,255,0.7)",
+  borderRadius: "8px",
+  padding: "12px",
+  marginTop: "10px",
 };
 
 const briefIcon = {
@@ -363,12 +366,6 @@ const briefSummary = {
   margin: "0 0 4px 0",
 };
 
-const briefCol: React.CSSProperties = {
-  background: "rgba(255,255,255,0.7)",
-  borderRadius: "8px",
-  padding: "12px",
-};
-
 const briefColTitle = {
   fontSize: "13px",
   fontWeight: "600",
@@ -381,12 +378,6 @@ const briefItem = {
   color: "#475569",
   lineHeight: "19px",
   margin: "0 0 3px 8px",
-};
-
-const actionCard: React.CSSProperties = {
-  background: "rgba(255,255,255,0.7)",
-  borderRadius: "8px",
-  padding: "12px",
 };
 
 // Table
