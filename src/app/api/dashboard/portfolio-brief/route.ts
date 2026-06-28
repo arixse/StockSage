@@ -123,8 +123,9 @@ export async function POST() {
 
   if (error) {
     console.error("[portfolio-brief] upsert error:", error);
+    const detail = typeof error === "object" ? JSON.stringify(error) : String(error);
     return NextResponse.json(
-      { data: { hasBrief: false, message: "Failed to save brief." } },
+      { data: { hasBrief: false, message: `Failed to save brief. ${detail}` } },
       { status: 500 }
     );
   }
