@@ -16,8 +16,7 @@ interface DigestStock {
   change: number;
   changePercent: number;
   score?: number;
-  summary: string;
-  keyPoints: string[];
+  recommendation?: string;
 }
 
 interface DigestUser {
@@ -134,13 +133,6 @@ export async function sendDailyDigests(): Promise<{
           const analysis = analysisMap.get(ticker);
           const stock = stockMap.get(ticker);
 
-          let keyPoints: string[] = [];
-          if (analysis?.key_points) {
-            keyPoints = Array.isArray(analysis.key_points)
-              ? analysis.key_points.slice(0, 3)
-              : [];
-          }
-
           return {
             ticker,
             companyName: stock?.company_name || ticker,
@@ -148,11 +140,10 @@ export async function sendDailyDigests(): Promise<{
             change: Number(stock?.change_val ?? 0),
             changePercent: Number(stock?.change_percent ?? 0),
             score: analysis?.overall_score ?? undefined,
-            summary: analysis?.summary_text || "No recent analysis available.",
-            keyPoints,
+            recommendation: analysis?.recommendation ?? undefined,
           };
         })
-        .slice(0, 10); // Max 10 stocks per email
+        .slice(0, 30); // Compact table — can fit more stocks
 
       if (stocks.length === 0) continue;
 

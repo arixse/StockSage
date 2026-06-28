@@ -22,8 +22,7 @@ interface DailyDigestProps {
     change: number;
     changePercent: number;
     score?: number;
-    summary: string;
-    keyPoints: string[];
+    recommendation?: string;
   }[];
   portfolioBrief?: {
     summary: string;
@@ -39,87 +38,137 @@ export const DailyDigest = ({
   stocks,
   portfolioBrief,
 }: DailyDigestProps) => {
+  const gainers = stocks.filter((s) => s.change > 0).length;
+  const avgScore =
+    stocks.filter((s) => s.score != null).length > 0
+      ? Math.round(
+          stocks
+            .filter((s) => s.score != null)
+            .reduce((sum, s) => sum + (s.score as number), 0) /
+            stocks.filter((s) => s.score != null).length
+        )
+      : null;
+
   return (
     <Html>
       <Head />
-      <Preview>AI-powered stock analysis for your watchlist — {date}</Preview>
+      <Preview>
+        {`${gainers}/${stocks.length} gainers${avgScore != null ? ` · Avg Score ${avgScore}/100` : ""} — ${date}`}
+      </Preview>
       <Body style={main}>
         <Container style={container}>
           <Heading style={h1}>StockSage Daily Briefing</Heading>
           <Text style={text}>Hi {userName},</Text>
-          <Text style={text}>
-            Here is your AI-powered stock summary for {date}.
-          </Text>
 
+          {/* ── Portfolio Brief ── */}
           {portfolioBrief && (
             <Section style={briefCard}>
               <Text style={briefHeading}>Portfolio Overview</Text>
               <Text style={briefSummary}>{portfolioBrief.summary}</Text>
               {portfolioBrief.highlights.length > 0 && (
-                <Section style={briefSection}>
+                <>
                   <Text style={briefSubheading}>Highlights</Text>
                   {portfolioBrief.highlights.map((h, i) => (
                     <Text key={i} style={briefItem}>• {h}</Text>
                   ))}
-                </Section>
+                </>
               )}
               {portfolioBrief.risks.length > 0 && (
-                <Section style={briefSection}>
+                <>
                   <Text style={briefSubheading}>Risks</Text>
                   {portfolioBrief.risks.map((r, i) => (
                     <Text key={i} style={briefItem}>• {r}</Text>
                   ))}
-                </Section>
+                </>
               )}
               {portfolioBrief.actionItems.length > 0 && (
-                <Section style={briefSection}>
+                <>
                   <Text style={briefSubheading}>Action Items</Text>
                   {portfolioBrief.actionItems.map((a, i) => (
                     <Text key={i} style={briefItem}>• {a}</Text>
                   ))}
-                </Section>
+                </>
               )}
             </Section>
           )}
 
-          {stocks.map((stock) => (
-            <Section key={stock.ticker} style={stockCard}>
-              <Row>
-                <Column>
-                  <Text style={ticker}>{stock.ticker}</Text>
-                  <Text style={companyName}>{stock.companyName}</Text>
+          {/* ── Watchlist Summary ── */}
+          <Text style={sectionTitle}>
+            Watchlist — {stocks.length} stocks · {gainers} gainers
+            {avgScore != null ? ` · Avg AI Score ${avgScore}/100` : ""}
+          </Text>
+
+          {/* ── Compact Table ── */}
+          <Section style={tableCard}>
+            {/* Header */}
+            <Row style={tableHeaderRow}>
+              <Column style={colTicker}>Ticker</Column>
+              <Column style={colPrice}>Price</Column>
+              <Column style={colChange}>Chg%</Column>
+              <Column style={colScore}>AI Score</Column>
+            </Row>
+            {/* Rows */}
+            {stocks.map((stock, i) => (
+              <Row
+                key={stock.ticker}
+                style={{
+                  ...tableRow,
+                  backgroundColor: i % 2 === 0 ? "#f8fafc" : "#ffffff",
+                }}
+              >
+                <Column style={colTicker}>
+                  <Text style={tickerCell}>{stock.ticker}</Text>
                 </Column>
-                <Column align="right">
-                  <Text style={price}>${stock.price.toFixed(2)}</Text>
+                <Column style={colPrice}>
+                  <Text style={priceCell}>${stock.price.toFixed(2)}</Text>
+                </Column>
+                <Column style={colChange}>
                   <Text
                     style={{
-                      ...change,
-                      color: stock.change >= 0 ? "#22c55e" : "#ef4444",
+                      ...changeCell,
+                      color: stock.change >= 0 ? "#16a34a" : "#dc2626",
                     }}
                   >
                     {stock.change >= 0 ? "+" : ""}
                     {stock.changePercent.toFixed(2)}%
                   </Text>
                 </Column>
-              </Row>
-              {stock.score != null && (
-                <Text style={score}>
-                  AI Score: {stock.score}/100
-                </Text>
-              )}
-              <Text style={summary}>{stock.summary}</Text>
-              {stock.keyPoints.length > 0 && (
-                <Section style={keyPointsSection}>
-                  {stock.keyPoints.map((point, i) => (
-                    <Text key={i} style={keyPoint}>
-                      • {point}
+                <Column style={colScore}>
+                  {stock.score != null ? (
+                    <Text
+                      style={{
+                        ...scoreCell,
+                        color:
+                          stock.score >= 65
+                            ? "#16a34a"
+                            : stock.score >= 45
+                              ? "#ca8a04"
+                              : "#dc2626",
+                      }}
+                    >
+                      {stock.score}
+                      {stock.recommendation
+                        ? ` · ${stock.recommendation.replace(/_/g, " ")}`
+                        : ""}
                     </Text>
-                  ))}
-                </Section>
-              )}
-            </Section>
-          ))}
+                  ) : (
+                    <Text style={scoreNa}>—</Text>
+                  )}
+                </Column>
+              </Row>
+            ))}
+          </Section>
 
+          {/* ── CTA ── */}
+          <Section style={ctaCard}>
+            <Text style={ctaText}>
+              <Link href="{{appUrl}}/dashboard" style={ctaLink}>
+                View full analysis on StockSage →
+              </Link>
+            </Text>
+          </Section>
+
+          {/* ── Footer ── */}
           <Section style={footer}>
             <Text style={footerText}>
               You received this email because you subscribed to StockSage daily digest.
@@ -143,7 +192,8 @@ export const DailyDigest = ({
   );
 };
 
-// Styles
+// ─── Styles ──────────────────────────────────────────────────────────
+
 const main = {
   backgroundColor: "#f8fafc",
   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
@@ -168,64 +218,12 @@ const text = {
   lineHeight: "24px",
 };
 
-const stockCard = {
-  background: "#ffffff",
-  borderRadius: "8px",
-  padding: "16px",
-  marginBottom: "12px",
-  border: "1px solid #e2e8f0",
-};
-
-const ticker = {
-  fontSize: "18px",
-  fontWeight: "700",
-  color: "#1e293b",
-};
-
-const companyName = {
-  fontSize: "14px",
-  color: "#94a3b8",
-};
-
-const price = {
-  fontSize: "20px",
-  fontWeight: "700",
-  color: "#1e293b",
-};
-
-const change = {
-  fontSize: "14px",
-  fontWeight: "600",
-};
-
-const score = {
-  fontSize: "14px",
-  fontWeight: "600",
-  color: "#6366f1",
-  marginTop: "8px",
-};
-
-const summary = {
-  fontSize: "14px",
-  color: "#334155",
-  lineHeight: "20px",
-  marginTop: "8px",
-};
-
-const keyPointsSection = {
-  marginTop: "8px",
-};
-
-const keyPoint = {
-  fontSize: "13px",
-  color: "#475569",
-  margin: "2px 0",
-};
-
+// Portfolio Brief
 const briefCard = {
   background: "#eef2ff",
   borderRadius: "8px",
   padding: "16px",
+  marginTop: "16px",
   marginBottom: "16px",
   border: "1px solid #c7d2fe",
 };
@@ -244,23 +242,96 @@ const briefSummary = {
   marginBottom: "12px",
 };
 
-const briefSection = {
-  marginTop: "8px",
-};
-
 const briefSubheading = {
   fontSize: "13px",
   fontWeight: "600",
   color: "#475569",
+  marginTop: "8px",
   marginBottom: "4px",
 };
 
 const briefItem = {
   fontSize: "13px",
   color: "#475569",
-  margin: "2px 0",
+  margin: "2px 0 2px 4px",
 };
 
+// Section title
+const sectionTitle = {
+  fontSize: "15px",
+  fontWeight: "600",
+  color: "#334155",
+  marginTop: "16px",
+  marginBottom: "8px",
+};
+
+// Table
+const tableCard = {
+  background: "#ffffff",
+  borderRadius: "8px",
+  padding: "4px 0",
+  border: "1px solid #e2e8f0",
+};
+
+const tableHeaderRow = {
+  borderBottom: "2px solid #e2e8f0",
+  padding: "8px 16px",
+};
+
+const tableRow = {
+  padding: "6px 16px",
+  borderBottom: "1px solid #f1f5f9",
+};
+
+const colTicker: React.CSSProperties = { width: "25%" };
+const colPrice: React.CSSProperties = { width: "25%", textAlign: "right" };
+const colChange: React.CSSProperties = { width: "25%", textAlign: "right" };
+const colScore: React.CSSProperties = { width: "25%", textAlign: "right" };
+
+const tickerCell = {
+  fontSize: "14px",
+  fontWeight: "700",
+  color: "#1e293b",
+};
+
+const priceCell = {
+  fontSize: "14px",
+  fontWeight: "600",
+  color: "#334155",
+};
+
+const changeCell = {
+  fontSize: "14px",
+  fontWeight: "600",
+};
+
+const scoreCell = {
+  fontSize: "12px",
+  fontWeight: "600",
+};
+
+const scoreNa = {
+  fontSize: "12px",
+  color: "#94a3b8",
+  fontWeight: "400" as const,
+};
+
+// CTA
+const ctaCard = {
+  textAlign: "center" as const,
+  marginTop: "16px",
+};
+
+const ctaText = {
+  fontSize: "15px",
+};
+
+const ctaLink = {
+  color: "#4f46e5",
+  fontWeight: "600",
+};
+
+// Footer
 const footer = {
   marginTop: "32px",
   borderTop: "1px solid #e2e8f0",
