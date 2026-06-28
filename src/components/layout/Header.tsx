@@ -139,9 +139,6 @@ export function Header() {
                 <DropdownMenuItem onClick={() => router.push("/watchlist")}>
                   Watchlist
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => router.push("/portfolio")}>
-                  Portfolio
-                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => router.push("/settings")}>
                   Settings
                 </DropdownMenuItem>
