@@ -18,7 +18,7 @@ jobs:
     steps:
       - name: Fetch stock data
         run: |
-          RESPONSE=$(curl -s -w "\n%{http_code}" \
+          RESPONSE=$(curl -sL -w "\n%{http_code}" \
             "${{ secrets.APP_URL }}/api/cron/fetch-stock-data?secret=${{ secrets.CRON_SECRET }}")
           HTTP_CODE=$(echo "$RESPONSE" | tail -1)
           BODY=$(echo "$RESPONSE" | sed '$d')
