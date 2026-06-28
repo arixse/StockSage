@@ -586,13 +586,18 @@ async function finnhubSearch(query: string): Promise<SearchResult[]> {
 
     return (data.result || [])
       .filter((r: any) => {
+        const symbol = (r.symbol || "") as string;
+        // US stocks only: ticker is 1-5 letters with optional class suffix (e.g. BRK.B)
+        // Non-US stocks have exchange suffixes like .SS, .T, .L, .KL, .HK etc.
+        const isUS = /^[A-Z]{1,5}(\.[A-Z])?$/.test(symbol);
+        if (!isUS) return false;
+
         const t = r.type || "";
-        // Accept all equity-like types (Finnhub uses various categories)
         return (
           t === "Common Stock" || t === "ETF" || t === "INDEX" ||
           t === "ADR" || t === "REIT" || t === "Closed-End Fund" ||
           t === "Preferred Stock" || t === "Unit" || t === "Warrant" ||
-          !t // If no type, still include (best-effort)
+          !t
         );
       })
       .slice(0, 10)
