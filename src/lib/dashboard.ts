@@ -291,23 +291,30 @@ export async function getWatchlistInsights(userId: string): Promise<WatchlistIns
     market.status === "after-hours";
 
   const cached = await getCachedQuotes(upper);
-  const staleTickers = isTrading
-    ? cached
-        .map((q, i) => {
-          if (!q?.timestamp) return upper[i];
-          const ageMin = (Date.now() - new Date(q.timestamp).getTime()) / 60000;
-          return ageMin > 5 ? upper[i] : null;
-        })
-        .filter(Boolean) as string[]
-    : [];
+
+  // Collect tickers needing a live fetch:
+  //   a) null cache (no data at all — e.g. newly added stock)
+  //   b) stale cache during trading hours (>5 min old)
+  const missingTickers: string[] = [];
+  const staleTickers: string[] = [];
+  cached.forEach((q, i) => {
+    if (!q) {
+      missingTickers.push(upper[i]);
+    } else if (isTrading && q.timestamp) {
+      const ageMin = (Date.now() - new Date(q.timestamp).getTime()) / 60000;
+      if (ageMin > 5) staleTickers.push(upper[i]);
+    }
+  });
+
+  const fetchTickers = [...new Set([...missingTickers, ...staleTickers])];
 
   let quotes: (StockQuote | null)[] = cached;
-  if (staleTickers.length > 0) {
-    const fresh = await fetchStockQuotes(staleTickers);
+  if (fetchTickers.length > 0) {
+    const fresh = await fetchStockQuotes(fetchTickers);
     const freshMap = new Map(
       fresh.filter((q): q is StockQuote => q !== null).map((q) => [q.ticker, q])
     );
-    const tickerSet = new Set(staleTickers);
+    const tickerSet = new Set(fetchTickers);
     quotes = cached.map((q, i) => {
       if (q && !tickerSet.has(upper[i])) return q;
       return freshMap.get(upper[i]) ?? q;
