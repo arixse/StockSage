@@ -399,8 +399,21 @@ async function twelveChart(ticker: string, range: string, interval: string): Pro
   try {
     const key = getTwelveDataKey();
     const outputsize = RANGE_OUTPUT[range] || 260;
+
+    // Map our internal intervals to Twelve Data's format
+    const TD_INTERVAL: Record<string, string> = {
+      "1d": "1day",
+      "1wk": "1week",
+      "1mo": "1month",
+      "1m": "1min",
+      "5m": "5min",
+      "15m": "15min",
+      "1h": "1h",
+    };
+    const tdInterval = TD_INTERVAL[interval] || "1day";
+
     const res = await fetch(
-      `${TWELVE_DATA_BASE}/time_series?symbol=${ticker}&interval=${interval}&outputsize=${outputsize}&apikey=${key}`,
+      `${TWELVE_DATA_BASE}/time_series?symbol=${ticker}&interval=${tdInterval}&outputsize=${outputsize}&apikey=${key}`,
       { next: { revalidate: 300 } }
     );
     if (!res.ok) return [];
