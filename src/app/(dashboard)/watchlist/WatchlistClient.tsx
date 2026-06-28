@@ -212,7 +212,7 @@ export function WatchlistClient({ watchlistId, initialStocks }: Props) {
             <DialogHeader>
               <DialogTitle>Add Stock to Watchlist</DialogTitle>
             </DialogHeader>
-            <Command className="rounded-lg border shadow-md mt-4">
+            <Command className="rounded-lg border shadow-md mt-4" shouldFilter={false}>
               <CommandInput
                 placeholder="Search by ticker or name..."
                 value={searchQuery}
