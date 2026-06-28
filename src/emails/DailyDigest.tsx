@@ -8,6 +8,8 @@ import {
   Section,
   Text,
   Link,
+  Img,
+  Hr,
 } from "@react-email/components";
 
 interface DailyDigestProps {
@@ -30,10 +32,10 @@ interface DailyDigestProps {
   } | null;
 }
 
-function scoreColor(score: number) {
-  if (score >= 65) return "#16a34a";
-  if (score >= 45) return "#ca8a04";
-  return "#dc2626";
+function scoreBadge(score: number) {
+  if (score >= 65) return { bg: "#dcfce7", color: "#16a34a", border: "#bbf7d0" };
+  if (score >= 45) return { bg: "#fef9c3", color: "#ca8a04", border: "#fef08a" };
+  return { bg: "#fee2e2", color: "#dc2626", border: "#fecaca" };
 }
 
 function recLabel(rec: string) {
@@ -47,153 +49,207 @@ export const DailyDigest = ({
   portfolioBrief,
 }: DailyDigestProps) => {
   const gainers = stocks.filter((s) => s.change > 0).length;
+  const losers = stocks.filter((s) => s.change < 0).length;
   const scored = stocks.filter((s) => s.score != null);
   const avgScore =
     scored.length > 0
       ? Math.round(scored.reduce((sum, s) => sum + (s.score as number), 0) / scored.length)
       : null;
 
+  const dateFormatted = new Date(date + "T00:00:00").toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+
   return (
     <Html>
       <Head />
       <Preview>
-        {`${gainers}/${stocks.length} gainers${avgScore != null ? ` · Avg Score ${avgScore}/100` : ""} — ${date}`}
+        {`${dateFormatted} · ${gainers}↑ ${losers}↓ · ${stocks.length} stocks`}
+        {avgScore != null ? ` · AI Score ${avgScore}/100` : ""}
       </Preview>
       <Body style={main}>
         <Container style={container}>
-          <Heading style={h1}>StockSage Daily Briefing</Heading>
-          <Text style={text}>Hi {userName},</Text>
+          {/* ── Header ── */}
+          <Section style={header}>
+            <Text style={logo}>📈 StockSage</Text>
+            <Text style={dateText}>{dateFormatted}</Text>
+          </Section>
+
+          <Text style={greeting}>Hi {userName},</Text>
+          <Text style={intro}>
+            Here&apos;s your daily portfolio briefing with AI-powered insights for{" "}
+            {stocks.length} stocks in your watchlist.
+          </Text>
+
+          {/* ── Stats Bar ── */}
+          <Section style={statsBar}>
+            <table width="100%" cellPadding={0} cellSpacing={0} border={0}>
+              <tr>
+                <td style={statCell} width="33%">
+                  <Text style={statValue}>{stocks.length}</Text>
+                  <Text style={statLabel}>Stocks</Text>
+                </td>
+                <td style={statCell} width="33%">
+                  <Text style={{ ...statValue, color: "#16a34a" }}>{gainers}↑</Text>
+                  <Text style={{ ...statValue, color: "#dc2626" }}>{losers}↓</Text>
+                  <Text style={statLabel}>Movers</Text>
+                </td>
+                <td style={statCell} width="33%">
+                  <Text style={statValue}>
+                    {avgScore != null ? avgScore : "—"}
+                  </Text>
+                  <Text style={statLabel}>Avg AI Score</Text>
+                </td>
+              </tr>
+            </table>
+          </Section>
 
           {/* ── Portfolio Brief ── */}
           {portfolioBrief && (
             <Section style={briefCard}>
-              <Text style={briefHeading}>Portfolio Overview</Text>
+              <Text style={briefIcon}>🤖 AI Portfolio Analysis</Text>
               <Text style={briefSummary}>{portfolioBrief.summary}</Text>
+
               {portfolioBrief.highlights.length > 0 && (
-                <>
-                  <Text style={briefSubheading}>Highlights</Text>
-                  {portfolioBrief.highlights.map((h, i) => (
-                    <Text key={i} style={briefItem}>• {h}</Text>
-                  ))}
-                </>
+                <table width="100%" cellPadding={0} cellSpacing={0} border={0} style={{ marginTop: "12px" }}>
+                  <tr>
+                    <td style={briefCol} width="48%" valign="top">
+                      <Text style={briefColTitle}>✨ Highlights</Text>
+                      {portfolioBrief.highlights.slice(0, 2).map((h, i) => (
+                        <Text key={i} style={briefItem}>{h}</Text>
+                      ))}
+                    </td>
+                    <td width="4%">&nbsp;</td>
+                    <td style={briefCol} width="48%" valign="top">
+                      <Text style={briefColTitle}>⚠️ Risks</Text>
+                      {portfolioBrief.risks.slice(0, 2).map((r, i) => (
+                        <Text key={i} style={briefItem}>{r}</Text>
+                      ))}
+                    </td>
+                  </tr>
+                </table>
               )}
-              {portfolioBrief.risks.length > 0 && (
-                <>
-                  <Text style={briefSubheading}>Risks</Text>
-                  {portfolioBrief.risks.map((r, i) => (
-                    <Text key={i} style={briefItem}>• {r}</Text>
-                  ))}
-                </>
-              )}
+
               {portfolioBrief.actionItems.length > 0 && (
-                <>
-                  <Text style={briefSubheading}>Action Items</Text>
-                  {portfolioBrief.actionItems.map((a, i) => (
-                    <Text key={i} style={briefItem}>• {a}</Text>
-                  ))}
-                </>
+                <table width="100%" cellPadding={0} cellSpacing={0} border={0} style={{ marginTop: "12px" }}>
+                  <tr>
+                    <td style={actionCard}>
+                      <Text style={briefColTitle}>🎯 Action Items</Text>
+                      {portfolioBrief.actionItems.map((a, i) => (
+                        <Text key={i} style={briefItem}>{a}</Text>
+                      ))}
+                    </td>
+                  </tr>
+                </table>
               )}
             </Section>
           )}
 
-          {/* ── Watchlist Summary ── */}
-          <Text style={sectionTitle}>
-            {`Watchlist — ${stocks.length} stocks · ${gainers} gainers${avgScore != null ? ` · Avg AI Score ${avgScore}/100` : ""}`}
-          </Text>
-
-          {/* ── Compact Table (raw HTML for continuous header + rows) ── */}
-          <table
-            style={{
-              width: "100%",
-              borderCollapse: "collapse" as const,
-              background: "#ffffff",
-              borderRadius: "8px",
-              border: "1px solid #e2e8f0",
-            }}
-          >
-            <thead>
-              <tr style={{ borderBottom: "2px solid #e2e8f0" }}>
-                <th style={thLeft}>Ticker</th>
-                <th style={thRight}>Price</th>
-                <th style={thRight}>Chg%</th>
-                <th style={thRight}>AI Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              {stocks.map((stock, i) => (
-                <tr
-                  key={stock.ticker}
-                  style={{
-                    backgroundColor: i % 2 === 0 ? "#f8fafc" : "#ffffff",
-                    borderBottom: "1px solid #f1f5f9",
-                  }}
-                >
-                  <td style={tdLeft}>
-                    <span style={{ fontWeight: "700" }}>{stock.ticker}</span>
-                  </td>
-                  <td style={tdRight}>${stock.price.toFixed(2)}</td>
-                  <td
-                    style={{
-                      ...tdRight,
-                      color: stock.change >= 0 ? "#16a34a" : "#dc2626",
-                      fontWeight: "600",
-                    }}
-                  >
-                    {stock.change >= 0 ? "+" : ""}
-                    {stock.changePercent.toFixed(2)}%
-                  </td>
-                  <td style={tdRight}>
-                    {stock.score != null ? (
-                      <span
-                        style={{
-                          fontWeight: "600",
-                          fontSize: "12px",
-                          color: scoreColor(stock.score),
-                          background: `${scoreColor(stock.score)}15`,
-                          padding: "2px 6px",
-                          borderRadius: "4px",
-                        }}
-                      >
-                        {stock.score}
-                        {stock.recommendation
-                          ? ` · ${recLabel(stock.recommendation)}`
-                          : ""}
-                      </span>
-                    ) : (
-                      <span style={{ color: "#94a3b8", fontSize: "12px" }}>
-                        —
-                      </span>
-                    )}
-                  </td>
+          {/* ── Watchlist Table ── */}
+          <Section style={tableWrapper}>
+            <Text style={tableTitle}>Watchlist</Text>
+            <table
+              width="100%"
+              cellPadding={0}
+              cellSpacing={0}
+              border={0}
+              style={{ borderCollapse: "collapse" }}
+            >
+              <thead>
+                <tr style={tableHeadRow}>
+                  <th style={th}>Ticker</th>
+                  <th style={{ ...th, textAlign: "right" }}>Price</th>
+                  <th style={{ ...th, textAlign: "right" }}>Chg%</th>
+                  <th style={{ ...th, textAlign: "right" }}>AI Score</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {stocks.map((stock, i) => {
+                  const badge = stock.score != null ? scoreBadge(stock.score) : null;
+                  return (
+                    <tr
+                      key={stock.ticker}
+                      style={{
+                        borderBottom: i < stocks.length - 1 ? "1px solid #f1f5f9" : "none",
+                      }}
+                    >
+                      <td style={td}>
+                        <Text style={tickerName}>{stock.ticker}</Text>
+                      </td>
+                      <td style={{ ...td, textAlign: "right" }}>
+                        <Text style={priceText}>
+                          ${stock.price > 0 ? stock.price.toFixed(2) : "—"}
+                        </Text>
+                      </td>
+                      <td style={{ ...td, textAlign: "right" }}>
+                        <Text
+                          style={{
+                            ...changeText,
+                            color: stock.change >= 0 ? "#16a34a" : "#dc2626",
+                          }}
+                        >
+                          {stock.price > 0
+                            ? `${stock.change >= 0 ? "+" : ""}${stock.changePercent.toFixed(2)}%`
+                            : "—"}
+                        </Text>
+                      </td>
+                      <td style={{ ...td, textAlign: "right" }}>
+                        {badge ? (
+                          <span
+                            style={{
+                              display: "inline-block",
+                              background: badge.bg,
+                              color: badge.color,
+                              border: `1px solid ${badge.border}`,
+                              borderRadius: "6px",
+                              padding: "2px 8px",
+                              fontSize: "12px",
+                              fontWeight: "600",
+                            }}
+                          >
+                            {stock.score}
+                            {stock.recommendation
+                              ? ` · ${recLabel(stock.recommendation)}`
+                              : ""}
+                          </span>
+                        ) : (
+                          <span style={{ color: "#94a3b8", fontSize: "12px" }}>—</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </Section>
+
+          <Hr style={hr} />
 
           {/* ── CTA ── */}
-          <Section style={ctaCard}>
-            <Text style={ctaText}>
-              <Link href="{{appUrl}}/dashboard" style={ctaLink}>
-                View full analysis on StockSage →
-              </Link>
-            </Text>
+          <Section style={cta}>
+            <table width="100%" cellPadding={0} cellSpacing={0} border={0}>
+              <tr>
+                <td align="center">
+                  <Link href="{{appUrl}}/dashboard" style={ctaButton}>
+                    View Full Analysis →
+                  </Link>
+                </td>
+              </tr>
+            </table>
           </Section>
+
+          <Hr style={hr} />
 
           {/* ── Footer ── */}
           <Section style={footer}>
             <Text style={footerText}>
-              You received this email because you subscribed to StockSage daily digest.
+              You received this email because daily digest is enabled in your{" "}
+              <Link href="{{appUrl}}/newsletter" style={footerLink}>notification preferences</Link>.
             </Text>
-            <Text style={footerText}>
-              <Link href="{{appUrl}}/newsletter" style={footerLink}>
-                Unsubscribe or manage preferences
-              </Link>
-              {" · "}
-              <Link href="{{appUrl}}/legal/privacy" style={footerLink}>
-                Privacy
-              </Link>
-            </Text>
-            <Text style={footerText}>
+            <Text style={footerMuted}>
               StockSage · AI-Powered Stock Analysis
             </Text>
           </Section>
@@ -206,140 +262,232 @@ export const DailyDigest = ({
 // ─── Styles ──────────────────────────────────────────────────────────
 
 const main = {
-  backgroundColor: "#f8fafc",
-  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  backgroundColor: "#f1f5f9",
+  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+  padding: "32px 0",
 };
 
 const container = {
   margin: "0 auto",
-  padding: "20px 0 48px",
-  maxWidth: "600px",
+  maxWidth: "560px",
+  background: "#ffffff",
+  borderRadius: "12px",
+  overflow: "hidden",
+  boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
 };
 
-const h1 = {
-  fontSize: "24px",
+// Header
+const header = {
+  background: "linear-gradient(135deg, #1e293b 0%, #334155 100%)",
+  padding: "28px 32px",
+  textAlign: "center" as const,
+};
+
+const logo = {
+  fontSize: "22px",
+  fontWeight: "800",
+  color: "#ffffff",
+  margin: "0 0 4px 0",
+};
+
+const dateText = {
+  fontSize: "13px",
+  color: "#94a3b8",
+  margin: "0",
+};
+
+const greeting = {
+  fontSize: "18px",
+  fontWeight: "600",
+  color: "#1e293b",
+  padding: "24px 32px 0 32px",
+  margin: "0",
+};
+
+const intro = {
+  fontSize: "15px",
+  color: "#64748b",
+  lineHeight: "22px",
+  padding: "8px 32px 0 32px",
+  margin: "0",
+};
+
+// Stats Bar
+const statsBar = {
+  padding: "16px 32px",
+};
+
+const statCell: React.CSSProperties = {
+  textAlign: "center",
+  padding: "12px 8px",
+  background: "#f8fafc",
+  borderRadius: "8px",
+};
+
+const statValue = {
+  fontSize: "20px",
   fontWeight: "700",
   color: "#1e293b",
-  marginBottom: "16px",
+  margin: "0",
 };
 
-const text = {
-  fontSize: "16px",
-  color: "#475569",
-  lineHeight: "24px",
+const statLabel = {
+  fontSize: "11px",
+  fontWeight: "500",
+  color: "#94a3b8",
+  textTransform: "uppercase" as const,
+  letterSpacing: "0.5px",
+  margin: "2px 0 0 0",
 };
 
 // Portfolio Brief
 const briefCard = {
-  background: "#eef2ff",
-  borderRadius: "8px",
-  padding: "16px",
-  marginTop: "16px",
-  marginBottom: "16px",
-  border: "1px solid #c7d2fe",
+  background: "linear-gradient(135deg, #eef2ff 0%, #faf5ff 100%)",
+  borderRadius: "10px",
+  padding: "20px",
+  margin: "0 32px 20px 32px",
+  border: "1px solid #e0e7ff",
 };
 
-const briefHeading = {
-  fontSize: "16px",
+const briefIcon = {
+  fontSize: "15px",
   fontWeight: "700",
   color: "#4338ca",
-  marginBottom: "8px",
+  margin: "0 0 8px 0",
 };
 
 const briefSummary = {
   fontSize: "14px",
   color: "#334155",
-  lineHeight: "20px",
-  marginBottom: "12px",
+  lineHeight: "21px",
+  margin: "0 0 4px 0",
 };
 
-const briefSubheading = {
+const briefCol: React.CSSProperties = {
+  background: "rgba(255,255,255,0.7)",
+  borderRadius: "8px",
+  padding: "12px",
+};
+
+const briefColTitle = {
   fontSize: "13px",
   fontWeight: "600",
   color: "#475569",
-  marginTop: "8px",
-  marginBottom: "4px",
+  margin: "0 0 6px 0",
 };
 
 const briefItem = {
   fontSize: "13px",
   color: "#475569",
-  margin: "2px 0 2px 4px",
+  lineHeight: "19px",
+  margin: "0 0 3px 8px",
 };
 
-// Section title
-const sectionTitle = {
-  fontSize: "15px",
-  fontWeight: "600",
-  color: "#334155",
-  marginTop: "16px",
-  marginBottom: "8px",
+const actionCard: React.CSSProperties = {
+  background: "rgba(255,255,255,0.7)",
+  borderRadius: "8px",
+  padding: "12px",
 };
 
 // Table
-const thLeft: React.CSSProperties = {
-  textAlign: "left",
-  fontSize: "12px",
+const tableWrapper = {
+  padding: "0 32px 8px 32px",
+};
+
+const tableTitle = {
+  fontSize: "13px",
   fontWeight: "600",
   color: "#64748b",
   textTransform: "uppercase" as const,
-  padding: "8px 16px",
+  letterSpacing: "0.5px",
+  margin: "0 0 8px 0",
 };
 
-const thRight: React.CSSProperties = {
-  textAlign: "right",
-  fontSize: "12px",
-  fontWeight: "600",
-  color: "#64748b",
-  textTransform: "uppercase" as const,
-  padding: "8px 16px",
+const tableHeadRow = {
+  background: "#f8fafc",
+  borderBottom: "2px solid #e2e8f0",
 };
 
-const tdLeft: React.CSSProperties = {
+const th: React.CSSProperties = {
   textAlign: "left",
+  fontSize: "11px",
+  fontWeight: "600",
+  color: "#94a3b8",
+  textTransform: "uppercase" as const,
+  letterSpacing: "0.5px",
+  padding: "10px 12px",
+};
+
+const td: React.CSSProperties = {
+  padding: "10px 12px",
+};
+
+const tickerName = {
   fontSize: "14px",
+  fontWeight: "700",
   color: "#1e293b",
-  padding: "8px 16px",
+  margin: "0",
 };
 
-const tdRight: React.CSSProperties = {
-  textAlign: "right",
+const priceText = {
   fontSize: "14px",
-  color: "#334155",
-  padding: "8px 16px",
+  fontWeight: "600",
+  color: "#1e293b",
+  margin: "0",
+};
+
+const changeText = {
+  fontSize: "14px",
+  fontWeight: "600",
+  margin: "0",
 };
 
 // CTA
-const ctaCard = {
+const cta = {
+  padding: "16px 32px",
   textAlign: "center" as const,
-  marginTop: "16px",
 };
 
-const ctaText = {
+const ctaButton = {
+  display: "inline-block",
+  background: "#4f46e5",
+  color: "#ffffff",
+  borderRadius: "8px",
+  padding: "12px 28px",
   fontSize: "15px",
+  fontWeight: "600",
+  textDecoration: "none",
 };
 
-const ctaLink = {
-  color: "#4f46e5",
-  fontWeight: "600",
+// Divider
+const hr = {
+  border: "none",
+  borderTop: "1px solid #e2e8f0",
+  margin: "0 32px",
 };
 
 // Footer
 const footer = {
-  marginTop: "32px",
-  borderTop: "1px solid #e2e8f0",
-  paddingTop: "16px",
+  padding: "16px 32px 24px 32px",
   textAlign: "center" as const,
 };
 
 const footerText = {
   fontSize: "12px",
   color: "#94a3b8",
+  lineHeight: "18px",
+  margin: "0 0 4px 0",
+};
+
+const footerMuted = {
+  fontSize: "11px",
+  color: "#cbd5e1",
+  margin: "8px 0 0 0",
 };
 
 const footerLink = {
-  fontSize: "12px",
   color: "#6366f1",
+  textDecoration: "underline",
 };
 
 export default DailyDigest;
