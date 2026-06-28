@@ -27,7 +27,7 @@ export async function POST(
     if (!llmKey || llmKey === "sk-...") {
       return NextResponse.json({
         summary: null,
-        message: "LLM not configured. Set LLM_API_KEY in .env.local",
+        message: "AI analysis is not available at the moment.",
       });
     }
 

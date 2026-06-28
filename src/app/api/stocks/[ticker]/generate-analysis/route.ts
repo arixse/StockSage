@@ -25,16 +25,14 @@ export async function POST(
       if (result.articles === 0) {
         const fhKey = process.env.FINNHUB_API_KEY;
         msg = fhKey
-          ? "No news articles found for this ticker. The Finnhub free tier may not include news for all stocks."
-          : "FINNHUB_API_KEY not set — cannot fetch news.";
+          ? "No news articles found for this ticker. Try again later."
+          : "News service is not configured — cannot fetch news.";
       } else {
         const llmKey = process.env.LLM_API_KEY;
-        if (!llmKey) {
-          msg = "LLM_API_KEY not set in Vercel environment variables.";
-        } else if (llmKey === "sk-...") {
-          msg = "LLM_API_KEY is still the placeholder value 'sk-...'. Replace with your real API key in Vercel env vars, then redeploy.";
+        if (!llmKey || llmKey === "sk-...") {
+          msg = "AI analysis service is not available at the moment.";
         } else {
-          msg = `LLM call failed (key: ${llmKey.slice(0, 8)}...). Check LLM_BASE_URL and LLM_MODEL.`;
+          msg = "AI analysis failed. Please try again later.";
         }
       }
 
