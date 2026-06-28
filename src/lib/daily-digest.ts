@@ -5,6 +5,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendEmail } from "@/lib/email";
 import { DailyDigest } from "@/emails/DailyDigest";
+import { fetchStockQuotes } from "@/lib/stock-api";
 import { createLogger } from "@/lib/logger";
 
 const log = createLogger("daily-digest");
@@ -112,7 +113,28 @@ export async function sendDailyDigests(): Promise<{
     .select("ticker, price, change_val, change_percent, company_name")
     .in("ticker", allTickers);
 
-  const stockMap = new Map((stockRows || []).map((s) => [s.ticker, s]));
+  const stockMap = new Map<string, any>((stockRows || []).map((s) => [s.ticker, s]));
+
+  // Live-fetch quotes for tickers missing or with stale/empty cached data
+  const missingTickers = allTickers.filter((t) => {
+    const row = stockMap.get(t);
+    return !row || !row.price || row.price <= 0;
+  });
+  if (missingTickers.length > 0) {
+    log.info("send", `Live-fetching quotes for ${missingTickers.length} tickers`);
+    const fresh = await fetchStockQuotes(missingTickers);
+    for (const q of fresh) {
+      if (q && q.price > 0) {
+        stockMap.set(q.ticker, {
+          ticker: q.ticker,
+          price: q.price,
+          change_val: q.change,
+          change_percent: q.changePercent,
+          company_name: q.shortName || q.ticker,
+        });
+      }
+    }
+  }
 
   // 5. Get today's portfolio briefs
   const { data: briefRows } = await admin
