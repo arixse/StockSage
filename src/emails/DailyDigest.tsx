@@ -109,37 +109,47 @@ export const DailyDigest = ({
 
           {/* ── Portfolio Brief ── */}
           {portfolioBrief && (
-            <Section style={briefCard}>
-              <Text style={briefIcon}>🤖 AI Portfolio Analysis</Text>
-              <Text style={briefSummary}>{portfolioBrief.summary}</Text>
+            <>
+              <Text style={briefHeading}>AI Portfolio Analysis</Text>
 
-              {portfolioBrief.highlights.length > 0 && (
-                <Section style={briefBlock}>
-                  <Text style={briefColTitle}>✨ Highlights</Text>
-                  {portfolioBrief.highlights.map((h, i) => (
-                    <Text key={i} style={briefItem}>{h}</Text>
-                  ))}
-                </Section>
-              )}
-
-              {portfolioBrief.risks.length > 0 && (
-                <Section style={briefBlock}>
-                  <Text style={briefColTitle}>⚠️ Risks</Text>
-                  {portfolioBrief.risks.map((r, i) => (
-                    <Text key={i} style={briefItem}>{r}</Text>
-                  ))}
-                </Section>
-              )}
-
-              {portfolioBrief.actionItems.length > 0 && (
-                <Section style={briefBlock}>
-                  <Text style={briefColTitle}>🎯 Action Items</Text>
-                  {portfolioBrief.actionItems.map((a, i) => (
-                    <Text key={i} style={briefItem}>{a}</Text>
-                  ))}
-                </Section>
-              )}
-            </Section>
+              <table width="100%" cellPadding={0} cellSpacing={0} border={0} style={briefTable}>
+                <tr>
+                  <td style={briefSummaryCell}>
+                    <Text style={briefSummaryText}>{portfolioBrief.summary}</Text>
+                  </td>
+                </tr>
+                {portfolioBrief.highlights.length > 0 && (
+                  <tr>
+                    <td style={briefSectionCell}>
+                      <Text style={briefLabel}>Highlights</Text>
+                      {portfolioBrief.highlights.map((h, i) => (
+                        <Text key={i} style={briefBullet}>{h}</Text>
+                      ))}
+                    </td>
+                  </tr>
+                )}
+                {portfolioBrief.risks.length > 0 && (
+                  <tr>
+                    <td style={briefSectionCell}>
+                      <Text style={briefLabel}>Risks</Text>
+                      {portfolioBrief.risks.map((r, i) => (
+                        <Text key={i} style={briefBullet}>{r}</Text>
+                      ))}
+                    </td>
+                  </tr>
+                )}
+                {portfolioBrief.actionItems.length > 0 && (
+                  <tr>
+                    <td style={briefSectionCell}>
+                      <Text style={briefLabel}>Action Items</Text>
+                      {portfolioBrief.actionItems.map((a, i) => (
+                        <Text key={i} style={briefBullet}>{a}</Text>
+                      ))}
+                    </td>
+                  </tr>
+                )}
+              </table>
+            </>
           )}
 
           {/* ── Watchlist Table ── */}
@@ -335,49 +345,50 @@ const statLabel = {
 };
 
 // Portfolio Brief
-const briefCard = {
-  background: "linear-gradient(135deg, #eef2ff 0%, #faf5ff 100%)",
-  borderRadius: "10px",
-  padding: "20px",
-  margin: "0 32px 20px 32px",
-  border: "1px solid #e0e7ff",
-  maxWidth: "100%",
-  overflow: "hidden",
-};
-
-const briefBlock = {
-  background: "rgba(255,255,255,0.7)",
-  borderRadius: "8px",
-  padding: "12px",
-  marginTop: "10px",
-};
-
-const briefIcon = {
+const briefHeading = {
   fontSize: "15px",
   fontWeight: "700",
   color: "#4338ca",
+  padding: "0 32px",
   margin: "0 0 8px 0",
 };
 
-const briefSummary = {
+const briefTable = {
+  background: "#eef2ff",
+  borderRadius: "8px",
+  border: "1px solid #e0e7ff",
+  margin: "0 32px 20px 32px",
+};
+
+const briefSummaryCell: React.CSSProperties = {
+  padding: "16px",
+  borderBottom: "1px solid #e0e7ff",
+};
+
+const briefSummaryText = {
   fontSize: "14px",
   color: "#334155",
   lineHeight: "21px",
-  margin: "0 0 4px 0",
+  margin: "0",
 };
 
-const briefColTitle = {
+const briefSectionCell: React.CSSProperties = {
+  padding: "12px 16px",
+  borderBottom: "1px solid #e0e7ff",
+};
+
+const briefLabel = {
   fontSize: "13px",
   fontWeight: "600",
   color: "#475569",
   margin: "0 0 6px 0",
 };
 
-const briefItem = {
+const briefBullet = {
   fontSize: "13px",
   color: "#475569",
   lineHeight: "19px",
-  margin: "0 0 3px 8px",
+  margin: "0 0 3px 10px",
 };
 
 // Table
