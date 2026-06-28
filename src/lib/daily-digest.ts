@@ -200,3 +200,142 @@ export async function sendDailyDigests(): Promise<{
   log.info("send", `Done: ${sent} sent, ${failed} failed, ${users.length} users`);
   return { users: users.length, sent, failed, errors };
 }
+
+/**
+ * Generate and save portfolio briefs for all users with daily_digest enabled.
+ * Called by the daily cron after the AI pipeline completes, so today's
+ * ai_daily_analysis rows are already populated.
+ */
+export async function generatePortfolioBriefs(): Promise<{
+  users: number;
+  generated: number;
+  errors: string[];
+}> {
+  const admin = createAdminClient();
+  const errors: string[] = [];
+  let generated = 0;
+  const today = new Date().toISOString().split("T")[0];
+
+  // 1. Get all users with daily_digest enabled
+  const { data: prefUsers, error: prefError } = await admin
+    .from("email_preferences")
+    .select("user_id")
+    .eq("daily_digest", true);
+
+  if (prefError || !prefUsers?.length) {
+    log.info("briefs", "No digest subscribers for brief generation");
+    return { users: 0, generated: 0, errors: [] };
+  }
+
+  const userIds = prefUsers.map((p) => p.user_id);
+  log.info("briefs", `Generating briefs for ${userIds.length} users`);
+
+  // 2. Get watchlist tickers per user
+  const { data: watchlistItems } = await admin
+    .from("watchlist_items")
+    .select("watchlist_id, ticker, watchlists!inner(user_id)")
+    .in("watchlists.user_id", userIds);
+
+  const userTickers = new Map<string, string[]>();
+  userIds.forEach((id) => userTickers.set(id, []));
+  (watchlistItems || []).forEach((item: any) => {
+    const uid = item.watchlists?.user_id;
+    if (uid && userTickers.has(uid)) {
+      userTickers.get(uid)!.push(item.ticker);
+    }
+  });
+
+  // Deduplicate and filter empty
+  const allTickers = [...new Set(
+    userIds.flatMap((uid) => userTickers.get(uid) || [])
+  )];
+
+  if (allTickers.length === 0) {
+    log.info("briefs", "No watchlist tickers found");
+    return { users: userIds.length, generated: 0, errors: [] };
+  }
+
+  // 3. Fetch quotes + fundamentals for all tickers at once
+  const { data: stockRows } = await admin
+    .from("stocks")
+    .select("ticker, price, change_percent, sector, company_name")
+    .in("ticker", allTickers);
+
+  const stockMap = new Map(
+    (stockRows || []).map((s) => [s.ticker, s])
+  );
+
+  // 4. Fetch today's AI analysis
+  const { data: analyses } = await admin
+    .from("ai_daily_analysis")
+    .select("ticker, overall_score, recommendation, sentiment")
+    .eq("analysis_date", today)
+    .in("ticker", allTickers);
+
+  const aiMap = new Map(
+    (analyses || []).map((a) => [a.ticker, a])
+  );
+
+  // 5. Generate brief for each user
+  const { generatePortfolioBrief } = await import("@/lib/ai");
+
+  for (const uid of userIds) {
+    try {
+      const tickers = [...new Set(userTickers.get(uid) || [])];
+      if (tickers.length === 0) continue;
+
+      const stocks = tickers.map((ticker) => {
+        const stock = stockMap.get(ticker);
+        const ai = aiMap.get(ticker);
+        return {
+          ticker,
+          sector: stock?.sector || null,
+          price: stock?.price != null ? Number(stock.price) : null,
+          changePercent: stock?.change_percent != null ? Number(stock.change_percent) : null,
+          volumeRatio: null,
+          rsi14: null,
+          trend: null,
+          aiScore: ai?.overall_score ?? null,
+          recommendation: ai?.recommendation ?? null,
+          sentiment: ai?.sentiment ?? null,
+        };
+      });
+
+      const brief = await generatePortfolioBrief(stocks);
+      if (!brief) {
+        log.warn("briefs", `User ${uid.slice(0, 8)}: LLM returned null`);
+        continue;
+      }
+
+      const tickersSnapshot = tickers.sort();
+
+      const { error } = await admin.from("portfolio_briefs").upsert(
+        {
+          user_id: uid,
+          brief_date: today,
+          content: brief,
+          tickers_snapshot: tickersSnapshot,
+          model_used: process.env.LLM_MODEL || "gpt-4o-mini",
+          generated_at: new Date().toISOString(),
+        },
+        { onConflict: "user_id,brief_date" }
+      );
+
+      if (error) {
+        const msg = `User ${uid.slice(0, 8)}: DB upsert failed — ${JSON.stringify(error)}`;
+        errors.push(msg);
+        log.error("briefs", msg);
+      } else {
+        generated++;
+        log.debug("briefs", `✓ User ${uid.slice(0, 8)} (${tickers.length} stocks)`);
+      }
+    } catch (e) {
+      const msg = `User ${uid.slice(0, 8)}: ${String(e)}`;
+      errors.push(msg);
+      log.error("briefs", msg);
+    }
+  }
+
+  log.info("briefs", `Done: ${generated} briefs generated, ${errors.length} errors`);
+  return { users: userIds.length, generated, errors };
+}

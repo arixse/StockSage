@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { runDailyPipelineForAll } from "@/lib/ai-pipeline";
-import { sendDailyDigests } from "@/lib/daily-digest";
+import { sendDailyDigests, generatePortfolioBriefs } from "@/lib/daily-digest";
 
 // Vercel Pro allows up to 300s; AI pipeline + email sending can take 2-4 min
 export const maxDuration = 300;
@@ -30,13 +30,17 @@ export async function GET(request: NextRequest) {
     // 1. Run AI pipeline — generates per-ticker analysis → ai_daily_analysis
     const pipelineResult = await runDailyPipelineForAll();
 
-    // 2. Compose and send personalized digest emails
-    const emailResult = await sendDailyDigests();
+    // 2. Run emails + portfolio briefs in parallel (both depend on pipeline result)
+    const [emailResult, briefResult] = await Promise.all([
+      sendDailyDigests(),
+      generatePortfolioBriefs(),
+    ]);
 
     return NextResponse.json({
       success: true,
       pipeline: pipelineResult,
       emails: emailResult,
+      briefs: briefResult,
     });
   } catch (error) {
     console.error("[Cron] Daily digest error:", error);

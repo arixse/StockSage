@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Sparkles, Loader2, Bot, Lightbulb, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { Sparkles, Loader2, Bot, Lightbulb, AlertTriangle, CheckCircle2, AlertCircle } from "lucide-react";
 
 interface Brief {
   summary: string;
@@ -26,25 +26,6 @@ export function PortfolioBriefCard() {
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState("");
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/dashboard/portfolio-brief");
-      const json = await res.json();
-      const data: BriefResponse = json.data || {};
-      if (data.hasBrief && data.brief) setBrief(data.brief);
-      else setBrief(null);
-    } catch {
-      setError("Failed to load brief.");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    load();
-  }, [load]);
-
   const generate = useCallback(async () => {
     setGenerating(true);
     setError("");
@@ -64,29 +45,53 @@ export function PortfolioBriefCard() {
     }
   }, []);
 
-  if (loading) {
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/dashboard/portfolio-brief");
+      const json = await res.json();
+      const data: BriefResponse = json.data || {};
+      if (data.hasBrief && data.brief) {
+        setBrief(data.brief);
+      } else {
+        // No cached brief — auto-generate
+        setBrief(null);
+        generate();
+      }
+    } catch {
+      setError("Failed to load brief.");
+    } finally {
+      setLoading(false);
+    }
+  }, [generate]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  if (loading || generating) {
     return (
       <Card className="border-primary/20 bg-primary/5">
         <CardHeader className="pb-2">
           <Skeleton className="h-5 w-48" />
         </CardHeader>
-        <CardContent className="space-y-2">
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-4/5" />
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (generating) {
-    return (
-      <Card className="border-primary/20">
-        <CardContent className="flex flex-col items-center justify-center py-10 text-center">
-          <Loader2 className="h-8 w-8 text-primary animate-spin mb-3" />
-          <p className="font-medium mb-1">Generating Portfolio Brief</p>
-          <p className="text-sm text-muted-foreground">
-            Analyzing your watchlist with AI — this takes 5–10 seconds.
-          </p>
+        <CardContent className="flex flex-col items-center justify-center py-6 text-center space-y-3">
+          {generating ? (
+            <>
+              <Loader2 className="h-6 w-6 text-primary animate-spin" />
+              <div>
+                <p className="font-medium">Generating Portfolio Brief</p>
+                <p className="text-sm text-muted-foreground">
+                  Analyzing your watchlist with AI — this takes a few seconds.
+                </p>
+              </div>
+            </>
+          ) : (
+            <>
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-4/5" />
+            </>
+          )}
         </CardContent>
       </Card>
     );
@@ -95,15 +100,14 @@ export function PortfolioBriefCard() {
   if (!brief) {
     return (
       <Card>
-        <CardContent className="flex flex-col items-center justify-center py-10 text-center">
-          <Bot className="h-10 w-10 text-muted-foreground/30 mb-3" />
-          <p className="text-muted-foreground mb-1">No Portfolio Brief Yet</p>
-          <p className="text-sm text-muted-foreground mb-4">
-            {error || "Generate an AI summary of your watchlist: cross-stock themes, risks, and action items."}
+        <CardContent className="flex flex-col items-center justify-center py-8 text-center">
+          <AlertCircle className="h-8 w-8 text-muted-foreground/30 mb-2" />
+          <p className="text-sm text-muted-foreground">
+            {error || "Unable to generate portfolio brief. Please try again later."}
           </p>
-          <Button onClick={generate} disabled={generating}>
-            <Sparkles className="h-4 w-4 mr-2" />
-            Generate Today's Brief
+          <Button variant="outline" size="sm" className="mt-3" onClick={generate}>
+            <Sparkles className="h-3.5 w-3.5 mr-1" />
+            Retry
           </Button>
         </CardContent>
       </Card>
