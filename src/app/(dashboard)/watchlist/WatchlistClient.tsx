@@ -84,22 +84,24 @@ export function WatchlistClient({ watchlistId, initialStocks }: Props) {
     setSearchQuery(query);
     if (query.length < 1) {
       setSearchResults(POPULAR_TICKERS);
+      setSearching(false);
       return;
     }
     setSearching(true);
     try {
       const res = await fetch(`/api/stocks?q=${encodeURIComponent(query)}`);
       const json = await res.json();
-      if (json.data && Array.isArray(json.data)) {
+      if (json.data && Array.isArray(json.data) && json.data.length > 0) {
         setSearchResults(
           json.data.map((s: { ticker: string; companyName: string }) => ({
             ticker: s.ticker,
             name: s.companyName || s.ticker,
           }))
         );
+      } else {
+        setSearchResults([]);
       }
     } catch {
-      // Fallback to client-side filter
       setSearchResults(
         POPULAR_TICKERS.filter(
           (s) =>
@@ -110,10 +112,6 @@ export function WatchlistClient({ watchlistId, initialStocks }: Props) {
     }
     setSearching(false);
   };
-
-  const filteredTickers = searchResults.filter(
-    (s) => !stocks.find((existing) => existing.ticker === s.ticker)
-  );
 
   const handleAddStock = async (ticker: string) => {
     if (!watchlistId) {
@@ -223,7 +221,7 @@ export function WatchlistClient({ watchlistId, initialStocks }: Props) {
               <CommandList>
                 <CommandEmpty>{searching ? "Searching..." : "No stocks found."}</CommandEmpty>
                 <CommandGroup heading="US Stocks">
-                  {filteredTickers.slice(0, 15).map((stock) => (
+                  {searchResults.map((stock) => (
                     <CommandItem
                       key={stock.ticker}
                       onSelect={() => {
