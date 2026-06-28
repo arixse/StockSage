@@ -189,6 +189,78 @@ function clampScore(value: unknown): number {
   return Math.max(0, Math.min(100, Math.round(num)));
 }
 
+/**
+ * Returns true if an LLM API key is actually configured (not the placeholder).
+ * Mirrors the guard in ai-pipeline.ts so callers can degrade gracefully.
+ */
+export function isLlmConfigured(): boolean {
+  const key = process.env.LLM_API_KEY || process.env.OPENAI_API_KEY;
+  return !!key && key !== "sk-...";
+}
+
+export interface PortfolioBriefInput {
+  ticker: string;
+  sector?: string | null;
+  price?: number | null;
+  changePercent?: number | null;
+  volumeRatio?: number | null; // today's volume / 20-day avg
+  rsi14?: number | null;
+  trend?: string | null;
+  aiScore?: number | null;
+  recommendation?: string | null;
+  sentiment?: string | null;
+}
+
+export interface PortfolioBrief {
+  summary: string;
+  highlights: string[];
+  risks: string[];
+  actionItems: string[];
+}
+
+export async function generatePortfolioBrief(
+  stocks: PortfolioBriefInput[]
+): Promise<PortfolioBrief | null> {
+  if (!isLlmConfigured() || stocks.length === 0) return null;
+
+  const stockText = stocks
+    .map(
+      (s) =>
+        `${s.ticker} (${s.sector || "N/A"}): ` +
+        `price ${s.price?.toFixed(2) ?? "N/A"}, ` +
+        `chg ${s.changePercent?.toFixed(2) ?? "N/A"}%, ` +
+        `volRatio ${s.volumeRatio?.toFixed(2) ?? "N/A"}x, ` +
+        `RSI ${s.rsi14?.toFixed(0) ?? "N/A"}, ` +
+        `trend ${s.trend ?? "N/A"}, ` +
+        `AI score ${s.aiScore ?? "N/A"}/100 (${s.recommendation ?? "N/A"}, ${s.sentiment ?? "N/A"})`
+    )
+    .join("\n");
+
+  const systemPrompt = `You are a senior portfolio analyst. Given a user's watchlist with technical + AI signals, produce a concise portfolio-level brief.
+Focus on cross-stock themes, concentration risk, and actionable next steps — do NOT just restate each stock.
+Always respond with valid JSON only — no markdown, no extra text.`;
+
+  const userPrompt = `Watchlist (${stocks.length} stocks):
+${stockText}
+
+Return a JSON object with this exact structure:
+{
+  "summary": "3-5 sentence portfolio-level overview: overall tilt, what's driving the group, what stands out",
+  "highlights": ["2-4 notable positives or opportunities across the list"],
+  "risks": ["2-4 risks: concentration, overbought names, earnings exposure, correlation, etc."],
+  "actionItems": ["2-4 concrete things to watch or do this week, tied to specific tickers"]
+}`;
+
+  const result = await jsonChat(systemPrompt, userPrompt);
+  const brief: PortfolioBrief = {
+    summary: (result.summary as string) || "No summary available.",
+    highlights: Array.isArray(result.highlights) ? (result.highlights as string[]) : [],
+    risks: Array.isArray(result.risks) ? (result.risks as string[]) : [],
+    actionItems: Array.isArray(result.actionItems) ? (result.actionItems as string[]) : [],
+  };
+  return brief;
+}
+
 export interface StockComparisonInput {
   ticker: string;
   price?: number | null;
