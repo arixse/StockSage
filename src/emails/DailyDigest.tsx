@@ -1,12 +1,10 @@
 import {
   Body,
   Container,
-  Column,
   Head,
   Heading,
   Html,
   Preview,
-  Row,
   Section,
   Text,
   Link,
@@ -32,6 +30,16 @@ interface DailyDigestProps {
   } | null;
 }
 
+function scoreColor(score: number) {
+  if (score >= 65) return "#16a34a";
+  if (score >= 45) return "#ca8a04";
+  return "#dc2626";
+}
+
+function recLabel(rec: string) {
+  return rec.replace(/_/g, " ");
+}
+
 export const DailyDigest = ({
   userName = "Investor",
   date,
@@ -39,14 +47,10 @@ export const DailyDigest = ({
   portfolioBrief,
 }: DailyDigestProps) => {
   const gainers = stocks.filter((s) => s.change > 0).length;
+  const scored = stocks.filter((s) => s.score != null);
   const avgScore =
-    stocks.filter((s) => s.score != null).length > 0
-      ? Math.round(
-          stocks
-            .filter((s) => s.score != null)
-            .reduce((sum, s) => sum + (s.score as number), 0) /
-            stocks.filter((s) => s.score != null).length
-        )
+    scored.length > 0
+      ? Math.round(scored.reduce((sum, s) => sum + (s.score as number), 0) / scored.length)
       : null;
 
   return (
@@ -94,70 +98,77 @@ export const DailyDigest = ({
 
           {/* ── Watchlist Summary ── */}
           <Text style={sectionTitle}>
-            Watchlist — {stocks.length} stocks · {gainers} gainers
-            {avgScore != null ? ` · Avg AI Score ${avgScore}/100` : ""}
+            {`Watchlist — ${stocks.length} stocks · ${gainers} gainers${avgScore != null ? ` · Avg AI Score ${avgScore}/100` : ""}`}
           </Text>
 
-          {/* ── Compact Table ── */}
-          <Section style={tableCard}>
-            {/* Header */}
-            <Row style={tableHeaderRow}>
-              <Column style={colTicker}>Ticker</Column>
-              <Column style={colPrice}>Price</Column>
-              <Column style={colChange}>Chg%</Column>
-              <Column style={colScore}>AI Score</Column>
-            </Row>
-            {/* Rows */}
-            {stocks.map((stock, i) => (
-              <Row
-                key={stock.ticker}
-                style={{
-                  ...tableRow,
-                  backgroundColor: i % 2 === 0 ? "#f8fafc" : "#ffffff",
-                }}
-              >
-                <Column style={colTicker}>
-                  <Text style={tickerCell}>{stock.ticker}</Text>
-                </Column>
-                <Column style={colPrice}>
-                  <Text style={priceCell}>${stock.price.toFixed(2)}</Text>
-                </Column>
-                <Column style={colChange}>
-                  <Text
+          {/* ── Compact Table (raw HTML for continuous header + rows) ── */}
+          <table
+            style={{
+              width: "100%",
+              borderCollapse: "collapse" as const,
+              background: "#ffffff",
+              borderRadius: "8px",
+              border: "1px solid #e2e8f0",
+            }}
+          >
+            <thead>
+              <tr style={{ borderBottom: "2px solid #e2e8f0" }}>
+                <th style={thLeft}>Ticker</th>
+                <th style={thRight}>Price</th>
+                <th style={thRight}>Chg%</th>
+                <th style={thRight}>AI Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              {stocks.map((stock, i) => (
+                <tr
+                  key={stock.ticker}
+                  style={{
+                    backgroundColor: i % 2 === 0 ? "#f8fafc" : "#ffffff",
+                    borderBottom: "1px solid #f1f5f9",
+                  }}
+                >
+                  <td style={tdLeft}>
+                    <span style={{ fontWeight: "700" }}>{stock.ticker}</span>
+                  </td>
+                  <td style={tdRight}>${stock.price.toFixed(2)}</td>
+                  <td
                     style={{
-                      ...changeCell,
+                      ...tdRight,
                       color: stock.change >= 0 ? "#16a34a" : "#dc2626",
+                      fontWeight: "600",
                     }}
                   >
                     {stock.change >= 0 ? "+" : ""}
                     {stock.changePercent.toFixed(2)}%
-                  </Text>
-                </Column>
-                <Column style={colScore}>
-                  {stock.score != null ? (
-                    <Text
-                      style={{
-                        ...scoreCell,
-                        color:
-                          stock.score >= 65
-                            ? "#16a34a"
-                            : stock.score >= 45
-                              ? "#ca8a04"
-                              : "#dc2626",
-                      }}
-                    >
-                      {stock.score}
-                      {stock.recommendation
-                        ? ` · ${stock.recommendation.replace(/_/g, " ")}`
-                        : ""}
-                    </Text>
-                  ) : (
-                    <Text style={scoreNa}>—</Text>
-                  )}
-                </Column>
-              </Row>
-            ))}
-          </Section>
+                  </td>
+                  <td style={tdRight}>
+                    {stock.score != null ? (
+                      <span
+                        style={{
+                          fontWeight: "600",
+                          fontSize: "12px",
+                          color: scoreColor(stock.score),
+                          background: `${scoreColor(stock.score)}15`,
+                          padding: "2px 6px",
+                          borderRadius: "4px",
+                        }}
+                      >
+                        {stock.score}
+                        {stock.recommendation
+                          ? ` · ${recLabel(stock.recommendation)}`
+                          : ""}
+                      </span>
+                    ) : (
+                      <span style={{ color: "#94a3b8", fontSize: "12px" }}>
+                        —
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
           {/* ── CTA ── */}
           <Section style={ctaCard}>
@@ -266,54 +277,36 @@ const sectionTitle = {
 };
 
 // Table
-const tableCard = {
-  background: "#ffffff",
-  borderRadius: "8px",
-  padding: "4px 0",
-  border: "1px solid #e2e8f0",
-};
-
-const tableHeaderRow = {
-  borderBottom: "2px solid #e2e8f0",
+const thLeft: React.CSSProperties = {
+  textAlign: "left",
+  fontSize: "12px",
+  fontWeight: "600",
+  color: "#64748b",
+  textTransform: "uppercase" as const,
   padding: "8px 16px",
 };
 
-const tableRow = {
-  padding: "6px 16px",
-  borderBottom: "1px solid #f1f5f9",
+const thRight: React.CSSProperties = {
+  textAlign: "right",
+  fontSize: "12px",
+  fontWeight: "600",
+  color: "#64748b",
+  textTransform: "uppercase" as const,
+  padding: "8px 16px",
 };
 
-const colTicker: React.CSSProperties = { width: "25%" };
-const colPrice: React.CSSProperties = { width: "25%", textAlign: "right" };
-const colChange: React.CSSProperties = { width: "25%", textAlign: "right" };
-const colScore: React.CSSProperties = { width: "25%", textAlign: "right" };
-
-const tickerCell = {
+const tdLeft: React.CSSProperties = {
+  textAlign: "left",
   fontSize: "14px",
-  fontWeight: "700",
   color: "#1e293b",
+  padding: "8px 16px",
 };
 
-const priceCell = {
+const tdRight: React.CSSProperties = {
+  textAlign: "right",
   fontSize: "14px",
-  fontWeight: "600",
   color: "#334155",
-};
-
-const changeCell = {
-  fontSize: "14px",
-  fontWeight: "600",
-};
-
-const scoreCell = {
-  fontSize: "12px",
-  fontWeight: "600",
-};
-
-const scoreNa = {
-  fontSize: "12px",
-  color: "#94a3b8",
-  fontWeight: "400" as const,
+  padding: "8px 16px",
 };
 
 // CTA
