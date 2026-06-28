@@ -12,9 +12,11 @@
  * All heavy data already exists in DB (synced by cron); this module only reads
  * and computes — no external API calls except the in-hours quote refresh.
  */
+import { after } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { fetchStockQuotes, fetchStockChart } from "@/lib/stock-api";
 import type { StockQuote, CompanyOverview } from "@/lib/stock-api";
+import { runDailyPipeline } from "@/lib/ai-pipeline";
 import {
   getCachedQuotes,
   getCachedChart,
@@ -412,6 +414,26 @@ export async function getWatchlistInsights(userId: string): Promise<WatchlistIns
   const alerts: SignalAlert[] = stocks
     .map((s) => ({ ticker: s.ticker, labels: collectAlertLabels(s.signals) }))
     .filter((a) => a.labels.length > 0);
+
+  // Fire-and-forget AI analysis for stocks that don't have one yet.
+  // Uses after() to run after the response is sent, so the page doesn't block.
+  // Results appear on the next page load.
+  const noAiTickers = stocks
+    .filter((s) => !s.error && !s.ai)
+    .map((s) => s.ticker);
+  if (noAiTickers.length > 0) {
+    after(async () => {
+      console.log(`[dashboard] Background AI pipeline for: ${noAiTickers.join(", ")}`);
+      await Promise.allSettled(
+        noAiTickers.map((t) =>
+          runDailyPipeline(t).catch((e) =>
+            console.error(`[dashboard] AI pipeline failed for ${t}:`, e)
+          )
+        )
+      );
+      console.log(`[dashboard] Background AI pipeline complete for: ${noAiTickers.join(", ")}`);
+    });
+  }
 
   return {
     watchlistId: watchlist?.id,
