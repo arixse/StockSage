@@ -13,7 +13,7 @@
  * and computes — no external API calls except the in-hours quote refresh.
  */
 import { createClient } from "@/lib/supabase/server";
-import { fetchStockQuotes } from "@/lib/stock-api";
+import { fetchStockQuotes, fetchStockChart } from "@/lib/stock-api";
 import type { StockQuote, CompanyOverview } from "@/lib/stock-api";
 import {
   getCachedQuotes,
@@ -331,6 +331,25 @@ export async function getWatchlistInsights(userId: string): Promise<WatchlistIns
       .order("analysis_date", { ascending: false }),
     getCachedCompanyOverviewsBatch(upper),
   ]);
+
+  // For tickers with no cached chart data (e.g. newly added), try live fetch
+  const noChartTickers = upper.filter((_, i) => (chartResults[i] as ChartBar[]).length === 0);
+  if (noChartTickers.length > 0) {
+    const freshCharts = await Promise.all(
+      noChartTickers.map((t) =>
+        fetchStockChart(t, "1y", "1d").catch(() => [] as ChartBar[])
+      )
+    );
+    const chartTickerSet = new Set(noChartTickers);
+    chartResults.forEach((bars, i) => {
+      if (bars.length === 0) {
+        const fi = noChartTickers.indexOf(upper[i]);
+        if (fi >= 0 && freshCharts[fi].length > 0) {
+          chartResults[i] = freshCharts[fi];
+        }
+      }
+    });
+  }
 
   // Latest AI row per ticker
   const aiMap = new Map<string, { analysis_date: string; sentiment: string | null; overall_score: number | null; recommendation: string | null }>();
