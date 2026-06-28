@@ -4,7 +4,6 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { TrendingUp, BarChart3, Sparkles, Mail, ArrowRight, Flame, GraduationCap } from "lucide-react";
 import { StockLogo } from "@/components/stock/StockLogo";
 import { getCachedQuotes } from "@/lib/stock-cache";
@@ -73,10 +72,7 @@ export default async function HomePage() {
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-primary/10" />
           <div className="container mx-auto px-4 relative">
             <div className="max-w-3xl mx-auto text-center">
-              <Badge variant="outline" className="mb-4 px-3 py-1 text-sm">
-                AI-Powered Stock Analysis
-              </Badge>
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
+<h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
                 Smarter Stock Analysis
                 <br />
                 <span className="text-primary">Powered by AI</span>
@@ -88,9 +84,6 @@ export default async function HomePage() {
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Button size="lg" render={<Link href="/register" />}>
                   Get Started Free <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-                <Button size="lg" variant="outline" render={<Link href="/stock/AAPL" />}>
-                  See an Example
                 </Button>
               </div>
             </div>
