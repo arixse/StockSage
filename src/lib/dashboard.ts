@@ -14,6 +14,7 @@
  */
 import { after } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { fetchStockQuotes, fetchStockChart } from "@/lib/stock-api";
 import type { StockQuote, CompanyOverview } from "@/lib/stock-api";
 import { runDailyPipeline } from "@/lib/ai-pipeline";
@@ -21,6 +22,8 @@ import {
   getCachedQuotes,
   getCachedChart,
   getCachedCompanyOverviewsBatch,
+  upsertStockQuotes,
+  upsertStockPrices,
 } from "@/lib/stock-cache";
 import { computeTechnicals } from "@/lib/technicals";
 import { getMarketStatus } from "@/lib/market-status";
@@ -321,6 +324,17 @@ export async function getWatchlistInsights(userId: string): Promise<WatchlistIns
       if (q && !tickerSet.has(upper[i])) return q;
       return freshMap.get(upper[i]) ?? q;
     });
+
+    // Write live-fetched quotes back to cache (background, don't block response)
+    const toCache = fresh.filter((q): q is StockQuote => q !== null && q.price > 0);
+    if (toCache.length > 0) {
+      after(async () => {
+        const admin = createAdminClient();
+        await upsertStockQuotes(admin, toCache).catch((e) =>
+          console.error("[dashboard] Failed to cache live quotes:", e)
+        );
+      });
+    }
   }
 
   // Parallel: charts (→ technicals), AI analysis rows, company overviews
@@ -342,12 +356,21 @@ export async function getWatchlistInsights(userId: string): Promise<WatchlistIns
         fetchStockChart(t, "1y", "1d").catch(() => [] as ChartBar[])
       )
     );
-    const chartTickerSet = new Set(noChartTickers);
     chartResults.forEach((bars, i) => {
       if (bars.length === 0) {
         const fi = noChartTickers.indexOf(upper[i]);
         if (fi >= 0 && freshCharts[fi].length > 0) {
           chartResults[i] = freshCharts[fi];
+        }
+      }
+    });
+
+    // Write live-fetched chart data back to cache (background)
+    after(async () => {
+      const admin = createAdminClient();
+      for (let i = 0; i < noChartTickers.length; i++) {
+        if (freshCharts[i].length > 0) {
+          await upsertStockPrices(admin, noChartTickers[i], freshCharts[i]).catch(() => {});
         }
       }
     });
