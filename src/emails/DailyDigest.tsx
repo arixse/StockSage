@@ -112,7 +112,7 @@ export const DailyDigest = ({
             <>
               <Text style={briefHeading}>AI Portfolio Analysis</Text>
 
-              <table width="100%" cellPadding={0} cellSpacing={0} border={0} style={briefTable}>
+              <table width="auto" cellPadding={0} cellSpacing={0} border={0} style={briefTable}>
                 <tr>
                   <td style={briefSummaryCell}>
                     <Text style={briefSummaryText}>{portfolioBrief.summary}</Text>
@@ -349,6 +349,7 @@ const briefHeading = {
   fontSize: "15px",
   fontWeight: "700",
   color: "#4338ca",
+  padding: "0 32px",
   margin: "0 0 8px 0",
 };
 
@@ -356,7 +357,7 @@ const briefTable = {
   background: "#eef2ff",
   borderRadius: "8px",
   border: "1px solid #e0e7ff",
-  marginBottom: "20px",
+  margin: "0 32px 20px 32px"
 };
 
 const briefSummaryCell: React.CSSProperties = {
