@@ -538,14 +538,14 @@ export async function searchStocks(query: string): Promise<SearchResult[]> {
 
   if (merged.length > 0) {
     log.info("search", `"${query}" → ${merged.length} results (Yahoo:${yh.length} Finnhub:${fh.length} Twelve:${td.length})`);
-    return merged.slice(0, 15);
+    return merged.slice(0, 20);
   }
 
   // Last resort: Alpha Vantage
   const av = await alphaSearch(query).catch(() => []);
   if (av.length > 0) {
     log.info("search", `"${query}" → AlphaVantage (${av.length} results)`);
-    return av.slice(0, 15);
+    return av.slice(0, 20);
   }
 
   // Final fallback: if query looks like a ticker, try direct quote lookup
@@ -562,7 +562,7 @@ export async function searchStocks(query: string): Promise<SearchResult[]> {
 }
 
 async function yahooSearch(query: string): Promise<SearchResult[]> {
-  const data = await yahooFetch(`/v1/finance/search?q=${encodeURIComponent(query)}&quotesCount=10`);
+  const data = await yahooFetch(`/v1/finance/search?q=${encodeURIComponent(query)}&quotesCount=20`);
   if (!data?.quotes) return [];
   return data.quotes
     .filter((q: any) => {
@@ -600,7 +600,7 @@ async function finnhubSearch(query: string): Promise<SearchResult[]> {
           !t
         );
       })
-      .slice(0, 10)
+      .slice(0, 20)
       .map((r: any) => ({
         ticker: r.symbol,
         companyName: r.description || "",
@@ -618,7 +618,7 @@ async function twelveSearch(query: string): Promise<SearchResult[]> {
     if (!key || key === "demo") return []; // demo key has no search access
 
     const res = await fetch(
-      `${TWELVE_DATA_BASE}/symbol_search?symbol=${encodeURIComponent(query)}&outputsize=10&apikey=${key}`,
+      `${TWELVE_DATA_BASE}/symbol_search?symbol=${encodeURIComponent(query)}&outputsize=20&apikey=${key}`,
       { next: { revalidate: 3600 } }
     );
     if (!res.ok) return [];
