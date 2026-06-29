@@ -1,0 +1,1 @@
+- [Important decisions require user approval](important-decisions-require-approval.md) — All significant technical decisions must be approved before implementation
