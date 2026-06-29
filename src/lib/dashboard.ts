@@ -299,15 +299,20 @@ export async function getWatchlistInsights(userId: string): Promise<WatchlistIns
 
   // Collect tickers needing a live fetch:
   //   a) null cache (no data at all — e.g. newly added stock)
-  //   b) stale cache during trading hours (>5 min old)
+  //   b) no timestamp (unknown age — must refresh)
+  //   c) stale cache during trading hours (>5 min old)
   const missingTickers: string[] = [];
   const staleTickers: string[] = [];
   cached.forEach((q, i) => {
     if (!q) {
       missingTickers.push(upper[i]);
-    } else if (isTrading && q.timestamp) {
-      const ageMin = (Date.now() - new Date(q.timestamp).getTime()) / 60000;
-      if (ageMin > 5) staleTickers.push(upper[i]);
+    } else if (isTrading) {
+      if (!q.timestamp) {
+        staleTickers.push(upper[i]); // no timestamp = age unknown, must refresh
+      } else {
+        const ageMin = (Date.now() - new Date(q.timestamp).getTime()) / 60000;
+        if (ageMin > 5) staleTickers.push(upper[i]);
+      }
     }
   });
 
