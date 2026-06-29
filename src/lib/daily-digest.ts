@@ -37,6 +37,20 @@ export async function sendDailyDigests(): Promise<{
   const errors: string[] = [];
   let sent = 0;
   let failed = 0;
+  const today = new Date().toISOString().split("T")[0];
+
+  // 0. Dedup: skip if already sent today (prevents double-run from Vercel Cron + GitHub Actions)
+  const { data: todayLogs } = await admin
+    .from("email_logs")
+    .select("id")
+    .eq("email_type", "daily_digest")
+    .gte("sent_at", `${today}T00:00:00Z`)
+    .limit(1);
+
+  if (todayLogs && todayLogs.length > 0) {
+    log.info("send", `Already sent today (${today}), skipping`);
+    return { users: 0, sent: 0, failed: 0, errors: [] };
+  }
 
   // 1. Get all users with daily_digest enabled
   const { data: prefUsers, error: prefError } = await admin
@@ -96,7 +110,6 @@ export async function sendDailyDigests(): Promise<{
   }
 
   // 3. Get today's AI analysis for all tracked tickers
-  const today = new Date().toISOString().split("T")[0];
   const allTickers = [...new Set(users.flatMap((u) => u.watchlistTickers))];
 
   const { data: analyses } = await admin
