@@ -2,8 +2,7 @@ name: Daily Digest
 
 on:
   schedule:
-    # 13:00 UTC — daily AI digest (9am EDT, before market open)
-    - cron: "0 13 * * 1-5"
+    - cron: '0 13 * * 1-5'
   workflow_dispatch:
 
 jobs:

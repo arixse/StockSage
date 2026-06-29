@@ -1,16 +1,9 @@
-name: Stock Data Refresh
+name: Stock Data — Overnight Full Pipeline
 
 on:
   schedule:
-    # 14:00 UTC — market open (10am EDT)
-    - cron: "0 14 * * 1-5"
-    # Every 15 min during market hours (14:00-20:59 UTC = 10am-5pm EDT)
-    - cron: "*/15 14-20 * * 1-5"
-    # 22:00 UTC — after market close (6pm EDT)
-    - cron: "0 22 * * 1-5"
-    # 1:00 UTC — overnight full pipeline (charts + fundamentals)
-    - cron: "0 1 * * 1-5"
-  workflow_dispatch:  # allow manual trigger from Actions tab
+    - cron: '0 1 * * 1-5'
+  workflow_dispatch:
 
 jobs:
   refresh:
@@ -18,7 +11,7 @@ jobs:
     steps:
       - name: Fetch stock data
         run: |
-          RESPONSE=$(curl -sL -w "\n%{http_code}" \
+          RESPONSE=$(curl -sL --max-time 300 -w "\n%{http_code}" \
             "${{ secrets.APP_URL }}/api/cron/fetch-stock-data?secret=${{ secrets.CRON_SECRET }}")
           HTTP_CODE=$(echo "$RESPONSE" | tail -1)
           BODY=$(echo "$RESPONSE" | sed '$d')
