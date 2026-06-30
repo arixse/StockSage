@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        source: "/:path((?!api|dashboard|watchlist|heat|settings|newsletter|callback|position-size-calculator|login|register).*)",
+        source: "/:path*((?!api|dashboard|watchlist|heat|settings|newsletter|callback|position-size-calculator|login|register).*)",
         headers: [
           {
             key: "Cache-Control",
