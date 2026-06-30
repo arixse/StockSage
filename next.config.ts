@@ -5,7 +5,16 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        source: "/:path*((?!api|dashboard|watchlist|heat|settings|newsletter|callback|position-size-calculator|login|register).*)",
+        source: "/",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, s-maxage=3600, stale-while-revalidate=86400",
+          },
+        ],
+      },
+      {
+        source: "/:path((?!api|dashboard|watchlist|heat|settings|newsletter|callback|position-size-calculator|login|register).+)",
         headers: [
           {
             key: "Cache-Control",
