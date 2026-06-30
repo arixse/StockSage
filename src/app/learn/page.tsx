@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -7,6 +8,15 @@ import { Badge } from "@/components/ui/badge";
 import { learnArticles, type LearnArticle } from "@/data/learn-articles";
 import { Briefcase, TrendingUp, Search, Layers, Grid3X3, BookOpen } from "lucide-react";
 import type { ReactNode } from "react";
+
+export const metadata: Metadata = {
+  title: "Learning Center",
+  description:
+    "Free stock market education for every investor. Learn portfolio building, value investing, ETFs, compound interest, and more with beginner-friendly guides.",
+  alternates: {
+    canonical: "/learn",
+  },
+};
 
 const ICONS: Record<string, ReactNode> = {
   Briefcase: <Briefcase className="h-8 w-8 text-primary" />,

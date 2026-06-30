@@ -1,10 +1,19 @@
+import type { Metadata } from "next";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { TrendingUp, BarChart3, Sparkles, Mail, Globe, Shield, Users } from "lucide-react";
+import { BarChart3, Sparkles, Globe, Shield } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "About StockSage",
+  description:
+    "Learn about StockSage's mission to democratize AI-powered stock research. We provide professional-grade US stock analysis, scoring, and market insights for every investor.",
+  alternates: {
+    canonical: "/about",
+  },
+};
 
 const VALUES = [
   {
@@ -67,11 +76,9 @@ export default function AboutPage() {
               {[
                 "AI-generated stock summaries and sentiment analysis",
                 "Real-time stock price, change, and volume data",
-                "AI composite scoring with buy/hold/sell signals",
                 "Composite AI scoring (0-100) with buy/hold/sell signals",
                 "Personalized watchlists with email alerts",
                 "Daily AI-powered newsletter delivered to your inbox",
-                "Stock comparison tools for side-by-side analysis",
                 "Market heatmaps for visual market breadth assessment",
                 "Learning center with investor education articles",
               ].map((item) => (

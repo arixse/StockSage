@@ -3,7 +3,16 @@ import { Footer } from "@/components/layout/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Clock } from "lucide-react";
 
-export const metadata = { title: "Pricing" };
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Pricing",
+  description:
+    "StockSage pricing plans. Start free with 5 stocks and AI analysis. Upgrade for unlimited stock tracking and premium features.",
+  alternates: {
+    canonical: "/pricing",
+  },
+};
 
 export default function PricingPage() {
   return (

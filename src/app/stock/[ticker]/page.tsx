@@ -61,6 +61,9 @@ export async function generateMetadata({ params }: Props) {
   return {
     title: `${upperTicker} - Stock Analysis & AI Brief`,
     description: `${upperTicker} price, fundamentals, technicals, and a research-backed AI brief. Catalysts and analyst context. Add to Radar for personalized calls and alerts.`,
+    alternates: {
+      canonical: `/stock/${upperTicker}`,
+    },
     openGraph: {
       title: `${upperTicker} Stock Analysis & AI Brief · StockSage`,
       description: `${upperTicker} price, fundamentals, technicals, and a research-backed AI brief.`,

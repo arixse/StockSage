@@ -12,6 +12,9 @@ import { fetchStockQuotes } from "@/lib/stock-api";
 export const metadata: Metadata = {
   description:
     "Free AI-powered US stock analysis platform. Get daily AI summaries, stock scores (0-100), market heatmaps, and personalized watchlists. Track NYSE and NASDAQ stocks with news sentiment and buy/hold/sell signals.",
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     title: "StockSage — AI-Powered Stock Analysis & Scoring",
     description:

@@ -25,6 +25,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: article.title,
     description: article.description,
+    alternates: {
+      canonical: `/learn/${slug}`,
+    },
     openGraph: {
       title: `${article.title} | StockSage Learn`,
       description: article.description,

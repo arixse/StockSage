@@ -21,20 +21,6 @@ export const metadata: Metadata = {
   },
   description:
     "StockSage provides AI-powered US stock analysis: get daily AI summaries, stock scores (0-100), market heatmaps, and personalized watchlists. Free for 5 stocks. Covers NYSE and NASDAQ equities with news sentiment, fundamentals, and buy/hold/sell signals.",
-  keywords: [
-    "stock analysis",
-    "AI stock analysis",
-    "US stocks",
-    "stock scoring",
-    "market heatmap",
-    "AI stock summary",
-    "stock watchlist",
-    "investment research",
-    "NYSE analysis",
-    "NASDAQ analysis",
-    "stock market AI",
-    "buy sell hold signals",
-  ],
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
   openGraph: {
     title: "StockSage · Stock Calls & Radar",
@@ -59,6 +45,9 @@ export const metadata: Metadata = {
     description:
       "AI-powered US stock market analysis platform. Get daily AI stock summaries, technical analysis, fundamentals, and smart scoring.",
     images: ["/api/og"],
+  },
+  alternates: {
+    canonical: "/",
   },
   robots: {
     index: true,
