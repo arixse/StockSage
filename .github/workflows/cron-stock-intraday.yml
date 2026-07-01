@@ -2,7 +2,7 @@ name: Stock Data — Intraday Refresh
 
 on:
   schedule:
-    - cron: '0,15,30,45 14-20 * * 1-5'
+    - cron: '3,18,33,48 14-20 * * 1-5'
   workflow_dispatch:
 
 jobs:
