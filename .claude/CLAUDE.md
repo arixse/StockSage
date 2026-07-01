@@ -11,7 +11,7 @@
 | UI | React 19, Tailwind CSS 4, shadcn/ui, Radix UI |
 | 图表 | lightweight-charts (candlestick + indicators) |
 | 数据库 | PostgreSQL (Supabase) + Prisma ORM |
-| Auth | Supabase Auth (cookie-based SSR) |
+| Auth | Supabase Auth — **仅 Google OAuth**，无邮箱/密码登录 |
 | 支付 | **Creem** (MoR), 测试环境用 test-api.creem.io |
 | AI/LLM | OpenAI SDK (支持任意兼容 API), 模型通过 `LLM_MODEL` 环境变量配置 |
 | 邮件 | Resend + @react-email/components |
