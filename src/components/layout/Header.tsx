@@ -92,6 +92,9 @@ export function Header() {
               <Link href="/learn" className="text-muted-foreground hover:text-foreground transition-colors">
                 Learn
               </Link>
+              <Link href="/pricing" className="text-muted-foreground hover:text-foreground transition-colors">
+                Pricing
+              </Link>
             </nav>
           )}
         </div>

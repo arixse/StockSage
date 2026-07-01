@@ -189,7 +189,7 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* CTA — no pricing yet */}
+        {/* CTA */}
         <section className="py-20 bg-muted/30">
           <div className="container mx-auto px-4 text-center">
             <h2 className="text-3xl font-bold mb-4">Start Free Today</h2>
