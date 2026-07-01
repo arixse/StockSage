@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     template: "%s | StockSage",
   },
   description:
-    "StockSage provides AI-powered US stock analysis: get daily AI summaries, stock scores (0-100), market heatmaps, and personalized watchlists. Free for 5 stocks. Covers NYSE and NASDAQ equities with news sentiment, fundamentals, and buy/hold/sell signals.",
+    "StockSage provides AI-powered US stock analysis: get daily AI summaries, stock scores (0-100), market heatmaps, and personalized watchlists. Free for 3 stocks. Covers NYSE and NASDAQ equities with news sentiment, fundamentals, and buy/hold/sell signals.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
   openGraph: {
     title: "StockSage · Stock Calls & Radar",

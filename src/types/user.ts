@@ -3,7 +3,7 @@ export interface UserProfile {
   email: string;
   name?: string;
   avatarUrl?: string;
-  tier: "free" | "basic" | "pro";
+  tier: "free" | "pro";
   createdAt: string;
 }
 

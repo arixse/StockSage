@@ -2,6 +2,79 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyWebhookSignature } from "@/lib/creem";
 import { createAdminClient } from "@/lib/supabase/admin";
 
+/** Derive period-end from billing_period string + a start date */
+function computePeriodEnd(billingPeriod: string | undefined, fromDate: string): string | null {
+  if (!billingPeriod) return null;
+  const d = new Date(fromDate);
+  if (isNaN(d.getTime())) return null;
+  if (billingPeriod === "every-month") d.setMonth(d.getMonth() + 1);
+  else if (billingPeriod === "every-year") d.setFullYear(d.getFullYear() + 1);
+  else if (billingPeriod === "every-week") d.setDate(d.getDate() + 7);
+  else return null;
+  return d.toISOString();
+}
+
+// ── Creem webhook object shapes (actual API, not flat) ──
+
+interface CreemCustomer { id: string; email?: string; }
+interface CreemProduct  { id: string; billing_period?: string; }
+interface CreemSubscription {
+  id: string;
+  status?: string;
+  created_at?: string;
+  canceled_at?: string | null;
+}
+
+/** checkout.completed: object is the checkout session */
+interface CheckoutCompletedObject {
+  id: string;
+  status: string;
+  customer: CreemCustomer;
+  product: CreemProduct;
+  subscription: CreemSubscription;
+  metadata?: Record<string, string>;
+}
+
+/** subscription.active: object IS the subscription */
+interface SubscriptionActiveObject extends CreemSubscription {
+  customer: CreemCustomer;
+  product: CreemProduct;
+}
+
+// ── Helpers ──
+
+/** Look up user_id by Creem customer_id. Returns null if never stored. */
+async function getUserIdByCustomer(supabase: ReturnType<typeof createAdminClient>, customerId: string): Promise<string | null> {
+  const { data } = await supabase
+    .from("subscriptions")
+    .select("user_id")
+    .eq("stripe_customer_id", customerId)
+    .maybeSingle();
+  return data?.user_id ?? null;
+}
+
+/** Upsert subscription row + update profile tier. */
+async function upsertSubscription(
+  supabase: ReturnType<typeof createAdminClient>,
+  userId: string,
+  customerId: string,
+  subscriptionId: string | null,
+  productId: string,
+  periodEnd: string | null,
+) {
+  await supabase.from("subscriptions").upsert({
+    user_id: userId,
+    stripe_customer_id: customerId,
+    stripe_subscription_id: subscriptionId,
+    stripe_price_id: productId,
+    status: "active",
+    tier: "pro",
+    current_period_end: periodEnd,
+  });
+
+  await supabase.from("profiles").update({ tier: "pro" }).eq("id", userId);
+}
+
 export async function POST(request: NextRequest) {
   const signature = request.headers.get("creem-signature");
 
@@ -24,80 +97,92 @@ export async function POST(request: NextRequest) {
 
   const supabase = createAdminClient();
 
-  switch (event.eventType) {
-    case "checkout.completed":
-    case "subscription.active": {
-      const obj = event.object as {
-        customer_id: string;
-        subscription_id?: string;
-        product_id: string;
-        current_period_end?: string;
-        metadata?: { userId?: string };
-      };
-      const userId = obj.metadata?.userId;
-      if (!userId) break;
+  try {
+    switch (event.eventType) {
+      case "checkout.completed": {
+        const obj = event.object as unknown as CheckoutCompletedObject;
+        const userId = obj.metadata?.userId;
+        const customerId = obj.customer?.id;
+        if (!userId || !customerId) break;
 
-      await supabase.from("subscriptions").upsert({
-        user_id: userId,
-        stripe_customer_id: obj.customer_id,
-        stripe_subscription_id: obj.subscription_id || null,
-        stripe_price_id: obj.product_id,
-        status: "active",
-        tier: "pro",
-        current_period_end: obj.current_period_end || null,
-      });
+        const subscriptionId = obj.subscription?.id ?? null;
+        const productId = obj.product?.id ?? "";
+        const periodEnd = computePeriodEnd(
+          obj.product?.billing_period,
+          obj.subscription?.created_at ?? new Date().toISOString(),
+        );
 
-      await supabase.from("profiles").update({ tier: "pro" }).eq("id", userId);
-      console.log(`Creem: user ${userId} upgraded to pro`);
-      break;
-    }
+        await upsertSubscription(supabase, userId, customerId, subscriptionId, productId, periodEnd);
+        console.log(`Creem: user ${userId} upgraded to pro (checkout)`);
+        break;
+      }
 
-    case "subscription.canceled":
-    case "subscription.expired": {
-      const obj = event.object as {
-        customer_id: string;
-        subscription_id?: string;
-        metadata?: { userId?: string };
-      };
-      // Find user by customer_id
-      const { data: sub } = await supabase
-        .from("subscriptions")
-        .select("user_id")
-        .eq("stripe_customer_id", obj.customer_id)
-        .single();
+      case "subscription.active": {
+        const obj = event.object as unknown as SubscriptionActiveObject;
+        const customerId = obj.customer?.id;
+        if (!customerId) break;
 
-      const userId = sub?.user_id;
-      if (!userId) break;
+        // subscription.active has no metadata — look up userId via customer_id
+        const userId = await getUserIdByCustomer(supabase, customerId);
+        if (!userId) break;
 
-      await supabase
-        .from("subscriptions")
-        .update({ status: "canceled", tier: "free" })
-        .eq("user_id", userId);
+        const subscriptionId = obj.id ?? null;
+        const productId = obj.product?.id ?? "";
+        const periodEnd = computePeriodEnd(
+          obj.product?.billing_period,
+          obj.created_at ?? new Date().toISOString(),
+        );
 
-      await supabase.from("profiles").update({ tier: "free" }).eq("id", userId);
-      console.log(`Creem: user ${userId} downgraded to free`);
-      break;
-    }
+        await upsertSubscription(supabase, userId, customerId, subscriptionId, productId, periodEnd);
+        console.log(`Creem: user ${userId} subscription activated`);
+        break;
+      }
 
-    case "subscription.paid": {
-      const obj = event.object as {
-        customer_id: string;
-        subscription_id?: string;
-      };
-      const { data: sub } = await supabase
-        .from("subscriptions")
-        .select("user_id")
-        .eq("stripe_customer_id", obj.customer_id)
-        .single();
+      case "subscription.paid": {
+        // subscription.paid object IS the subscription, same shape as subscription.active
+        const obj = event.object as unknown as SubscriptionActiveObject;
+        const customerId = obj.customer?.id;
+        if (!customerId) break;
 
-      if (sub?.user_id) {
+        const userId = await getUserIdByCustomer(supabase, customerId);
+        if (!userId) break;
+
+        const periodEnd = computePeriodEnd(
+          obj.product?.billing_period,
+          obj.created_at ?? new Date().toISOString(),
+        );
+
         await supabase
           .from("subscriptions")
-          .update({ status: "active" })
-          .eq("user_id", sub.user_id);
+          .update({ status: "active", current_period_end: periodEnd })
+          .eq("user_id", userId);
+
+        console.log(`Creem: subscription.paid for user ${userId}, periodEnd=${periodEnd}`);
+        break;
       }
-      break;
+
+      case "subscription.canceled":
+      case "subscription.expired": {
+        const obj = event.object as unknown as { customer?: { id?: string } };
+        const customerId = obj.customer?.id;
+        if (!customerId) break;
+
+        const userId = await getUserIdByCustomer(supabase, customerId);
+        if (!userId) break;
+
+        await supabase
+          .from("subscriptions")
+          .update({ status: "canceled", tier: "free" })
+          .eq("user_id", userId);
+
+        await supabase.from("profiles").update({ tier: "free" }).eq("id", userId);
+        console.log(`Creem: user ${userId} downgraded to free`);
+        break;
+      }
     }
+  } catch (err) {
+    console.error("Creem webhook error:", err);
+    return NextResponse.json({ error: "Webhook processing failed" }, { status: 500 });
   }
 
   return NextResponse.json({ received: true });

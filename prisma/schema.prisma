@@ -15,7 +15,7 @@ model Profile {
   email     String   @unique
   name      String?
   avatarUrl String?  @map("avatar_url")
-  tier      String   @default("free") // free | basic | pro
+  tier      String   @default("free") // free | pro
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 

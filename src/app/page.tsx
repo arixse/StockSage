@@ -85,7 +85,7 @@ export default async function HomePage() {
                 for every US stock. Your daily briefing, delivered to your inbox.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Button size="lg" render={<Link href="/register" />}>
+                <Button size="lg" render={<Link href="/login" />}>
                   Get Started Free <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
@@ -194,9 +194,9 @@ export default async function HomePage() {
           <div className="container mx-auto px-4 text-center">
             <h2 className="text-3xl font-bold mb-4">Start Free Today</h2>
             <p className="text-muted-foreground mb-8">
-              Track 5 stocks with AI analysis — no credit card required.
+              Track 3 stocks with AI analysis — no credit card required.
             </p>
-            <Button size="lg" render={<Link href="/register" />}>
+            <Button size="lg" render={<Link href="/login" />}>
               Get Started Free
             </Button>
           </div>
@@ -223,7 +223,7 @@ export default async function HomePage() {
             <p className="text-muted-foreground mb-6">
               Join thousands of investors who start their day with StockSage.
             </p>
-            <Button size="lg" render={<Link href="/register" />}>
+            <Button size="lg" render={<Link href="/login" />}>
               Get Started Free
             </Button>
           </div>

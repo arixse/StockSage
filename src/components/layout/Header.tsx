@@ -119,7 +119,7 @@ export function Header() {
                   <div className="flex flex-col space-y-1">
                     <p className="text-sm font-medium">{user.email}</p>
                     <Badge
-                      variant={tier === "pro" ? "default" : tier === "basic" ? "secondary" : "outline"}
+                      variant={tier === "pro" ? "default" : "outline"}
                       className="text-xs w-fit"
                     >
                       {tier === "pro" && <Crown className="h-3 w-3 mr-1" />}
@@ -150,11 +150,8 @@ export function Header() {
             </DropdownMenu>
           ) : (
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" onClick={() => router.push("/login")}>
-                Log In
-              </Button>
-              <Button size="sm" onClick={() => router.push("/register")}>
-                Sign Up
+              <Button size="sm" onClick={() => router.push("/login")}>
+                Sign In
               </Button>
             </div>
           )}
