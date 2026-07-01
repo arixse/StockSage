@@ -4,7 +4,7 @@ import { Header } from "@/components/layout/Header";
 import { LoginForm } from "@/components/auth/LoginForm";
 
 export const metadata = {
-  title: "Log In",
+  title: "Sign In",
 };
 
 export default async function LoginPage() {

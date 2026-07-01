@@ -154,7 +154,7 @@ export function Header() {
           ) : (
             <div className="flex items-center gap-2">
               <Button size="sm" onClick={() => router.push("/login")}>
-                Log In
+                Sign In
               </Button>
             </div>
           )}

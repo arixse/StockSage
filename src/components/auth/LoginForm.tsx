@@ -27,7 +27,7 @@ export function LoginForm() {
         </div>
         <h1 className="text-2xl font-bold tracking-tight">Welcome to StockSage</h1>
         <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
-          AI-powered stock analysis.<br />Log in to track your watchlist.
+          AI-powered stock analysis.<br />Sign in to track your watchlist.
         </p>
       </div>
 
