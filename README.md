@@ -2,8 +2,6 @@
 
 AI-powered US stock analysis and scoring platform. Free for 5 stocks. Covering NYSE & NASDAQ.
 
-![StockSage](https://www.stocksage.xyz/api/og)
-
 **🔗 [stocksage.xyz](https://stocksage.xyz)**
 
 ---
@@ -30,10 +28,9 @@ StockSage reads hundreds of financial news articles every day so you don't have 
 | Database | [Supabase](https://supabase.com) (PostgreSQL + Auth) |
 | ORM | [Prisma](https://prisma.io) |
 | Market Data | [Finnhub](https://finnhub.io) (primary) + Alpha Vantage / Twelve Data (fallbacks) |
-| AI / LLM | OpenAI-compatible API ([DeepSeek](https://deepseek.com), OpenAI, Groq, Ollama, etc.) |
+| AI / LLM | OpenAI-compatible API |
 | Email | [Resend](https://resend.com) |
 | Styling | [Tailwind CSS](https://tailwindcss.com) + [shadcn/ui](https://ui.shadcn.com) |
-| Payments | [Creem](https://creem.io) |
 
 ---
 
@@ -154,39 +151,11 @@ src/
 
 ---
 
-## API Routes
-
-| Endpoint | Description |
-|----------|-------------|
-| `GET /api/stocks` | List/search stocks |
-| `GET /api/stocks/[ticker]` | Stock quote + overview |
-| `GET /api/stocks/[ticker]/chart` | Historical price data |
-| `GET /api/stocks/[ticker]/news` | Recent news articles |
-| `GET /api/stocks/[ticker]/score` | AI composite score |
-| `GET /api/stocks/[ticker]/ai-analysis` | Cached AI summary |
-| `POST /api/stocks/[ticker]/summarize` | Generate new AI summary |
-| `GET /api/heat` | S&P 500 heatmap data |
-| `GET /api/watchlists` | User watchlists |
-| `GET /api/cron/*` | Scheduled tasks (stock data refresh, daily digest) |
-| `POST /api/creem/webhook` | Payment webhook |
-
----
-
-## Cron Jobs (GitHub Actions)
-
-Scheduled workflows in `.github/workflows/`. All times UTC, weekdays only.
-
-| Workflow | Schedule | Description |
-|----------|----------|-------------|
-| `cron-stock-intraday` | Every 15 min (14:00–20:00 UTC) | Refresh stock quotes during market hours |
-| `cron-stock-close` | 22:00 UTC | Final stock data refresh after market close |
-| `cron-daily-digest` | 22:30 UTC | Run AI pipeline + send daily email briefings |
-
----
+## License
 
 ## License
 
-MIT
+[AGPL v3](LICENSE) — GNU Affero General Public License v3.0
 
 ---
 
