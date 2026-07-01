@@ -29,8 +29,8 @@ StockSage reads hundreds of financial news articles every day so you don't have 
 | Hosting | [Vercel](https://vercel.com) |
 | Database | [Supabase](https://supabase.com) (PostgreSQL + Auth) |
 | ORM | [Prisma](https://prisma.io) |
-| Market Data | [Finnhub](https://finnhub.io) |
-| AI / LLM | DeepSeek (via OpenAI-compatible API) |
+| Market Data | [Finnhub](https://finnhub.io) (primary) + Alpha Vantage / Twelve Data (fallbacks) |
+| AI / LLM | OpenAI-compatible API ([DeepSeek](https://deepseek.com), OpenAI, Groq, Ollama, etc.) |
 | Email | [Resend](https://resend.com) |
 | Styling | [Tailwind CSS](https://tailwindcss.com) + [shadcn/ui](https://ui.shadcn.com) |
 | Payments | [Creem](https://creem.io) |
@@ -44,7 +44,7 @@ StockSage reads hundreds of financial news articles every day so you don't have 
 - Node.js 18+
 - A [Supabase](https://supabase.com) project
 - [Finnhub](https://finnhub.io) API key (free tier works)
-- A DeepSeek or OpenAI-compatible API key for AI features
+- An OpenAI-compatible API key for AI features (DeepSeek, OpenAI, Groq, etc.)
 
 ### Setup
 
@@ -69,32 +69,38 @@ Fill in `.env.local`:
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-DATABASE_URL=postgresql://...
 
-# Finnhub
+# Market Data (Finnhub primary, Alpha Vantage fallback)
 FINNHUB_API_KEY=your-key
+ALPHA_VANTAGE_API_KEY=demo
 
-# AI (OpenAI-compatible)
-DEEPSEEK_API_KEY=your-key
-DEEPSEEK_BASE_URL=https://api.deepseek.com/v1
-LLM_MODEL=deepseek-chat
+# LLM (OpenAI-compatible — DeepSeek, OpenAI, Groq, Ollama, etc.)
+LLM_BASE_URL=https://api.openai.com/v1
+LLM_API_KEY=sk-...
+LLM_MODEL=gpt-4o-mini
 
 # Email (Resend)
-RESEND_API_KEY=your-key
+RESEND_API_KEY=re_...
+EMAIL_FROM=newsletter@yourdomain.com
 
 # App
 NEXT_PUBLIC_APP_URL=http://localhost:3000
-CREEM_API_KEY=your-key  # optional — payments
+NEXT_PUBLIC_APP_NAME=StockSage
+
+# Cron Secret (protect cron endpoints)
+CRON_SECRET=change-me-in-production
+
+# Payments (Creem — optional)
+CREEM_API_KEY=creem_test_...
+CREEM_WEBHOOK_SECRET=whsec_...
+CREEM_PRODUCT_ID=prod_...
 ```
 
 ### Database
 
 ```bash
-# Push Prisma schema to Supabase
+# Push Prisma schema to Supabase (no migration files needed)
 npx prisma db push
-
-# Or run migrations
-npx prisma migrate dev
 ```
 
 ### Run
@@ -124,17 +130,26 @@ src/
 │   ├── stock/               # StockLogo, TickerSearch, AddToWatchlist
 │   ├── news/                # AI news analysis tab
 │   ├── dashboard/           # Dashboard components
+│   ├── charts/              # Chart components (lightweight-charts)
+│   ├── auth/                # Auth UI components
+│   ├── payment/             # Subscription / billing UI
 │   ├── seo/                 # JsonLd schema component
 │   ├── shared/              # PageHeader, DataTable
 │   └── ui/                  # shadcn/ui primitives
-├── data/                    # Static data (learn articles, etc.)
+├── data/                    # Static data (learn articles, legal content, ticker lists)
 ├── lib/                     # Business logic
-│   ├── ai.ts                # LLM calls (summaries, scoring, portfolio brief)
-│   ├── stock-api.ts         # Finnhub API client
-│   ├── stock-cache.ts       # Supabase cache layer
+│   ├── ai.ts                # LLM calls (summaries, scoring)
+│   ├── ai-pipeline.ts       # AI analysis pipeline orchestration
+│   ├── stock-api.ts         # Market data (Finnhub + Alpha Vantage + Twelve Data)
+│   ├── stock-cache.ts       # Supabase cache layer for stock data
+│   ├── technicals.ts        # Technical indicator calculations
 │   ├── market-status.ts     # Market open/close detection
+│   ├── daily-digest.ts      # Daily email digest logic
+│   ├── email.ts             # Email sending (Resend)
+│   ├── dashboard.ts         # Dashboard data aggregation
+│   ├── ticker-sync.ts       # Tracked ticker synchronization
 │   └── supabase/            # Supabase client (server + browser)
-└── hooks/                   # React hooks
+└── prisma/                  # Prisma schema
 ```
 
 ---
@@ -152,24 +167,26 @@ src/
 | `POST /api/stocks/[ticker]/summarize` | Generate new AI summary |
 | `GET /api/heat` | S&P 500 heatmap data |
 | `GET /api/watchlists` | User watchlists |
-| `POST /api/cron/*` | Scheduled tasks (news fetch, stock data refresh, daily digest) |
+| `GET /api/cron/*` | Scheduled tasks (stock data refresh, daily digest) |
 | `POST /api/creem/webhook` | Payment webhook |
 
 ---
 
-## Cron Jobs (Vercel Cron)
+## Cron Jobs (GitHub Actions)
 
-| Job | Schedule | Description |
-|-----|----------|-------------|
-| `cron-fetch-news` | Every 60 min (market hours) | Fetch latest news for tracked stocks |
-| `cron-fetch-stock-data` | Every 15 min (market hours) | Refresh stock quotes for watchlists |
-| `cron-daily-digest` | Daily 22:30 UTC | Send daily email briefing to subscribers |
+Scheduled workflows in `.github/workflows/`. All times UTC, weekdays only.
+
+| Workflow | Schedule | Description |
+|----------|----------|-------------|
+| `cron-stock-intraday` | Every 15 min (14:00–20:00 UTC) | Refresh stock quotes during market hours |
+| `cron-stock-close` | 22:00 UTC | Final stock data refresh after market close |
+| `cron-daily-digest` | 22:30 UTC | Run AI pipeline + send daily email briefings |
 
 ---
 
 ## License
 
-MIT — see [LICENSE](LICENSE) for details.
+MIT
 
 ---
 
