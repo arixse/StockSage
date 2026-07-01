@@ -14,11 +14,15 @@ export async function GET(request: Request) {
       // Create default email_preferences for new users (idempotent upsert)
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        const admin = createAdminClient();
-        await admin.from("email_preferences").upsert(
-          { user_id: user.id, daily_digest: true },
-          { onConflict: "user_id" }
-        ).catch(() => {}); // non-critical
+        try {
+          const admin = createAdminClient();
+          await admin.from("email_preferences").upsert(
+            { user_id: user.id, daily_digest: true },
+            { onConflict: "user_id" }
+          );
+        } catch {
+          // non-critical — user can enable later in newsletter settings
+        }
       }
       return NextResponse.redirect(`${origin}${next}`);
     }
