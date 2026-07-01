@@ -4,7 +4,6 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { CheckCircle2 } from "lucide-react";
 
 const TIERS = [
@@ -73,9 +72,8 @@ export default function PricingPage() {
                 key={tier.name}
                 className={`relative ${tier.highlighted ? "border-primary shadow-lg" : "border-muted"}`}
               >
-                {tier.highlighted && (
-                  <Badge className="absolute -top-2.5 left-1/2 -translate-x-1/2">Popular</Badge>
-                )}
+
+
                 <CardHeader className="text-center">
                   <CardTitle>{tier.name}</CardTitle>
                   <div className="mt-2">
