@@ -132,12 +132,12 @@ export function NewsTab({ ticker }: { ticker: string }) {
       <Card>
         <CardContent className="flex flex-col items-center justify-center py-12 text-center">
           <LogIn className="h-12 w-12 text-muted-foreground/30 mb-4" />
-          <p className="text-muted-foreground mb-2">Sign in Required</p>
+          <p className="text-muted-foreground mb-2">Log in Required</p>
           <p className="text-sm text-muted-foreground mb-4">
-            Please sign in to access AI-powered stock analysis.
+            Please log in to access AI-powered stock analysis.
           </p>
           <Button variant="default" onClick={() => router.push("/login")}>
-            Sign In
+            Log In
           </Button>
         </CardContent>
       </Card>
