@@ -151,13 +151,6 @@ src/
 
 ---
 
-## License
-
-## License
-
-[AGPL v3](LICENSE) — GNU Affero General Public License v3.0
-
----
 
 ## Links
 
