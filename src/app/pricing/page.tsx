@@ -96,7 +96,7 @@ export default function PricingPage() {
                   <Button
                     variant={tier.ctaVariant}
                     className="w-full"
-                    render={<Link href="/register" />}
+                    render={<Link href="/login" />}
                   >
                     {tier.cta}
                   </Button>

@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { Header } from "@/components/layout/Header";
 import { LoginForm } from "@/components/auth/LoginForm";
@@ -20,9 +19,7 @@ export default async function LoginPage() {
     <div className="flex flex-col min-h-full">
       <Header />
       <main className="flex-1 flex items-center justify-center py-12 px-4">
-        <Suspense>
-          <LoginForm />
-        </Suspense>
+        <LoginForm />
       </main>
     </div>
   );

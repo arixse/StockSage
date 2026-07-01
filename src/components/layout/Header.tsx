@@ -153,11 +153,8 @@ export function Header() {
             </DropdownMenu>
           ) : (
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" onClick={() => router.push("/login")}>
+              <Button size="sm" onClick={() => router.push("/login")}>
                 Log In
-              </Button>
-              <Button size="sm" onClick={() => router.push("/register")}>
-                Sign Up
               </Button>
             </div>
           )}

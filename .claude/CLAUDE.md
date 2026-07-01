@@ -118,7 +118,7 @@ Webhook 事件类型：
 ```
 src/
 ├── app/
-│   ├── (auth)/          # login, register, callback
+│   ├── (auth)/          # login, callback（仅 Google OAuth，无注册页）
 │   ├── (dashboard)/     # 需登录的页面（dashboard, watchlist, heat, settings, portfolio, screener, newsletter, position-size-calculator）
 │   ├── api/
 │   │   ├── creem/       # 支付 API
