@@ -14,12 +14,13 @@ const TIERS = [
     period: "forever",
     description: "Get started with AI-powered stock analysis.",
     features: [
-      "5 stocks in watchlist",
-      "AI news summaries (3/week)",
-      "AI stock scoring (weekly)",
-      "K-line charts with MACD, RSI, Bollinger Bands",
-      "Market heatmap (delayed 15 min)",
-      "Weekly email digest",
+      "3 stocks in watchlist",
+      "Real-time market data",
+      "AI news summaries (unlimited)",
+      "AI stock scoring (unlimited + history)",
+      "All technical indicators (MACD, RSI, Bollinger Bands, etc.)",
+      "Market heatmap",
+      "Daily email digest + price alerts",
       "Learning center access",
     ],
     highlighted: false,
@@ -49,7 +50,7 @@ const TIERS = [
 export const metadata: Metadata = {
   title: "Pricing",
   description:
-    "StockSage pricing plans. Start free with 5 stocks and AI analysis. Upgrade to Pro for unlimited stock tracking and premium features.",
+    "StockSage pricing plans. Start free with 3 stocks and full AI analysis. Upgrade to Pro for unlimited stock tracking.",
   alternates: {
     canonical: "/pricing",
   },

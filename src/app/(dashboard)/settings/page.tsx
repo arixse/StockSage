@@ -56,9 +56,7 @@ export default async function SettingsPage() {
           <CardDescription>
             {tier === "pro"
               ? "You are on the Pro plan."
-              : tier === "basic"
-                ? "You are on the Basic plan."
-                : "You are on the Free plan."}
+              : "You are on the Free plan."}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -94,7 +92,7 @@ export default async function SettingsPage() {
               <div className="space-y-0.5">
                 <p className="text-sm font-medium">Upgrade to Pro</p>
                 <p className="text-sm text-muted-foreground">
-                  Get unlimited AI analysis, daily briefs, and more.
+                  Get unlimited watchlist stocks and all premium features.
                 </p>
               </div>
               <a href="/pricing">

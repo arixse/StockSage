@@ -122,7 +122,7 @@ export function Header() {
                   <div className="flex flex-col space-y-1">
                     <p className="text-sm font-medium">{user.email}</p>
                     <Badge
-                      variant={tier === "pro" ? "default" : tier === "basic" ? "secondary" : "outline"}
+                      variant={tier === "pro" ? "default" : "outline"}
                       className="text-xs w-fit"
                     >
                       {tier === "pro" && <Crown className="h-3 w-3 mr-1" />}

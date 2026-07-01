@@ -96,7 +96,7 @@ export interface AiScore {
   generatedAt: string;
 }
 
-export type Tier = "free" | "basic" | "pro";
+export type Tier = "free" | "pro";
 
 export interface TierConfig {
   name: Tier;

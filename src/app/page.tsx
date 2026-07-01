@@ -194,7 +194,7 @@ export default async function HomePage() {
           <div className="container mx-auto px-4 text-center">
             <h2 className="text-3xl font-bold mb-4">Start Free Today</h2>
             <p className="text-muted-foreground mb-8">
-              Track 5 stocks with AI analysis — no credit card required.
+              Track 3 stocks with AI analysis — no credit card required.
             </p>
             <Button size="lg" render={<Link href="/register" />}>
               Get Started Free

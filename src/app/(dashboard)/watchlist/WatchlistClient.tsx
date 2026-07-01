@@ -77,7 +77,7 @@ export function WatchlistClient({ watchlistId, initialStocks }: Props) {
     open: false,
     message: "",
     tier: "free",
-    limit: 5,
+    limit: 3,
   });
 
   const handleSearch = async (query: string) => {
@@ -151,7 +151,7 @@ export function WatchlistClient({ watchlistId, initialStocks }: Props) {
           open: true,
           message: body.error || "Tier limit reached",
           tier: body.tier || "free",
-          limit: body.limit || 5,
+          limit: body.limit || 3,
         });
         return;
       }
@@ -364,12 +364,11 @@ export function WatchlistClient({ watchlistId, initialStocks }: Props) {
             <div className="bg-muted/50 rounded-lg p-4 text-sm">
               <p className="font-medium mb-2">
                 {tierDialog.tier === "free"
-                  ? "🔓 Free: 5 stocks · Weekly AI summary"
-                  : "Upgrade for more capacity"}
+                  ? "🔓 Free: 3 stocks · Full AI features"
+                  : "Upgrade for unlimited stocks"}
               </p>
               <ul className="space-y-1 text-muted-foreground text-xs">
-                <li className="flex items-center gap-1"><span className="text-green-500">✓</span> Basic ($9.99/mo): 50 stocks, daily AI</li>
-                <li className="flex items-center gap-1"><span className="text-green-500">✓</span> Pro ($9.99/mo): Unlimited stocks, daily AI analysis</li>
+                <li className="flex items-center gap-1"><span className="text-green-500">✓</span> Pro ($9.99/mo): Unlimited stocks, all features included</li>
               </ul>
             </div>
             <div className="flex gap-2">
