@@ -9,7 +9,7 @@ export const TIERS: Record<string, TierConfig> = {
       "3 stocks in watchlist",
       "AI news summaries",
       "AI stock scoring (0-100)",
-      "K-line charts & technical indicators",
+
       "Market heatmap",
       "Daily email digest",
       "Stock fundamentals",
@@ -33,7 +33,7 @@ export const TIERS: Record<string, TierConfig> = {
       "Unlimited watchlist stocks",
       "AI news summaries",
       "AI stock scoring (0-100)",
-      "K-line charts & technical indicators",
+
       "Market heatmap",
       "Daily email digest",
       "Stock fundamentals",
