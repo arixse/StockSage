@@ -75,10 +75,10 @@ export default async function SettingsPage() {
               </div>
               <ul className="space-y-1.5">
                 {[
-                  "Unlimited AI stock analysis",
-                  "Daily portfolio briefs",
-                  "Real-time price alerts",
-                  "Priority email support",
+                  "Unlimited watchlist stocks",
+                  "AI news summaries & stock scoring",
+                  "Daily email digest",
+                  "K-line charts & technical indicators",
                 ].map((f) => (
                   <li key={f} className="flex items-center gap-2 text-sm text-muted-foreground">
                     <CheckCircle2 className="h-3.5 w-3.5 text-green-500 shrink-0" />
