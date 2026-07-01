@@ -181,3 +181,5 @@ src/
 4. `middleware.ts` 目前只做 Supabase cookie 刷新，**不做 auth check**（auth 在 page layout 和 API route 各自处理）
 5. K 线图表组件虽然已实现，但需要接入到股票详情页才能真正上线
 6. Newsletter 页面的 `price_alerts` 开关只是 UI，后端无实际 alert 逻辑
+7. 影响网站核心功能的重要决策需要征得开发者同意才能执行，不要擅自决定
+8. Cron使用github action,不要用vercel cron
