@@ -59,6 +59,10 @@ export default async function LearnArticlePage({ params }: Props) {
           headline: article.title,
           description: article.description,
           url: `${appUrl}/learn/${slug}`,
+          datePublished: article.date || "2026-01-01",
+          dateModified: article.lastUpdated || article.date || "2026-01-01",
+          image: `${appUrl}/api/og?title=${encodeURIComponent(article.title)}`,
+          mainEntityOfPage: { "@type": "WebPage", "@id": `${appUrl}/learn/${slug}` },
           author: { "@type": "Organization", name: "StockSage" },
           publisher: { "@type": "Organization", name: "StockSage", logo: { "@type": "ImageObject", url: `${appUrl}/icon.svg` } },
         }}

@@ -5,6 +5,8 @@ export interface LearnArticle {
   readTime: string;
   icon: string; // lucide-react icon name
   tags: string[];
+  date: string; // ISO date for schema.org datePublished
+  lastUpdated?: string;
   sections: LearnSection[];
 }
 
@@ -22,6 +24,8 @@ export const learnArticles: LearnArticle[] = [
     description: "A step-by-step guide to constructing a diversified investment portfolio from scratch. Learn about asset allocation, risk management, and getting started with your first investments.",
     readTime: "8 min",
     icon: "Briefcase",
+    date: "2026-06-01",
+    lastUpdated: "2026-06-01",
     tags: ["Beginner", "Portfolio", "Strategy"],
     sections: [
       {
@@ -73,6 +77,8 @@ export const learnArticles: LearnArticle[] = [
     description: "Understanding market cycles is crucial for every investor. Learn what defines bull and bear markets, how to identify them, and strategies for navigating each phase.",
     readTime: "7 min",
     icon: "TrendingUp",
+    date: "2026-06-01",
+    lastUpdated: "2026-06-01",
     tags: ["Intermediate", "Market Cycles", "Strategy"],
     sections: [
       {
@@ -120,6 +126,8 @@ export const learnArticles: LearnArticle[] = [
     description: "Albert Einstein allegedly called compound interest the eighth wonder of the world. Discover how time and reinvestment can turn modest savings into substantial wealth.",
     readTime: "6 min",
     icon: "TrendingUp",
+    date: "2026-06-01",
+    lastUpdated: "2026-06-01",
     tags: ["Beginner", "Fundamentals", "Wealth Building"],
     sections: [
       {
@@ -167,6 +175,8 @@ export const learnArticles: LearnArticle[] = [
     description: "Learn the timeless principles of value investing pioneered by Benjamin Graham and Warren Buffett. Discover how to identify undervalued companies and build wealth through disciplined analysis.",
     readTime: "9 min",
     icon: "Search",
+    date: "2026-06-01",
+    lastUpdated: "2026-06-01",
     tags: ["Advanced", "Fundamental Analysis", "Strategy"],
     sections: [
       {
@@ -215,6 +225,8 @@ export const learnArticles: LearnArticle[] = [
     description: "Exchange-Traded Funds (ETFs) have revolutionized investing. Understand how ETFs work, their advantages over mutual funds and individual stocks, and how to choose the right ones for your portfolio.",
     readTime: "7 min",
     icon: "Layers",
+    date: "2026-06-01",
+    lastUpdated: "2026-06-01",
     tags: ["Beginner", "ETFs", "Diversification"],
     sections: [
       {
@@ -258,6 +270,8 @@ export const learnArticles: LearnArticle[] = [
     description: "Don't put all your eggs in one basket. Learn the science behind diversification, how it reduces risk without sacrificing returns, and practical strategies for building a diversified portfolio.",
     readTime: "6 min",
     icon: "Grid3X3",
+    date: "2026-06-01",
+    lastUpdated: "2026-06-01",
     tags: ["Beginner", "Risk Management", "Portfolio"],
     sections: [
       {

@@ -113,6 +113,9 @@ Webhook 事件类型：
 - `src/lib/supabase/client.ts` — 浏览器端
 - `src/lib/supabase/admin.ts` — service_role 绕过 RLS，仅用于 cron/webhook
 
+# 重要事项
+- 首页的数据一定要保证用户在任何时候访问都是最新的，绝对不能出现缓存，否则用户可能会看到旧数据，失去对该产品的信心
+
 ## 项目结构
 
 ```

@@ -10,21 +10,21 @@ import { getFreshQuotes } from "@/lib/stock-cache";
 
 export const metadata: Metadata = {
   description:
-    "Free AI-powered US stock analysis platform. Get daily AI summaries, stock scores (0-100), market heatmaps, and personalized watchlists. Track NYSE and NASDAQ stocks with news sentiment and buy/hold/sell signals.",
+    "Free AI-powered stock market analysis for US equities. Track Tesla (TSLA), Nvidia (NVDA), Apple (AAPL), Amazon (AMZN), and more. Get daily AI stock summaries, 0-100 scores, market heatmaps, and buy/hold/sell signals for NYSE & NASDAQ stocks.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "StockSage — AI-Powered Stock Analysis & Scoring",
+    title: "StockSage — Free AI Stock Market Analysis & Scoring",
     description:
-      "Free AI-powered US stock analysis. Daily AI summaries, smart scoring, market heatmaps, and personalized watchlists for NYSE & NASDAQ stocks.",
+      "Track Tesla, Nvidia, Apple, and more with AI-powered US stock analysis. Daily AI summaries, smart scoring, market heatmaps, and personalized watchlists.",
     url: "/",
   },
   twitter: {
     card: "summary_large_image",
-    title: "StockSage — AI-Powered Stock Analysis & Scoring",
+    title: "StockSage — Free AI Stock Market Analysis & Scoring",
     description:
-      "Free AI-powered US stock analysis. Daily AI summaries, smart scoring, and buy/hold/sell signals.",
+      "Track Tesla, Nvidia, Apple, and more with AI-powered US stock analysis. Daily AI summaries, smart scoring, and buy/hold/sell signals.",
   },
 };
 
