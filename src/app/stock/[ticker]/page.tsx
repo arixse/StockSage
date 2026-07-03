@@ -7,33 +7,7 @@ import { TrendingUp, TrendingDown } from "lucide-react";
 import { StockLogo } from "@/components/stock/StockLogo";
 import { AddToWatchlistButton } from "@/components/stock/AddToWatchlistButton";
 import Link from "next/link";
-import { fetchStockQuote } from "@/lib/stock-api";
-import { getCachedQuotes } from "@/lib/stock-cache";
-import { getMarketStatus } from "@/lib/market-status";
-
-/** Skip cache if market is open and cached quote is older than N minutes */
-async function getFreshQuote(ticker: string) {
-  const market = getMarketStatus();
-  const cachedArr = await getCachedQuotes([ticker]);
-  const cached = cachedArr[0];
-
-  // During market hours, skip stale cache (or no timestamp at all)
-  if (market.status === "open" || market.status === "pre-market" || market.status === "after-hours") {
-    const ageMinutes = cached?.timestamp
-      ? (Date.now() - new Date(cached.timestamp).getTime()) / 60000
-      : Infinity; // no timestamp = treat as stale
-
-    if (ageMinutes > 5) {
-      const live = await fetchStockQuote(ticker);
-      if (live) return live;
-    }
-    // If cache is fresh (<5 min), return it
-    if (cached) return cached;
-  }
-
-  // Fallback: cached (even if old) or live
-  return cached ?? await fetchStockQuote(ticker);
-}
+import { getFreshQuotes } from "@/lib/stock-cache";
 
 // Stock prices change constantly — never cache this page
 export const dynamic = "force-dynamic";
@@ -49,7 +23,7 @@ export async function generateMetadata({ params }: Props) {
 
   let quote = null;
   try {
-    quote = await getFreshQuote(upperTicker);
+    quote = (await getFreshQuotes([upperTicker]))[0];
   } catch {
     // metadata fetch can fail silently
   }
@@ -94,7 +68,7 @@ export default async function StockPage({ params }: Props) {
   const upperTicker = ticker.toUpperCase();
 
   // Fetch quote for header display
-  const quote = await getFreshQuote(upperTicker).catch(() => null);
+  const quote = (await getFreshQuotes([upperTicker]).catch(() => [null]))[0];
 
   if (!quote) {
     return (

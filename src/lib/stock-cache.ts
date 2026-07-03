@@ -10,6 +10,7 @@
 import { createClient } from "@/lib/supabase/server";
 import type { StockQuote, CompanyOverview, OHLCVBar } from "@/lib/stock-api";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { getMarketStatus } from "@/lib/market-status";
 
 // ─── Range → days mapping (for chart queries) ────────────────────────
 const RANGE_DAYS: Record<string, number> = {
@@ -192,6 +193,84 @@ export async function upsertStockQuotes(
     return 0;
   }
   return rows.length;
+}
+
+/**
+ * Save a single live quote back to the cache.
+ * Called from the stock detail page when it fetches a fresh quote during market hours.
+ * Uses a lazy-loaded admin client so the import is only paid when this path executes.
+ */
+export async function saveLiveQuote(quote: StockQuote): Promise<void> {
+  try {
+    const { createAdminClient } = await import("@/lib/supabase/admin");
+    const admin = createAdminClient();
+    await upsertStockQuotes(admin, [quote]);
+  } catch (e) {
+    // Best-effort — don't block the page render if cache write fails
+    console.error("[stock-cache] saveLiveQuote failed:", e);
+  }
+}
+
+/**
+ * Get fresh quotes for a list of tickers — the single source of truth for
+ * stock quote display on the homepage and detail pages.
+ *
+ * Strategy:
+ *  1. Read cached quotes from Supabase
+ *  2. During market hours, identify tickers whose cache is > 5 min old (or missing)
+ *  3. Fetch live quotes for stale tickers in a single batch call
+ *  4. Write live quotes back to cache (best-effort, non-blocking)
+ *  5. Return the best available data: live for stale tickers, cache for fresh ones
+ *
+ * This ensures stocks show current prices even when they aren't tracked by the cron
+ * job (i.e. not in any user's watchlist).
+ */
+export async function getFreshQuotes(
+  tickers: string[]
+): Promise<(StockQuote | null)[]> {
+  const upper = tickers.map((t) => t.toUpperCase());
+  const cached = await getCachedQuotes(upper);
+  const market = getMarketStatus();
+  const isTrading =
+    market.status === "open" ||
+    market.status === "pre-market" ||
+    market.status === "after-hours";
+
+  if (!isTrading) return cached;
+
+  // Identify tickers with stale or missing cache
+  const staleTickers: string[] = [];
+  for (let i = 0; i < upper.length; i++) {
+    const q = cached[i];
+    const ageMinutes = q?.timestamp
+      ? (Date.now() - new Date(q.timestamp).getTime()) / 60000
+      : Infinity;
+    if (ageMinutes > 5) staleTickers.push(upper[i]);
+  }
+
+  if (staleTickers.length === 0) return cached;
+
+  // Fetch live quotes in batch, then merge into the result
+  const { fetchStockQuotes } = await import("@/lib/stock-api");
+  const liveQuotes = await fetchStockQuotes(staleTickers);
+
+  const validLive: StockQuote[] = [];
+  for (let i = 0; i < staleTickers.length; i++) {
+    const live = liveQuotes[i];
+    if (!live) continue;
+    validLive.push(live);
+    const idx = upper.indexOf(staleTickers[i]);
+    if (idx >= 0) cached[idx] = live;
+  }
+
+  // Write back to cache so the next visit is fast (best-effort)
+  if (validLive.length > 0) {
+    const { createAdminClient } = await import("@/lib/supabase/admin");
+    const admin = createAdminClient();
+    upsertStockQuotes(admin, validLive).catch(() => {});
+  }
+
+  return cached;
 }
 
 export async function upsertStockPrices(
