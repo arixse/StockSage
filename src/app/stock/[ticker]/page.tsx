@@ -33,14 +33,14 @@ export async function generateMetadata({ params }: Props) {
     : `${appUrl}/api/og`;
 
   return {
-    title: `${upperTicker} - Stock Analysis & AI Brief`,
-    description: `${upperTicker} price, fundamentals, technicals, and a research-backed AI brief. Catalysts and analyst context. Add to Radar for personalized calls and alerts.`,
+    title: `${upperTicker} Stock Analysis — AI Score, News & Technical Data`,
+    description: `${upperTicker} stock price, AI score, latest news, and technical analysis. Get buy, hold, or sell signals for ${upperTicker} stock on the US stock market.`,
     alternates: {
       canonical: `/stock/${upperTicker}`,
     },
     openGraph: {
-      title: `${upperTicker} Stock Analysis & AI Brief · StockSage`,
-      description: `${upperTicker} price, fundamentals, technicals, and a research-backed AI brief.`,
+      title: `${upperTicker} Stock Analysis & AI Score · StockSage`,
+      description: `${upperTicker} stock price, AI analysis, news sentiment, and buy/hold/sell signals. Track ${upperTicker} on the US stock market.`,
       images: [
         {
           url: ogImageUrl,
@@ -52,8 +52,8 @@ export async function generateMetadata({ params }: Props) {
     },
     twitter: {
       card: "summary_large_image",
-      title: `${upperTicker} Stock Analysis · StockSage`,
-      description: `${upperTicker} price, fundamentals, technicals, and AI brief.`,
+      title: `${upperTicker} Stock Analysis & AI Score · StockSage`,
+      description: `${upperTicker} stock price, AI analysis, and buy/hold/sell signals. Track ${upperTicker} on the US stock market.`,
       images: [ogImageUrl],
     },
     robots: {
@@ -126,7 +126,6 @@ export default async function StockPage({ params }: Props) {
               name: `${upperTicker} Stock Analysis — StockSage`,
               description: `AI-powered stock analysis for ${upperTicker} including price data, AI news summary, sentiment scoring, and smart buy/hold/sell signals.`,
               url: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/stock/${upperTicker}`,
-              applicationCategory: "FinanceApplication",
             },
           ],
         }}

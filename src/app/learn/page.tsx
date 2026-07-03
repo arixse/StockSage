@@ -38,6 +38,7 @@ export default function LearnPage() {
             description="Build your investing knowledge with our free educational articles. From beginner basics to advanced strategies, we've got you covered."
           />
 
+          <h2 className="text-2xl font-bold mb-6">All Articles</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {learnArticles.map((article: LearnArticle) => (
               <Link key={article.slug} href={`/learn/${article.slug}`}>

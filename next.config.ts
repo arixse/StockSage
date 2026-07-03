@@ -14,7 +14,7 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        source: "/:path((?!api|dashboard|watchlist|heat|settings|newsletter|callback|position-size-calculator|login|register).+)",
+        source: "/:path((?!api|dashboard|stock|watchlist|heat|settings|newsletter|callback|position-size-calculator|login|register).+)",
         headers: [
           {
             key: "Cache-Control",

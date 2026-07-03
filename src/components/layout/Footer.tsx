@@ -21,7 +21,7 @@ export function Footer() {
           </div>
 
           {/* Learn */}
-          <div>
+          <nav aria-label="Learn">
             <h4 className="font-medium text-sm mb-3">Learn</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
@@ -45,10 +45,10 @@ export function Footer() {
                 </Link>
               </li>
             </ul>
-          </div>
+          </nav>
 
           {/* Market */}
-          <div>
+          <nav aria-label="Market">
             <h4 className="font-medium text-sm mb-3">Market</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
@@ -57,10 +57,10 @@ export function Footer() {
                 </Link>
               </li>
             </ul>
-          </div>
+          </nav>
 
           {/* Company & Legal */}
-          <div>
+          <nav aria-label="Company & Legal">
             <h4 className="font-medium text-sm mb-3">Company</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
@@ -94,7 +94,7 @@ export function Footer() {
                 </Link>
               </li>
             </ul>
-          </div>
+          </nav>
         </div>
       </div>
     </footer>

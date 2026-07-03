@@ -16,16 +16,16 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "StockSage - AI-Powered US Stock Analysis & Scoring",
+    default: "StockSage — AI Stock Market Analysis: Track AAPL, TSLA, NVDA & US Equities",
     template: "%s | StockSage",
   },
   description:
-    "StockSage provides AI-powered US stock analysis: get daily AI summaries, stock scores (0-100), market heatmaps, and personalized watchlists. Free for 3 stocks. Covers NYSE and NASDAQ equities with news sentiment, fundamentals, and buy/hold/sell signals.",
+    "Free AI-powered stock market analysis for US equities. Track Tesla (TSLA), Nvidia (NVDA), Apple (AAPL), and more. Get daily AI stock summaries, 0-100 scores, market heatmaps, and buy/hold/sell signals for NYSE and NASDAQ stocks.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
   openGraph: {
-    title: "StockSage · Stock Calls & Radar",
+    title: "StockSage — AI Stock Market Analysis & Scoring",
     description:
-      "AI-powered US stock market analysis platform. Get daily AI stock summaries, technical analysis, fundamentals, and smart scoring.",
+      "Free AI-powered US stock market analysis. Track Tesla, Nvidia, Apple, and more. Get daily AI summaries, stock scores, heatmaps, and buy/hold/sell signals.",
     url: "/",
     siteName: "StockSage",
     locale: "en_US",
@@ -35,15 +35,15 @@ export const metadata: Metadata = {
         url: "/api/og",
         width: 1200,
         height: 630,
-        alt: "StockSage — AI-powered stock analysis and scoring",
+        alt: "StockSage — AI-powered stock market analysis and scoring",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "StockSage · Stock Calls & Radar",
+    title: "StockSage — AI Stock Market Analysis & Scoring",
     description:
-      "AI-powered US stock market analysis platform. Get daily AI stock summaries, technical analysis, fundamentals, and smart scoring.",
+      "Free AI-powered US stock market analysis. Track Tesla, Nvidia, Apple, and more. Get daily AI summaries, stock scores, and buy/hold/sell signals.",
     images: ["/api/og"],
   },
   alternates: {

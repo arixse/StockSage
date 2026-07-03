@@ -16,6 +16,13 @@ const sizeMap = {
   xl: "w-14 h-14",
 };
 
+const pixelSizeMap = {
+  sm: 24,
+  md: 32,
+  lg: 40,
+  xl: 56,
+};
+
 const textSizeMap = {
   sm: "text-xs",
   md: "text-sm",
@@ -78,6 +85,8 @@ export function StockLogo({ ticker, size = "md", className }: StockLogoProps) {
       key={sourceIdx}
       src={sources[sourceIdx]}
       alt={`${cleanTicker} logo`}
+      width={pixelSizeMap[size]}
+      height={pixelSizeMap[size]}
       className={cn("rounded-lg object-contain shrink-0 bg-white", sizeMap[size], className)}
       onError={handleError}
       loading="lazy"
