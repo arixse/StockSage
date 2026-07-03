@@ -108,7 +108,7 @@ export interface TierConfig {
     dataDelayMinutes: number;
     aiSummariesPerWeek: number;
     aiScoresPerWeek: number;
-    newsletterFrequency: "weekly" | "daily" | "realtime";
+    newsletterFrequency: "daily" | "realtime";
     portfolios: number;
     screener: boolean;
   };
