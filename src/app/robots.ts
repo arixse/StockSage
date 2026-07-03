@@ -21,7 +21,6 @@ export default function robots(): MetadataRoute.Robots {
         "/watchlist/",
         "/newsletter/",
         "/settings/",
-        "/position-size-calculator/",
       ],
     },
     sitemap: `${BASE_URL}/sitemap.xml`,

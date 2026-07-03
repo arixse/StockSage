@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { TrendingUp, BarChart3, Sparkles, Mail, ArrowRight, Flame, GraduationCap } from "lucide-react";
 import { StockLogo } from "@/components/stock/StockLogo";
-import { getCachedQuotes } from "@/lib/stock-cache";
-import { fetchStockQuotes } from "@/lib/stock-api";
+import { getFreshQuotes } from "@/lib/stock-cache";
 
 export const metadata: Metadata = {
   description:
@@ -56,9 +55,7 @@ const TRENDING_TICKERS = ["AAPL", "MSFT", "NVDA", "GOOGL", "AMZN", "META", "TSLA
 
 async function getTrendingStocks() {
   try {
-    const cached = await getCachedQuotes(TRENDING_TICKERS);
-    if (cached.some((q) => q !== null)) return cached;
-    return await fetchStockQuotes(TRENDING_TICKERS);
+    return await getFreshQuotes(TRENDING_TICKERS);
   } catch {
     return TRENDING_TICKERS.map(() => null);
   }
