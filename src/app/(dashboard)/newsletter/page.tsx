@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Loader2, Mail, Clock, Bell, Calendar } from "lucide-react";
+import { Loader2, Mail, Clock, Bell } from "lucide-react";
 
 const PREFERENCES = [
   {
@@ -13,12 +13,6 @@ const PREFERENCES = [
     label: "Daily Digest",
     icon: Mail,
     desc: "AI summary of your watchlist stocks every morning (weekdays).",
-  },
-  {
-    key: "weekly_summary",
-    label: "Weekly Summary",
-    icon: Calendar,
-    desc: "Weekly recap of your stocks' performance every Monday.",
   },
   {
     key: "price_alerts",
@@ -52,7 +46,6 @@ export default function NewsletterPage() {
     if (data) {
       setPrefs({
         daily_digest: data.daily_digest,
-        weekly_summary: data.weekly_summary,
         price_alerts: data.price_alerts,
       });
       setDeliveryHour(data.delivery_hour_utc);

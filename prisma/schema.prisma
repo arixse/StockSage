@@ -151,7 +151,6 @@ model NewsArticle {
 model EmailPreference {
   userId          String  @id @map("user_id") @db.Uuid
   dailyDigest     Boolean @default(true) @map("daily_digest")
-  weeklySummary   Boolean @default(false) @map("weekly_summary")
   priceAlerts     Boolean @default(false) @map("price_alerts")
   deliveryHourUtc Int     @default(13) @map("delivery_hour_utc")
 
