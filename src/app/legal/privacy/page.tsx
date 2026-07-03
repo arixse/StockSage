@@ -1,4 +1,19 @@
+import type { Metadata } from "next";
 import { getLegalPage } from "@/data/legal-content";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description:
+    "Learn how StockSage collects, uses, and protects your personal data. Our privacy policy explains your rights and our data practices in plain language.",
+  alternates: { canonical: "/legal/privacy" },
+  openGraph: {
+    title: "Privacy Policy | StockSage",
+    description:
+      "Learn how StockSage collects, uses, and protects your personal data. Our privacy policy explains your rights and our data practices in plain language.",
+    url: "/legal/privacy",
+    type: "website",
+  },
+};
 
 export default function PrivacyPage() {
   const page = getLegalPage("privacy");

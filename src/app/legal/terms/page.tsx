@@ -1,4 +1,19 @@
+import type { Metadata } from "next";
 import { getLegalPage } from "@/data/legal-content";
+
+export const metadata: Metadata = {
+  title: "Terms of Service",
+  description:
+    "Read StockSage's Terms of Service. Understand the rules, disclaimers, and your rights when using our AI-powered stock analysis platform.",
+  alternates: { canonical: "/legal/terms" },
+  openGraph: {
+    title: "Terms of Service | StockSage",
+    description:
+      "Read StockSage's Terms of Service. Understand the rules, disclaimers, and your rights when using our AI-powered stock analysis platform.",
+    url: "/legal/terms",
+    type: "website",
+  },
+};
 
 export default function TermsPage() {
   const page = getLegalPage("terms");
