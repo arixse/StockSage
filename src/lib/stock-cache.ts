@@ -231,12 +231,14 @@ export async function getFreshQuotes(
   const upper = tickers.map((t) => t.toUpperCase());
   const cached = await getCachedQuotes(upper);
   const market = getMarketStatus();
-  const isTrading =
+  const isLiveMarket =
     market.status === "open" ||
     market.status === "pre-market" ||
     market.status === "after-hours";
 
-  if (!isTrading) return cached;
+  // Staleness threshold: 5 min during live market, 60 min otherwise
+  // (Yahoo still returns last closing price when market is closed)
+  const maxAgeMinutes = isLiveMarket ? 5 : 60;
 
   // Identify tickers with stale or missing cache
   const staleTickers: string[] = [];
@@ -245,7 +247,7 @@ export async function getFreshQuotes(
     const ageMinutes = q?.timestamp
       ? (Date.now() - new Date(q.timestamp).getTime()) / 60000
       : Infinity;
-    if (ageMinutes > 5) staleTickers.push(upper[i]);
+    if (ageMinutes > maxAgeMinutes) staleTickers.push(upper[i]);
   }
 
   if (staleTickers.length === 0) return cached;
