@@ -1,4 +1,19 @@
+import type { Metadata } from "next";
 import { getLegalPage } from "@/data/legal-content";
+
+export const metadata: Metadata = {
+  title: "Disclaimer",
+  description:
+    "StockSage provides AI-powered stock analysis for informational purposes only. Read our full disclaimer — we are not a registered financial advisor.",
+  alternates: { canonical: "/legal/disclaimer" },
+  openGraph: {
+    title: "Disclaimer | StockSage",
+    description:
+      "StockSage provides AI-powered stock analysis for informational purposes only. Read our full disclaimer — we are not a registered financial advisor.",
+    url: "/legal/disclaimer",
+    type: "website",
+  },
+};
 
 export default function DisclaimerPage() {
   const page = getLegalPage("disclaimer");

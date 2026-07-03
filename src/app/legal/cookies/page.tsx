@@ -1,4 +1,19 @@
+import type { Metadata } from "next";
 import { getLegalPage } from "@/data/legal-content";
+
+export const metadata: Metadata = {
+  title: "Cookie Policy",
+  description:
+    "Understand how StockSage uses cookies and similar technologies. Learn about essential, functional, and analytics cookies used on our platform.",
+  alternates: { canonical: "/legal/cookies" },
+  openGraph: {
+    title: "Cookie Policy | StockSage",
+    description:
+      "Understand how StockSage uses cookies and similar technologies. Learn about essential, functional, and analytics cookies used on our platform.",
+    url: "/legal/cookies",
+    type: "website",
+  },
+};
 
 export default function CookiesPage() {
   const page = getLegalPage("cookies");
