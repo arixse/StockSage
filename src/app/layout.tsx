@@ -19,6 +19,11 @@ export const metadata: Metadata = {
     default: "StockSage — AI Stock Market Analysis: Track AAPL, TSLA, NVDA & US Equities",
     template: "%s | StockSage",
   },
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
   description:
     "Free AI-powered stock market analysis for US equities. Track Tesla (TSLA), Nvidia (NVDA), Apple (AAPL), and more. Get daily AI stock summaries, 0-100 scores, market heatmaps, and buy/hold/sell signals for NYSE and NASDAQ stocks.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
