@@ -16,6 +16,13 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/learn",
   },
+  openGraph: {
+    title: "Learning Center | StockSage",
+    description:
+      "Free stock market education for every investor. Learn portfolio building, value investing, ETFs, compound interest, and more with beginner-friendly guides.",
+    url: "/learn",
+    type: "website",
+  },
 };
 
 const ICONS: Record<string, ReactNode> = {

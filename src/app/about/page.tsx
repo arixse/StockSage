@@ -13,6 +13,13 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/about",
   },
+  openGraph: {
+    title: "About StockSage | StockSage",
+    description:
+      "Learn about StockSage's mission to democratize AI-powered stock research. Professional-grade US stock analysis, scoring, and market insights.",
+    url: "/about",
+    type: "website",
+  },
 };
 
 const VALUES = [

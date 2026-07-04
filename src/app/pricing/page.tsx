@@ -12,6 +12,13 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/pricing",
   },
+  openGraph: {
+    title: "Pricing | StockSage",
+    description:
+      "StockSage pricing plans. Start free with 3 stocks. Upgrade to Pro for unlimited watchlist stocks.",
+    url: "/pricing",
+    type: "website",
+  },
 };
 
 export default function PricingPage() {
