@@ -240,11 +240,12 @@ export async function getFreshQuotes(
   // (Yahoo still returns last closing price when market is closed)
   const maxAgeMinutes = isLiveMarket ? 5 : 60;
 
-  // Identify tickers with stale or missing cache
+  // Identify tickers with stale, missing, or zero-price cache
   const staleTickers: string[] = [];
   for (let i = 0; i < upper.length; i++) {
     const q = cached[i];
-    const ageMinutes = q?.timestamp
+    if (!q || q.price <= 0) { staleTickers.push(upper[i]); continue; }
+    const ageMinutes = q.timestamp
       ? (Date.now() - new Date(q.timestamp).getTime()) / 60000
       : Infinity;
     if (ageMinutes > maxAgeMinutes) staleTickers.push(upper[i]);
