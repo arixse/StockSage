@@ -160,11 +160,12 @@ async function yahooFetch(path: string): Promise<any> {
 
 // Yahoo single quote
 async function yahooQuote(ticker: string): Promise<StockQuote | null> {
-  const data = await yahooFetch(`/v7/finance/quote?symbols=${ticker}`);
+  const yahooSymbol = normalizeKey(ticker);
+  const data = await yahooFetch(`/v7/finance/quote?symbols=${yahooSymbol}`);
   const r = data?.quoteResponse?.result?.[0];
   if (!r) return null;
   return {
-    ticker: r.symbol, price: r.regularMarketPrice ?? 0,
+    ticker: ticker, price: r.regularMarketPrice ?? 0,
     change: r.regularMarketChange ?? 0, changePercent: r.regularMarketChangePercent ?? 0,
     high: r.regularMarketDayHigh ?? 0, low: r.regularMarketDayLow ?? 0,
     open: r.regularMarketOpen ?? 0, prevClose: r.regularMarketPreviousClose ?? 0,
@@ -174,16 +175,23 @@ async function yahooQuote(ticker: string): Promise<StockQuote | null> {
   };
 }
 
+/** Normalize ticker for API lookup — handles BRK.B ↔ BRK-B mismatch */
+function normalizeKey(t: string): string {
+  return t.toUpperCase().replace(/\./g, "-");
+}
+
 // Yahoo batch quotes
 async function yahooBatchQuotes(tickers: string[]): Promise<(StockQuote | null)[] | null> {
-  const data = await yahooFetch(`/v7/finance/quote?symbols=${tickers.join(",")}`);
+  // Yahoo Finance uses hyphens for share-class suffixes (e.g. BRK-B not BRK.B)
+  const yahooSymbols = tickers.map((t) => normalizeKey(t));
+  const data = await yahooFetch(`/v7/finance/quote?symbols=${yahooSymbols.join(",")}`);
   if (!data?.quoteResponse?.result) return null;
-  const map = new Map<string, any>(data.quoteResponse.result.map((r: any) => [r.symbol, r]));
+  const map = new Map<string, any>(data.quoteResponse.result.map((r: any) => [normalizeKey(r.symbol), r]));
   return tickers.map((t) => {
-    const r = map.get(t);
+    const r = map.get(normalizeKey(t));
     if (!r) return null;
     return {
-      ticker: r.symbol, price: r.regularMarketPrice ?? 0,
+      ticker: t, price: r.regularMarketPrice ?? 0,
       change: r.regularMarketChange ?? 0, changePercent: r.regularMarketChangePercent ?? 0,
       high: r.regularMarketDayHigh ?? 0, low: r.regularMarketDayLow ?? 0,
       open: r.regularMarketOpen ?? 0, prevClose: r.regularMarketPreviousClose ?? 0,
