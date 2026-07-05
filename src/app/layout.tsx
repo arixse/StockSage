@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "StockSage — AI Stock Market Analysis: Track AAPL, TSLA, NVDA & US Equities",
+    default: "StockSage — Free AI Stock Analysis & Scoring",
     template: "%s | StockSage",
   },
   icons: {
@@ -26,12 +26,12 @@ export const metadata: Metadata = {
     apple: "/icon.svg",
   },
   description:
-    "Free AI-powered stock market analysis for US equities. Track Tesla (TSLA), Nvidia (NVDA), Apple (AAPL), and more. Get daily AI stock summaries, 0-100 scores, market heatmaps, and buy/hold/sell signals for NYSE and NASDAQ stocks.",
+    "Free AI stock market analysis for US equities. Track Tesla, Nvidia, Apple, and more. Get daily AI summaries, 0-100 scores, and buy/hold/sell signals.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
   openGraph: {
     title: "StockSage — AI Stock Market Analysis & Scoring",
     description:
-      "Free AI-powered US stock market analysis. Track Tesla, Nvidia, Apple, and more. Get daily AI summaries, stock scores, heatmaps, and buy/hold/sell signals.",
+      "Free AI US stock market analysis. Track Tesla, Nvidia, Apple, and more. Get daily AI summaries, stock scores, and buy/hold/sell signals.",
     url: "/",
     siteName: "StockSage",
     locale: "en_US",

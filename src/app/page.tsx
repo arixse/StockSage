@@ -10,14 +10,14 @@ import { getFreshQuotes } from "@/lib/stock-cache";
 
 export const metadata: Metadata = {
   description:
-    "Free AI-powered stock market analysis for US equities. Track Tesla (TSLA), Nvidia (NVDA), Apple (AAPL), Amazon (AMZN), and more. Get daily AI stock summaries, 0-100 scores, market heatmaps, and buy/hold/sell signals for NYSE & NASDAQ stocks.",
+    "Free AI stock market analysis. Track Tesla, Nvidia, Apple, Amazon, and more. Daily AI summaries, 0-100 scores, market heatmaps, and buy/hold/sell signals.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
     title: "StockSage — Free AI Stock Market Analysis & Scoring",
     description:
-      "Track Tesla, Nvidia, Apple, and more with AI-powered US stock analysis. Daily AI summaries, smart scoring, market heatmaps, and personalized watchlists.",
+      "Track Tesla, Nvidia, Apple, and more with AI US stock analysis. Daily AI summaries, smart scoring, and market heatmaps.",
     url: "/",
   },
   twitter: {
