@@ -4,7 +4,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { TrendingUp, BarChart3, Sparkles, Mail, ArrowRight, Flame, GraduationCap, Search } from "lucide-react";
+import { TrendingUp, BarChart3, Sparkles, Mail, ArrowRight, Flame, GraduationCap } from "lucide-react";
 import { StockLogo } from "@/components/stock/StockLogo";
 import { getFreshQuotes } from "@/lib/stock-cache";
 
@@ -147,30 +147,68 @@ export default async function HomePage() {
         </section>
 
         {/* Popular Stocks — internal links to stock pages for SEO */}
-        <section className="py-16">
+        <section className="py-20 bg-muted/10">
           <div className="container mx-auto px-4">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold mb-2">Browse Popular Stocks</h2>
-              <p className="text-muted-foreground text-sm">
-                Explore AI-powered analysis for top US equities on NYSE and NASDAQ.
+            <div className="text-center mb-10">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-3">Explore Popular Stocks</h2>
+              <p className="text-muted-foreground text-sm max-w-lg mx-auto">
+                AI-powered analysis for the most tracked US equities on NYSE and NASDAQ.
               </p>
             </div>
-            <div className="flex flex-wrap justify-center gap-2 max-w-3xl mx-auto">
+            <div className="space-y-8 max-w-5xl mx-auto">
               {[
-                "AAPL", "MSFT", "GOOGL", "AMZN", "NVDA", "META", "TSLA", "BRK.B",
-                "JPM", "V", "UNH", "JNJ", "WMT", "MA", "PG", "XOM", "HD", "COST",
-                "NFLX", "AMD", "CRM", "DIS", "BAC", "ADBE", "INTC", "QCOM", "TXN",
-                "PYPL", "ORCL", "CVX", "PEP", "KO", "ABBV", "MRK", "LLY",
-                "AVGO", "UBER", "PLTR", "ABNB", "ARM", "SHOP", "SNOW", "CRWD", "PANW",
-              ].map((ticker) => (
-                <Link
-                  key={ticker}
-                  href={`/stock/${ticker}`}
-                  className="inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:border-primary/30 hover:bg-muted/50 transition-colors"
-                >
-                  <Search className="h-3 w-3" />
-                  {ticker}
-                </Link>
+                {
+                  label: "Magnificent Seven",
+                  tickers: ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA", "META", "TSLA"],
+                },
+                {
+                  label: "Financials",
+                  tickers: ["JPM", "V", "BAC", "MA", "BRK.B"],
+                },
+                {
+                  label: "Healthcare",
+                  tickers: ["UNH", "JNJ", "ABBV", "MRK", "LLY"],
+                },
+                {
+                  label: "Consumer & Retail",
+                  tickers: ["WMT", "PG", "HD", "COST", "KO", "PEP", "DIS", "NFLX"],
+                },
+                {
+                  label: "Tech — Semiconductors",
+                  tickers: ["AMD", "AVGO", "INTC", "QCOM", "TXN", "ARM"],
+                },
+                {
+                  label: "Tech — Software & Cloud",
+                  tickers: ["ADBE", "CRM", "ORCL", "SNOW", "CRWD", "PANW"],
+                },
+                {
+                  label: "Platforms & Fintech",
+                  tickers: ["PYPL", "UBER", "PLTR", "ABNB", "SHOP"],
+                },
+                {
+                  label: "Energy & Industrials",
+                  tickers: ["XOM", "CVX"],
+                },
+              ].map((group) => (
+                <div key={group.label}>
+                  <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 pl-1">
+                    {group.label}
+                  </h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
+                    {group.tickers.map((ticker) => (
+                      <Link
+                        key={ticker}
+                        href={`/stock/${ticker}`}
+                        className="flex items-center gap-2.5 rounded-xl border bg-card px-3 py-2.5 hover:border-primary/40 hover:shadow-sm hover:bg-accent/30 transition-all group"
+                      >
+                        <StockLogo ticker={ticker} size="sm" />
+                        <span className="text-sm font-medium group-hover:text-primary transition-colors">
+                          {ticker}
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
           </div>
