@@ -57,14 +57,6 @@ const FEATURED_TICKERS = [
   "JPM", "V", "LLY", "AVGO", "COST",
 ];
 
-// Secondary stocks for "More to Explore" (SEO internal links)
-const MORE_TICKERS = [
-  "BRK.B", "UNH", "JNJ", "WMT", "MA", "PG", "XOM", "HD",
-  "NFLX", "AMD", "CRM", "DIS", "BAC", "ADBE", "INTC", "QCOM", "TXN",
-  "PYPL", "ORCL", "CVX", "PEP", "KO", "ABBV", "MRK",
-  "UBER", "PLTR", "ABNB", "ARM", "SHOP", "SNOW", "CRWD", "PANW",
-];
-
 /** Deterministic accent color per ticker — always the same for the same ticker */
 function tickerAccent(ticker: string): string {
   const colors = [
@@ -189,24 +181,6 @@ export default async function HomePage() {
               })}
             </div>
 
-            {/* More to explore */}
-            <div className="mt-12 max-w-4xl mx-auto">
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 text-center">
-                More to Explore
-              </p>
-              <div className="flex flex-wrap justify-center gap-1.5">
-                {MORE_TICKERS.map((ticker) => (
-                  <Link
-                    key={ticker}
-                    href={`/stock/${ticker}`}
-                    className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/30 group-hover:bg-primary/50" />
-                    {ticker}
-                  </Link>
-                ))}
-              </div>
-            </div>
           </div>
         </section>
 
