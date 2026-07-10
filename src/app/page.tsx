@@ -4,7 +4,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { TrendingUp, BarChart3, Sparkles, Mail, ArrowRight, Flame, GraduationCap } from "lucide-react";
+import { TrendingUp, TrendingDown, BarChart3, Sparkles, Mail, ArrowRight, Flame, GraduationCap } from "lucide-react";
 import { StockLogo } from "@/components/stock/StockLogo";
 import { getFreshQuotes } from "@/lib/stock-cache";
 
@@ -37,7 +37,7 @@ const FEATURES = [
   {
     icon: BarChart3,
     title: "Market Heatmap",
-    description: "Visualize S&P 500 breadth with a live treemap. See which sectors are leading and lagging at a glance.",
+    description: "Visualize S&P 500 market breadth with a live treemap. See which sectors are leading and lagging at a glance.",
   },
   {
     icon: TrendingUp,
@@ -51,18 +51,52 @@ const FEATURES = [
   },
 ];
 
-const TRENDING_TICKERS = ["AAPL", "MSFT", "NVDA", "GOOGL", "AMZN", "META", "TSLA", "AMD"];
+// Featured stocks — fetch live quotes for these
+const FEATURED_TICKERS = [
+  "AAPL", "MSFT", "NVDA", "GOOGL", "AMZN", "META", "TSLA",
+  "JPM", "V", "LLY", "AVGO", "COST",
+];
 
-async function getTrendingStocks() {
+// Secondary stocks for "More to Explore" (SEO internal links)
+const MORE_TICKERS = [
+  "BRK.B", "UNH", "JNJ", "WMT", "MA", "PG", "XOM", "HD",
+  "NFLX", "AMD", "CRM", "DIS", "BAC", "ADBE", "INTC", "QCOM", "TXN",
+  "PYPL", "ORCL", "CVX", "PEP", "KO", "ABBV", "MRK",
+  "UBER", "PLTR", "ABNB", "ARM", "SHOP", "SNOW", "CRWD", "PANW",
+];
+
+/** Deterministic accent color per ticker — always the same for the same ticker */
+function tickerAccent(ticker: string): string {
+  const colors = [
+    "from-blue-500 to-cyan-400", "from-emerald-500 to-teal-400",
+    "from-violet-500 to-purple-400", "from-amber-500 to-orange-400",
+    "from-rose-500 to-pink-400", "from-indigo-500 to-blue-400",
+    "from-teal-500 to-green-400", "from-orange-500 to-red-400",
+    "from-sky-500 to-indigo-400", "from-lime-500 to-emerald-400",
+    "from-fuchsia-500 to-rose-400", "from-cyan-500 to-sky-400",
+  ];
+  let hash = 0;
+  for (let i = 0; i < ticker.length; i++) {
+    hash = ((hash << 5) - hash) + ticker.charCodeAt(i);
+    hash |= 0;
+  }
+  return colors[Math.abs(hash) % colors.length];
+}
+
+async function getFeaturedQuotes() {
   try {
-    return await getFreshQuotes(TRENDING_TICKERS);
+    return await getFreshQuotes(FEATURED_TICKERS);
   } catch {
-    return TRENDING_TICKERS.map(() => null);
+    return FEATURED_TICKERS.map(() => null);
   }
 }
 
 export default async function HomePage() {
-  const trendingQuotes = await getTrendingStocks();
+  const quotes = await getFeaturedQuotes();
+  const quoteMap = new Map(
+    quotes.filter((q) => q !== null).map((q) => [q!.ticker, q!])
+  );
+
   return (
     <div className="flex flex-col min-h-full">
       <Header />
@@ -72,7 +106,7 @@ export default async function HomePage() {
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-primary/10" />
           <div className="container mx-auto px-4 relative">
             <div className="max-w-3xl mx-auto text-center">
-<h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
                 Smarter Stock Analysis
                 <br />
                 <span className="text-primary">Powered by AI</span>
@@ -90,36 +124,91 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* Trending Stocks — only show if we have data */}
-        {trendingQuotes.some((q) => q !== null) && (
-          <section className="border-y">
-            <div className="container mx-auto px-4 py-4">
-              <div className="flex flex-wrap justify-center gap-3">
-                {trendingQuotes.map((quote, i) => {
-                  if (!quote) return null;
-                  return (
-                    <Link
-                      key={quote.ticker}
-                      href={`/stock/${quote.ticker}`}
-                      className="flex items-center gap-2 rounded-lg border px-3 py-2 hover:border-primary/30 transition-colors w-[calc(50%-0.375rem)] sm:w-[calc(25%-0.5625rem)] lg:w-[180px]"
-                    >
-                      <StockLogo ticker={quote.ticker} size="sm" />
-                      <div className="min-w-0">
-                        <div className="font-medium text-sm leading-tight">{quote.ticker}</div>
-                        <div className={quote.change >= 0 ? "text-green-500" : "text-red-500"}>
-                          <span className="text-xs font-mono">
-                            {quote.change >= 0 ? "+" : ""}{quote.changePercent.toFixed(1)}%
-                          </span>
+        {/* Featured Stocks — live quotes in premium card grid */}
+        <section className="py-20 bg-muted/10">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-3">Popular Stocks</h2>
+              <p className="text-muted-foreground text-sm max-w-lg mx-auto">
+                Live prices and AI-powered analysis for the most tracked US equities.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 max-w-6xl mx-auto">
+              {FEATURED_TICKERS.map((ticker) => {
+                const quote = quoteMap.get(ticker);
+                const isUp = quote ? quote.changePercent >= 0 : true;
+                const accent = tickerAccent(ticker);
+
+                return (
+                  <Link
+                    key={ticker}
+                    href={`/stock/${ticker}`}
+                    className="group relative overflow-hidden rounded-2xl border bg-card p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
+                  >
+                    {/* Colored top accent bar */}
+                    <div className={`absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r ${accent}`} />
+
+                    <div className="flex items-center gap-2.5 mb-3">
+                      <StockLogo ticker={ticker} size="md" />
+                      <div>
+                        <div className="font-bold text-sm leading-tight group-hover:text-primary transition-colors">
+                          {ticker}
+                        </div>
+                        {quote?.shortName && (
+                          <div className="text-[10px] text-muted-foreground leading-tight truncate max-w-[100px]">
+                            {quote.shortName}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {quote ? (
+                      <div>
+                        <div className="font-mono text-lg font-bold tracking-tight">
+                          ${quote.price.toFixed(2)}
+                        </div>
+                        <div className={`inline-flex items-center gap-0.5 text-xs font-semibold rounded-full px-2 py-0.5 mt-1 ${
+                          isUp
+                            ? "text-emerald-700 bg-emerald-500/10"
+                            : "text-red-700 bg-red-500/10"
+                        }`}>
+                          {isUp ? (
+                            <TrendingUp className="h-3 w-3" />
+                          ) : (
+                            <TrendingDown className="h-3 w-3" />
+                          )}
+                          {isUp ? "+" : ""}{quote.changePercent.toFixed(2)}%
                         </div>
                       </div>
-                      <span className="font-mono text-sm ml-auto">${quote.price.toFixed(2)}</span>
-                    </Link>
-                  );
-                })}
+                    ) : (
+                      <div className="text-xs text-muted-foreground italic">Loading...</div>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* More to explore */}
+            <div className="mt-12 max-w-4xl mx-auto">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 text-center">
+                More to Explore
+              </p>
+              <div className="flex flex-wrap justify-center gap-1.5">
+                {MORE_TICKERS.map((ticker) => (
+                  <Link
+                    key={ticker}
+                    href={`/stock/${ticker}`}
+                    className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/30 group-hover:bg-primary/50" />
+                    {ticker}
+                  </Link>
+                ))}
               </div>
             </div>
-          </section>
-        )}
+          </div>
+        </section>
 
         {/* Features Grid */}
         <section className="py-20">
@@ -141,74 +230,6 @@ export default async function HomePage() {
                     <CardDescription className="text-sm">{feature.description}</CardDescription>
                   </CardContent>
                 </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Popular Stocks — internal links to stock pages for SEO */}
-        <section className="py-20 bg-muted/10">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-10">
-              <h2 className="text-2xl sm:text-3xl font-bold mb-3">Explore Popular Stocks</h2>
-              <p className="text-muted-foreground text-sm max-w-lg mx-auto">
-                AI-powered analysis for the most tracked US equities on NYSE and NASDAQ.
-              </p>
-            </div>
-            <div className="space-y-8 max-w-5xl mx-auto">
-              {[
-                {
-                  label: "Magnificent Seven",
-                  tickers: ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA", "META", "TSLA"],
-                },
-                {
-                  label: "Financials",
-                  tickers: ["JPM", "V", "BAC", "MA", "BRK.B"],
-                },
-                {
-                  label: "Healthcare",
-                  tickers: ["UNH", "JNJ", "ABBV", "MRK", "LLY"],
-                },
-                {
-                  label: "Consumer & Retail",
-                  tickers: ["WMT", "PG", "HD", "COST", "KO", "PEP", "DIS", "NFLX"],
-                },
-                {
-                  label: "Tech — Semiconductors",
-                  tickers: ["AMD", "AVGO", "INTC", "QCOM", "TXN", "ARM"],
-                },
-                {
-                  label: "Tech — Software & Cloud",
-                  tickers: ["ADBE", "CRM", "ORCL", "SNOW", "CRWD", "PANW"],
-                },
-                {
-                  label: "Platforms & Fintech",
-                  tickers: ["PYPL", "UBER", "PLTR", "ABNB", "SHOP"],
-                },
-                {
-                  label: "Energy & Industrials",
-                  tickers: ["XOM", "CVX"],
-                },
-              ].map((group) => (
-                <div key={group.label}>
-                  <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 pl-1">
-                    {group.label}
-                  </h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
-                    {group.tickers.map((ticker) => (
-                      <Link
-                        key={ticker}
-                        href={`/stock/${ticker}`}
-                        className="flex items-center gap-2.5 rounded-xl border bg-card px-3 py-2.5 hover:border-primary/40 hover:shadow-sm hover:bg-accent/30 transition-all group"
-                      >
-                        <StockLogo ticker={ticker} size="sm" />
-                        <span className="text-sm font-medium group-hover:text-primary transition-colors">
-                          {ticker}
-                        </span>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
               ))}
             </div>
           </div>
@@ -281,7 +302,7 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* CTA */}
+        {/* Footer CTA */}
         <section className="py-20">
           <div className="container mx-auto px-4 max-w-2xl text-center">
             <h2 className="text-3xl font-bold mb-4">Ready to Invest Smarter?</h2>
