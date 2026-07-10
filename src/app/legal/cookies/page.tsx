@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { getLegalPage } from "@/data/legal-content";
 
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
 export const metadata: Metadata = {
   title: "Cookie Policy",
   description:
@@ -12,6 +14,14 @@ export const metadata: Metadata = {
       "Understand how StockSage uses cookies and similar technologies. Learn about essential, functional, and analytics cookies used on our platform.",
     url: "/legal/cookies",
     type: "website",
+    images: [{ url: `${appUrl}/api/og`, width: 1200, height: 630, alt: "StockSage Cookie Policy" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Cookie Policy | StockSage",
+    description:
+      "Understand how StockSage uses cookies and similar technologies. Learn about essential, functional, and analytics cookies used on our platform.",
+    images: [`${appUrl}/api/og`],
   },
 };
 

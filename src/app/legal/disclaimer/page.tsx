@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { getLegalPage } from "@/data/legal-content";
 
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
 export const metadata: Metadata = {
   title: "Disclaimer",
   description:
@@ -12,6 +14,14 @@ export const metadata: Metadata = {
       "StockSage provides AI-powered stock analysis for informational purposes only. Read our full disclaimer — we are not a registered financial advisor.",
     url: "/legal/disclaimer",
     type: "website",
+    images: [{ url: `${appUrl}/api/og`, width: 1200, height: 630, alt: "StockSage Disclaimer" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Disclaimer | StockSage",
+    description:
+      "StockSage provides AI-powered stock analysis for informational purposes only. Read our full disclaimer — we are not a registered financial advisor.",
+    images: [`${appUrl}/api/og`],
   },
 };
 

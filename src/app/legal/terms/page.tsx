@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { getLegalPage } from "@/data/legal-content";
 
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
 export const metadata: Metadata = {
   title: "Terms of Service",
   description:
@@ -12,6 +14,14 @@ export const metadata: Metadata = {
       "Read StockSage's Terms of Service. Understand the rules, disclaimers, and your rights when using our AI-powered stock analysis platform.",
     url: "/legal/terms",
     type: "website",
+    images: [{ url: `${appUrl}/api/og`, width: 1200, height: 630, alt: "StockSage Terms of Service" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Terms of Service | StockSage",
+    description:
+      "Read StockSage's Terms of Service. Understand the rules, disclaimers, and your rights when using our AI-powered stock analysis platform.",
+    images: [`${appUrl}/api/og`],
   },
 };
 

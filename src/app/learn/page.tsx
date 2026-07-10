@@ -9,19 +9,29 @@ import { learnArticles, type LearnArticle } from "@/data/learn-articles";
 import { Briefcase, TrendingUp, Search, Layers, Grid3X3, BookOpen } from "lucide-react";
 import type { ReactNode } from "react";
 
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
 export const metadata: Metadata = {
-  title: "Learning Center",
+  title: "Learn",
   description:
     "Free stock market education for every investor. Learn portfolio building, value investing, ETFs, compound interest, and more with beginner-friendly guides.",
   alternates: {
     canonical: "/learn",
   },
   openGraph: {
-    title: "Learning Center | StockSage",
+    title: "StockSage Learning Center",
     description:
       "Free stock market education for every investor. Learn portfolio building, value investing, ETFs, compound interest, and more with beginner-friendly guides.",
     url: "/learn",
     type: "website",
+    images: [{ url: `${appUrl}/api/og`, width: 1200, height: 630, alt: "StockSage Learning Center" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "StockSage Learning Center",
+    description:
+      "Free stock market education for every investor. Learn portfolio building, value investing, ETFs, compound interest, and more with beginner-friendly guides.",
+    images: [`${appUrl}/api/og`],
   },
 };
 
