@@ -62,36 +62,38 @@ export default function GlossaryPage() {
       />
       <Header />
       <main className="flex-1">
-        <PageHeader
-          title="Stock Market Glossary"
-          description="50+ financial terms explained in plain English. From P/E ratio to RSI, learn the language of investing."
-        />
-        <div className="container mx-auto px-4 py-8 space-y-12">
-          {Array.from(grouped.entries()).map(([category, terms]) => {
-            const cat = CATEGORIES[category];
-            return (
-              <section key={category}>
-                <div className="flex items-center gap-2 mb-4">
-                  {cat?.icon}
-                  <h2 className="text-xl font-bold">{cat?.label || category}</h2>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {terms.map((term) => (
-                    <Link key={term.slug} href={`/glossary/${term.slug}`}>
-                      <Card className="h-full hover:border-primary/50 transition-colors cursor-pointer">
-                        <CardHeader className="pb-2">
-                          <CardTitle className="text-base">{term.term}</CardTitle>
-                          <CardDescription className="line-clamp-2">
-                            {term.definition.slice(0, 120)}...
-                          </CardDescription>
-                        </CardHeader>
-                      </Card>
-                    </Link>
-                  ))}
-                </div>
-              </section>
-            );
-          })}
+        <div className="container mx-auto px-4 py-8">
+          <PageHeader
+            title="Stock Market Glossary"
+            description="50+ financial terms explained in plain English. From P/E ratio to RSI, learn the language of investing."
+          />
+          <div className="space-y-12">
+            {Array.from(grouped.entries()).map(([category, terms]) => {
+              const cat = CATEGORIES[category];
+              return (
+                <section key={category}>
+                  <div className="flex items-center gap-2 mb-4">
+                    {cat?.icon}
+                    <h2 className="text-xl font-bold">{cat?.label || category}</h2>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {terms.map((term) => (
+                      <Link key={term.slug} href={`/glossary/${term.slug}`}>
+                        <Card className="h-full hover:border-primary/50 transition-colors cursor-pointer">
+                          <CardHeader className="pb-2">
+                            <CardTitle className="text-base">{term.term}</CardTitle>
+                            <CardDescription className="line-clamp-2">
+                              {term.definition.slice(0, 120)}...
+                            </CardDescription>
+                          </CardHeader>
+                        </Card>
+                      </Link>
+                    ))}
+                  </div>
+                </section>
+              );
+            })}
+          </div>
         </div>
       </main>
       <Footer />
