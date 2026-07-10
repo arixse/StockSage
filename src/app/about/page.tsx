@@ -6,19 +6,29 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { BarChart3, Sparkles, Globe, Shield } from "lucide-react";
 
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
 export const metadata: Metadata = {
-  title: "About StockSage",
+  title: "About",
   description:
     "Learn about StockSage's mission to democratize AI-powered stock research. We provide professional-grade US stock analysis, scoring, and market insights for every investor.",
   alternates: {
     canonical: "/about",
   },
   openGraph: {
-    title: "About StockSage | StockSage",
+    title: "About StockSage",
     description:
       "Learn about StockSage's mission to democratize AI-powered stock research. Professional-grade US stock analysis, scoring, and market insights.",
     url: "/about",
     type: "website",
+    images: [{ url: `${appUrl}/api/og`, width: 1200, height: 630, alt: "About StockSage" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "About StockSage",
+    description:
+      "Learn about StockSage's mission to democratize AI-powered stock research. Professional-grade US stock analysis, scoring, and market insights.",
+    images: [`${appUrl}/api/og`],
   },
 };
 

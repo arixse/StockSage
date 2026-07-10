@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { getLegalPage } from "@/data/legal-content";
 
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
@@ -12,6 +14,14 @@ export const metadata: Metadata = {
       "Learn how StockSage collects, uses, and protects your personal data. Our privacy policy explains your rights and our data practices in plain language.",
     url: "/legal/privacy",
     type: "website",
+    images: [{ url: `${appUrl}/api/og`, width: 1200, height: 630, alt: "StockSage Privacy Policy" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Privacy Policy | StockSage",
+    description:
+      "Learn how StockSage collects, uses, and protects your personal data. Our privacy policy explains your rights and our data practices in plain language.",
+    images: [`${appUrl}/api/og`],
   },
 };
 

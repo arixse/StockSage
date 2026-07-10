@@ -17,7 +17,7 @@ jobs:
           BODY=$(echo "$RESPONSE" | sed '$d')
           echo "HTTP $HTTP_CODE"
           echo "$BODY" | head -40
-          if [ "$HTTP_CODE" != "200" ]; then
+          if [ "$HTTP_CODE" != "200" ] && [ "$HTTP_CODE" != "202" ]; then
             echo "::error::Daily digest failed with HTTP $HTTP_CODE"
             exit 1
           fi

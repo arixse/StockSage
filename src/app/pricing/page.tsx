@@ -45,6 +45,8 @@ const TIERS = [
   },
 ];
 
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
 export const metadata: Metadata = {
   title: "Pricing",
   description:
@@ -53,11 +55,19 @@ export const metadata: Metadata = {
     canonical: "/pricing",
   },
   openGraph: {
-    title: "Pricing | StockSage",
+    title: "StockSage Pricing",
     description:
       "StockSage pricing plans. Start free with 3 stocks. Upgrade to Pro for unlimited watchlist stocks.",
     url: "/pricing",
     type: "website",
+    images: [{ url: `${appUrl}/api/og`, width: 1200, height: 630, alt: "StockSage Pricing" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "StockSage Pricing",
+    description:
+      "StockSage pricing plans. Start free with 3 stocks. Upgrade to Pro for unlimited watchlist stocks.",
+    images: [`${appUrl}/api/og`],
   },
 };
 

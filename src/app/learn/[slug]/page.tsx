@@ -6,6 +6,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { SmartSection } from "@/components/shared/SmartContent";
 import { getLearnArticle, getLearnSlugs } from "@/data/learn-articles";
 import { ChevronLeft } from "lucide-react";
 
@@ -33,11 +34,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: article.description,
       type: "article",
       url: `${appUrl}/learn/${slug}`,
+      publishedTime: article.date,
+      modifiedTime: article.lastUpdated || article.date,
+      images: [
+        {
+          url: `${appUrl}/api/og?title=${encodeURIComponent(article.title)}`,
+          width: 1200,
+          height: 630,
+          alt: article.title,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title: article.title,
       description: article.description,
+      images: [`${appUrl}/api/og?title=${encodeURIComponent(article.title)}`],
     },
   };
 }
@@ -100,33 +112,13 @@ export default async function LearnArticlePage({ params }: Props) {
           {/* Sections */}
           <div className="space-y-8">
             {article.sections.map((section, i) => (
-              <section key={i}>
-                <h2 className="text-xl font-bold mb-3">{section.heading}</h2>
-
-                {section.type === "callout" && (
-                  <div className="bg-primary/5 border-l-4 border-primary rounded-r-lg p-4 mb-4">
-                    <p className="text-sm text-muted-foreground leading-relaxed">{section.content}</p>
-                  </div>
-                )}
-
-                {section.type === "list" && section.items && (
-                  <>
-                    <p className="text-muted-foreground leading-relaxed mb-3">{section.content}</p>
-                    <ul className="space-y-2 ml-4">
-                      {section.items.map((item, j) => (
-                        <li key={j} className="flex items-start gap-2 text-sm text-muted-foreground">
-                          <span className="text-primary mt-0.5">▸</span>
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </>
-                )}
-
-                {(!section.type || section.type === "text") && (
-                  <p className="text-muted-foreground leading-relaxed">{section.content}</p>
-                )}
-              </section>
+              <SmartSection
+                key={i}
+                heading={section.heading}
+                content={section.content}
+                type={section.type}
+                items={section.items}
+              />
             ))}
           </div>
 

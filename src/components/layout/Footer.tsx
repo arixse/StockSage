@@ -44,6 +44,11 @@ export function Footer() {
                   Compound Interest
                 </Link>
               </li>
+              <li>
+                <Link href="/glossary" className="hover:text-foreground transition-colors">
+                  Financial Glossary
+                </Link>
+              </li>
             </ul>
           </nav>
 
