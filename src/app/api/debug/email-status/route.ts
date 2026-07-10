@@ -12,7 +12,7 @@ export async function GET() {
   // Check subscribers
   const { data: prefs, error: prefErr } = await admin
     .from("email_preferences")
-    .select("user_id, daily_digest, price_alerts, delivery_hour_utc")
+    .select("user_id, daily_digest, delivery_hour_utc")
     .eq("daily_digest", true);
 
   // Check tracked tickers
