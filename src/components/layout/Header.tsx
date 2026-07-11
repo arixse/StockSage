@@ -83,7 +83,7 @@ export function Header() {
 
           {!isDashboard && (
             <nav className="hidden md:flex items-center gap-4 text-sm">
-              <Link href="/stock/AAPL" className="text-muted-foreground hover:text-foreground transition-colors">
+              <Link href="/stocks" className="text-muted-foreground hover:text-foreground transition-colors">
                 Stocks
               </Link>
               <Link href="/heat" className="text-muted-foreground hover:text-foreground transition-colors">

@@ -8,6 +8,8 @@ import { StockLogo } from "@/components/stock/StockLogo";
 import { AddToWatchlistButton } from "@/components/stock/AddToWatchlistButton";
 import Link from "next/link";
 import { getFreshQuotes } from "@/lib/stock-cache";
+import { buildOpenGraph, buildTwitter, ogImage } from "@/lib/seo";
+import { relatedStocks } from "@/data/stock-directory";
 
 // Stock prices change constantly — never cache this page
 export const dynamic = "force-dynamic";
@@ -19,7 +21,6 @@ interface Props {
 export async function generateMetadata({ params }: Props) {
   const { ticker } = await params;
   const upperTicker = ticker.toUpperCase();
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
   let quote = null;
   try {
@@ -29,33 +30,34 @@ export async function generateMetadata({ params }: Props) {
   }
 
   const ogImageUrl = quote
-    ? `${appUrl}/api/og?ticker=${upperTicker}&price=${quote.price.toFixed(2)}&change=${quote.changePercent >= 0 ? "+" : ""}${quote.changePercent.toFixed(2)}%`
-    : `${appUrl}/api/og`;
+    ? ogImage({
+        ticker: upperTicker,
+        price: quote.price.toFixed(2),
+        change: `${quote.changePercent >= 0 ? "+" : ""}${quote.changePercent.toFixed(2)}%`,
+      })
+    : ogImage();
+
+  const ogTitle = `${upperTicker} Stock Analysis & AI Score · StockSage`;
+  const ogDescription = `${upperTicker} stock price, AI analysis, news sentiment, and buy/hold/sell signals. Track ${upperTicker} on the US stock market.`;
 
   return {
-    title: `${upperTicker} Stock Analysis — AI Score, News & Technical Data`,
-    description: `${upperTicker} stock price, AI score, latest news, and technical analysis. Get buy, hold, or sell signals for ${upperTicker} stock on the US stock market.`,
+    title: `${upperTicker} Stock — AI Score, News & Analysis`,
+    description: `${upperTicker} stock price, AI score, latest news, and technical analysis. Get buy, hold, or sell signals for ${upperTicker} on the US stock market.`,
     alternates: {
       canonical: `/stock/${upperTicker}`,
     },
-    openGraph: {
-      title: `${upperTicker} Stock Analysis & AI Score · StockSage`,
-      description: `${upperTicker} stock price, AI analysis, news sentiment, and buy/hold/sell signals. Track ${upperTicker} on the US stock market.`,
-      images: [
-        {
-          url: ogImageUrl,
-          width: 1200,
-          height: 630,
-          alt: `${upperTicker} stock analysis`,
-        },
-      ],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: `${upperTicker} Stock Analysis & AI Score · StockSage`,
+    openGraph: buildOpenGraph({
+      title: ogTitle,
+      description: ogDescription,
+      path: `/stock/${upperTicker}`,
+      image: ogImageUrl,
+      imageAlt: `${upperTicker} stock analysis`,
+    }),
+    twitter: buildTwitter({
+      title: ogTitle,
       description: `${upperTicker} stock price, AI analysis, and buy/hold/sell signals. Track ${upperTicker} on the US stock market.`,
-      images: [ogImageUrl],
-    },
+      image: ogImageUrl,
+    }),
     robots: {
       index: true,
       follow: true,
@@ -85,6 +87,7 @@ export default async function StockPage({ params }: Props) {
   }
 
   const changePositive = quote.change >= 0;
+  const peers = relatedStocks(upperTicker, 8);
 
   return (
     <>
@@ -153,6 +156,30 @@ export default async function StockPage({ params }: Props) {
 
           {/* AI Analysis */}
           <NewsTab ticker={upperTicker} />
+
+          {/* Related stocks — same-sector peers for internal linking */}
+          {peers.length > 0 && (
+            <section aria-label="Related stocks" className="pt-4 border-t">
+              <h2 className="text-lg font-bold mb-3">Related Stocks</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+                {peers.map((p) => (
+                  <Link
+                    key={p.ticker}
+                    href={`/stock/${p.ticker}`}
+                    className="flex items-center gap-2 rounded-lg border bg-card px-3 py-2 hover:border-primary/50 transition-all"
+                  >
+                    <StockLogo ticker={p.ticker} size="sm" />
+                    <div className="min-w-0">
+                      <div className="font-semibold text-sm leading-tight">{p.ticker}</div>
+                      <div className="text-[11px] text-muted-foreground leading-tight truncate">
+                        {p.companyName}
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
         </div>
       </main>
     </>

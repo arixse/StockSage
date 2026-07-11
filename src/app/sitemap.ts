@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { learnArticles } from "@/data/learn-articles";
 import { glossaryTerms } from "@/data/glossary-terms";
+import { directoryTickers } from "@/data/stock-directory";
 
 function getBaseUrl(): string {
   if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL;
@@ -11,23 +12,13 @@ function getBaseUrl(): string {
 
 const BASE_URL = getBaseUrl();
 
-// Top US stocks — broad coverage of major names
-const TOP_STOCKS = [
-  "AAPL", "MSFT", "GOOGL", "AMZN", "NVDA", "META", "TSLA", "BRK.B",
-  "JPM", "V", "UNH", "JNJ", "WMT", "MA", "PG", "XOM", "HD", "COST",
-  "NFLX", "AMD", "CRM", "DIS", "BAC", "ADBE", "INTC", "QCOM", "TXN",
-  "PYPL", "ASML", "ORCL", "CVX", "PEP", "KO", "ABBV", "MRK", "LLY",
-  "AVGO", "SNAP", "UBER", "PLTR", "SOFI", "ABNB", "SNDK", "SMCI",
-  "ARM", "RDDT", "RIVN", "CVNA", "HOOD", "AFRM", "NU", "SHOP",
-  "SNOW", "DDOG", "MDB", "ZS", "CRWD", "NET", "PANW",
-];
-
 // Static pages — last modification dates are approximate
 const STATIC_DATE = "2026-06-01";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: BASE_URL, lastModified: new Date(), changeFrequency: "daily", priority: 1.0 },
+    { url: `${BASE_URL}/stocks`, lastModified: new Date(), changeFrequency: "daily", priority: 0.8 },
     { url: `${BASE_URL}/about`, lastModified: STATIC_DATE, changeFrequency: "monthly", priority: 0.5 },
     { url: `${BASE_URL}/learn`, lastModified: STATIC_DATE, changeFrequency: "weekly", priority: 0.8 },
     { url: `${BASE_URL}/pricing`, lastModified: STATIC_DATE, changeFrequency: "weekly", priority: 0.6 },
@@ -54,8 +45,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.5,
   }));
 
-  // Dynamic: top stock pages
-  const stockRoutes = TOP_STOCKS.map((ticker) => ({
+  // Dynamic: every stock in the browsable directory (same source as /stocks —
+  // guarantees each sitemap URL has an incoming internal link, no orphans)
+  const stockRoutes = directoryTickers.map((ticker) => ({
     url: `${BASE_URL}/stock/${ticker}`,
     lastModified: new Date(),
     changeFrequency: "hourly" as const,
