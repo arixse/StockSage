@@ -57,6 +57,11 @@ export function Footer() {
             <h4 className="font-medium text-sm mb-3">Market</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
+                <Link href="/stocks" className="hover:text-foreground transition-colors">
+                  Browse Stocks
+                </Link>
+              </li>
+              <li>
                 <Link href="/heat" className="hover:text-foreground transition-colors">
                   Market Heatmap
                 </Link>

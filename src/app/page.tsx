@@ -7,25 +7,28 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { TrendingUp, TrendingDown, BarChart3, Sparkles, Mail, ArrowRight, Flame, GraduationCap } from "lucide-react";
 import { StockLogo } from "@/components/stock/StockLogo";
 import { getFreshQuotes } from "@/lib/stock-cache";
+import { buildOpenGraph, buildTwitter } from "@/lib/seo";
+
+const HOME_TITLE = "StockSage — Free AI Stock Market Analysis & Scoring";
+const HOME_DESCRIPTION =
+  "Free AI stock market analysis. Track Tesla, Nvidia, Apple, Amazon, and more. Daily AI summaries, 0-100 scores, market heatmaps, and buy/hold/sell signals.";
 
 export const metadata: Metadata = {
-  description:
-    "Free AI stock market analysis. Track Tesla, Nvidia, Apple, Amazon, and more. Daily AI summaries, 0-100 scores, market heatmaps, and buy/hold/sell signals.",
+  description: HOME_DESCRIPTION,
   alternates: {
     canonical: "/",
   },
-  openGraph: {
-    title: "StockSage — Free AI Stock Market Analysis & Scoring",
+  openGraph: buildOpenGraph({
+    title: HOME_TITLE,
     description:
       "Track Tesla, Nvidia, Apple, and more with AI US stock analysis. Daily AI summaries, smart scoring, and market heatmaps.",
-    url: "/",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "StockSage — Free AI Stock Market Analysis & Scoring",
+    path: "/",
+  }),
+  twitter: buildTwitter({
+    title: HOME_TITLE,
     description:
       "Track Tesla, Nvidia, Apple, and more with AI-powered US stock analysis. Daily AI summaries, smart scoring, and buy/hold/sell signals.",
-  },
+  }),
 };
 
 const FEATURES = [
