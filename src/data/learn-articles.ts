@@ -313,6 +313,80 @@ export const learnArticles: LearnArticle[] = [
       },
     ],
   },
+  {
+    slug: "technical-analysis-beginners-guide",
+    title: "Technical Analysis: A Beginner's Guide",
+    description: "Learn how to read stock charts, understand key indicators like RSI and MACD, and use technical analysis to time your entries and exits. No prior experience needed.",
+    readTime: "8 min",
+    icon: "CandlestickChart",
+    date: "2026-07-14",
+    lastUpdated: "2026-07-14",
+    tags: ["Beginner", "Technical Analysis", "Charts"],
+    sections: [
+      {
+        heading: "What is Technical Analysis?",
+        content: "Technical analysis is the study of price movements and trading volume to forecast future price direction. Unlike fundamental analysis, which examines a company's financials and business model, technical analysis focuses purely on what the market is doing — price action, trends, and patterns. The core belief: all known information is already reflected in the price.",
+        type: "text",
+      },
+      {
+        heading: "Price Tells a Story — Fundamental vs Technical",
+        content: "Fundamental analysis answers 'what to buy'; technical analysis answers 'when to buy it.' A company might have stellar financials, but entering at the wrong time can mean months of drawdown. Smart investors combine both: use fundamentals to find quality companies, use technicals to time their entry points.",
+        type: "callout",
+      },
+      {
+        heading: "The Building Blocks: Candlesticks",
+        content: "The most common way to visualize price is the candlestick chart. Each candle represents a time period (1 day, 1 hour, etc.) and shows four data points: open, high, low, and close. A green candle means the price closed higher than it opened (bullish); a red candle means it closed lower (bearish). The 'body' is the range between open and close, and the 'wicks' show the high and low.",
+        type: "text",
+      },
+      {
+        heading: "Support and Resistance",
+        content: "Support is a price level where buying pressure tends to overcome selling pressure, creating a 'floor' that prices bounce off. Resistance is the opposite — a 'ceiling' where selling overcomes buying. These levels form because investors remember past prices and act on them. Once resistance is broken, it often becomes new support — and vice versa.",
+        type: "text",
+      },
+      {
+        heading: "Moving Averages: The Trend's Compass",
+        content: "A moving average (MA) smooths out price data to reveal the underlying trend. The two most common are the 50-day MA (short-term trend) and the 200-day MA (long-term trend). When the 50-day crosses above the 200-day, it's called a 'Golden Cross' — a bullish signal. The opposite is a 'Death Cross' — a bearish signal. StockSage calculates these automatically for every stock you track.",
+        type: "callout",
+      },
+      {
+        heading: "RSI: Measuring Overbought and Oversold",
+        content: "The Relative Strength Index (RSI) oscillates between 0 and 100, measuring the speed and magnitude of recent price changes. RSI above 70 suggests a stock may be overbought (due for a pullback); below 30 suggests it may be oversold (due for a bounce). However, strong trends can keep RSI in overbought or oversold territory for extended periods — never trade on RSI alone.",
+        type: "text",
+      },
+      {
+        heading: "MACD: Momentum in Motion",
+        content: "The Moving Average Convergence Divergence (MACD) is a trend-following momentum indicator. It consists of the MACD line (difference between 12-day and 26-day EMAs), the signal line (9-day EMA of the MACD line), and the histogram (difference between the two). When the MACD line crosses above the signal line, it's a bullish signal. The histogram flipping from negative to positive (or vice versa) is often an early warning of a trend change.",
+        type: "text",
+      },
+      {
+        heading: "Volume: The Forgotten Indicator",
+        content: "Volume confirms price movements. A price rise on high volume is more significant than one on low volume — it shows conviction. Similarly, a breakdown on high volume is more concerning. The volume ratio (current volume ÷ 20-day average) helps spot unusual activity. A ratio above 1.5 often signals an event-driven move worth investigating.",
+        type: "text",
+      },
+      {
+        heading: "Putting It All Together",
+        content: "No single indicator is perfect. The best approach is confluence — when multiple signals point in the same direction. For example: price above the 50-day MA (uptrend) + RSI recovering from 35 (not overbought) + MACD histogram turning positive (momentum shifting) + rising volume (confirmation) = a high-probability setup.",
+        type: "list",
+        items: [
+          "Trend: Is price above or below key moving averages?",
+          "Momentum: What are RSI and MACD telling you?",
+          "Volume: Is the move being confirmed by participation?",
+          "Support/Resistance: Where is the next likely turning point?",
+          "Confluence: Do at least 2-3 indicators agree?",
+        ],
+      },
+      {
+        heading: "Common Beginner Mistakes",
+        content: "New technical traders often overtrade (every wiggle is not a signal), ignore the bigger picture (daily noise vs. weekly trends), and fall prey to indicator overload (10 indicators on a chart creates analysis paralysis). Start simple: price, volume, one trend indicator (MA), and one momentum indicator (RSI or MACD). Add complexity only when these become second nature.",
+        type: "callout",
+      },
+      {
+        heading: "How StockSage Helps",
+        content: "StockSage computes moving averages, RSI, MACD, volume ratios, and Bollinger Bands for every stock on your watchlist. The dashboard shows you at a glance whether each stock is bullish or bearish, overbought or oversold, and whether a Golden Cross or Death Cross is forming. Visit the Dashboard to see your stocks' technical health in one view.",
+        type: "text",
+      },
+    ],
+  },
 ];
 
 export function getLearnArticle(slug: string): LearnArticle | undefined {
