@@ -87,7 +87,7 @@ async function getYahooCrumb(): Promise<{ crumb: string; cookie: string } | null
 
   try {
     // Step 1: get cookie from Yahoo
-    const r1 = await fetch("https://fc.yahoo.com/", { headers, cache: "no-store" });
+    const r1 = await fetch("https://fc.yahoo.com/", { headers, next: { revalidate: 300 } });
     const setCookie = r1.headers.get("set-cookie") || "";
 
     // Try A3 cookie first, then A1 as fallback
@@ -108,7 +108,7 @@ async function getYahooCrumb(): Promise<{ crumb: string; cookie: string } | null
     const crumbHeaders = { ...headers, Cookie: cookie };
     const r2 = await fetch(`https://query1.finance.yahoo.com/v1/test/getcrumb`, {
       headers: crumbHeaders,
-      cache: "no-store",
+      next: { revalidate: 300 },
     });
     const crumb = (await r2.text()).trim();
 
@@ -117,7 +117,7 @@ async function getYahooCrumb(): Promise<{ crumb: string; cookie: string } | null
       log.warn("Yahoo", `crumb query1 failed (len=${crumb.length}), trying query2`);
       const r3 = await fetch(`https://query2.finance.yahoo.com/v1/test/getcrumb`, {
         headers: crumbHeaders,
-        cache: "no-store",
+        next: { revalidate: 300 },
       });
       const crumb2 = (await r3.text()).trim();
       if (!crumb2 || crumb2.length > 20) {
@@ -152,7 +152,7 @@ async function yahooFetch(path: string): Promise<any> {
       "Origin": "https://finance.yahoo.com",
       Cookie: auth.cookie,
     },
-    cache: "no-store",
+    next: { revalidate: 60 },
   });
   if (!res.ok) return null;
   return res.json();
@@ -266,7 +266,7 @@ async function twelveQuote(ticker: string): Promise<StockQuote | null> {
     const key = getTwelveDataKey();
     const res = await fetch(
       `${TWELVE_DATA_BASE}/quote?symbol=${ticker}&apikey=${key}`,
-      { cache: "no-store" }
+      { next: { revalidate: 60 } }
     );
     if (!res.ok) return null;
     const d = await res.json();
@@ -297,7 +297,7 @@ async function finnhubQuote(ticker: string): Promise<StockQuote | null> {
     const key = getFinnhubKey();
     const [quoteRes, profileRes] = await Promise.all([
       fetch(`${FINNHUB_BASE}/quote?symbol=${ticker}&token=${key}`, {
-        cache: "no-store",
+        next: { revalidate: 60 },
       }),
       fetch(`${FINNHUB_BASE}/stock/profile2?symbol=${ticker}&token=${key}`, {
         next: { revalidate: 86400 },
@@ -342,7 +342,7 @@ async function alphaQuote(ticker: string): Promise<StockQuote | null> {
   try {
     const res = await fetch(
       `${ALPHA_VANTAGE_BASE}?function=GLOBAL_QUOTE&symbol=${ticker}&apikey=${getAvKey()}`,
-      { cache: "no-store" }
+      { next: { revalidate: 300 } }
     );
     if (!res.ok) return null;
     const data = await res.json();
@@ -738,7 +738,7 @@ async function twelveOverview(ticker: string): Promise<CompanyOverview | null> {
     const key = getTwelveDataKey();
     const [statRes, profileRes] = await Promise.all([
       fetch(`${TWELVE_DATA_BASE}/statistics?symbol=${ticker}&apikey=${key}`, { next: { revalidate: 86400 } }),
-      fetch(`${TWELVE_DATA_BASE}/quote?symbol=${ticker}&apikey=${key}`, { cache: "no-store" }),
+      fetch(`${TWELVE_DATA_BASE}/quote?symbol=${ticker}&apikey=${key}`, { next: { revalidate: 60 } }),
     ]);
     if (!statRes.ok) return null;
     const s = await statRes.json();

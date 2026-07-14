@@ -12,6 +12,9 @@ import { buildOpenGraph, buildTwitter } from "@/lib/seo";
 const HOME_TITLE = "StockSage — Free AI Stock Market Analysis & Scoring";
 const HOME_DESCRIPTION =
   "Free AI stock market analysis. Track Tesla, Nvidia, Apple, Amazon, and more. Daily AI summaries, 0-100 scores, market heatmaps, and buy/hold/sell signals.";
+// ISR: regenerate at most once per 30s — ensures stock prices are never more
+// than ~30s stale while delivering cached-fast responses for the homepage.
+export const revalidate = 30;
 
 export const metadata: Metadata = {
   description: HOME_DESCRIPTION,

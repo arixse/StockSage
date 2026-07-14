@@ -11,8 +11,9 @@ import { getFreshQuotes } from "@/lib/stock-cache";
 import { buildOpenGraph, buildTwitter, ogImage } from "@/lib/seo";
 import { relatedStocks } from "@/data/stock-directory";
 
-// Stock prices change constantly — never cache this page
-export const dynamic = "force-dynamic";
+// ISR: regenerate at most once per 60s — stock prices are fast-moving but 60s
+// staleness is acceptable for a public page crawled by search engines.
+export const revalidate = 60;
 
 interface Props {
   params: Promise<{ ticker: string }>;
