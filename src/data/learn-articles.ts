@@ -315,17 +315,17 @@ export const learnArticles: LearnArticle[] = [
   },
   {
     slug: "technical-analysis-beginners-guide",
-    title: "Technical Analysis: A Beginner's Guide",
-    description: "Learn how to read stock charts, understand key indicators like RSI and MACD, and use technical analysis to time your entries and exits. No prior experience needed.",
+    title: "How to Read Stock Charts: Technical Analysis for Beginners",
+    description: "Learn how to read stock charts and master stock market basics including RSI, MACD, and moving averages. Discover how to pick the best stocks using technical analysis — a complete guide for beginner investors who want to time their entries and exits with confidence.",
     readTime: "8 min",
     icon: "CandlestickChart",
     date: "2026-07-14",
     lastUpdated: "2026-07-14",
-    tags: ["Beginner", "Technical Analysis", "Charts"],
+    tags: ["Beginner", "Technical Analysis", "Charts", "How to Read Stock Charts", "Stock Market Basics", "How to Invest in Stocks"],
     sections: [
       {
         heading: "What is Technical Analysis?",
-        content: "Technical analysis is the study of price movements and trading volume to forecast future price direction. Unlike fundamental analysis, which examines a company's financials and business model, technical analysis focuses purely on what the market is doing — price action, trends, and patterns. The core belief: all known information is already reflected in the price.",
+        content: "If you're learning how to invest in stocks, understanding stock market basics starts with two approaches: fundamental analysis and technical analysis. Technical analysis is the study of price movements and trading volume to forecast future price direction. Unlike fundamental analysis, which examines a company's financials and business model, technical analysis focuses purely on what the market is doing — price action, trends, and patterns. The core belief: all known information is already reflected in the price.",
         type: "text",
       },
       {
@@ -344,8 +344,8 @@ export const learnArticles: LearnArticle[] = [
         type: "text",
       },
       {
-        heading: "Moving Averages: The Trend's Compass",
-        content: "A moving average (MA) smooths out price data to reveal the underlying trend. The two most common are the 50-day MA (short-term trend) and the 200-day MA (long-term trend). When the 50-day crosses above the 200-day, it's called a 'Golden Cross' — a bullish signal. The opposite is a 'Death Cross' — a bearish signal. StockSage calculates these automatically for every stock you track.",
+        heading: "Moving Average Explained: The Trend's Compass",
+        content: "A moving average (MA) smooths out price data to reveal the underlying trend — it's one of the most important stock market basics every investor should know. The two most common are the 50-day MA (short-term trend) and the 200-day MA (long-term trend). When the 50-day crosses above the 200-day, it's called a 'Golden Cross' — a bullish signal. The opposite is a 'Death Cross' — a bearish signal. Learning to read these crossovers is essential for anyone who wants to know how to pick the best stocks with good timing.",
         type: "callout",
       },
       {
@@ -381,8 +381,8 @@ export const learnArticles: LearnArticle[] = [
         type: "callout",
       },
       {
-        heading: "How StockSage Helps",
-        content: "StockSage computes moving averages, RSI, MACD, volume ratios, and Bollinger Bands for every stock on your watchlist. The dashboard shows you at a glance whether each stock is bullish or bearish, overbought or oversold, and whether a Golden Cross or Death Cross is forming. Visit the Dashboard to see your stocks' technical health in one view.",
+        heading: "StockSage: Your Technical Analysis Toolkit",
+        content: "If you want to learn how to invest in the stock market for beginners without memorizing every formula, StockSage does the heavy lifting. It computes moving averages, RSI, MACD, volume ratios, and Bollinger Bands for every stock on your watchlist. The dashboard shows at a glance whether each stock is bullish or bearish, overbought or oversold, and whether a Golden Cross or Death Cross is forming — helping you understand how to read stock charts and how to pick the best stocks backed by data, not hype.",
         type: "text",
       },
     ],
