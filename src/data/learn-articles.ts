@@ -387,6 +387,75 @@ export const learnArticles: LearnArticle[] = [
       },
     ],
   },
+  {
+    slug: "dividend-investing-passive-income",
+    title: "Dividend Investing: How to Build Passive Income with Stocks",
+    description: "Learn how to invest in dividend stocks and build passive income — from dividend yield explained to how much you need invested to make $1,000 per month. Covers dividend aristocrats, best dividend ETFs, DRIP investing, and tax tips for beginners.",
+    readTime: "8 min",
+    icon: "Banknote",
+    date: "2026-07-15",
+    lastUpdated: "2026-07-15",
+    tags: ["Beginner", "Dividend Investing", "Passive Income", "Dividend Stocks", "How to Invest in Dividend Stocks"],
+    sections: [
+      {
+        heading: "What is Dividend Investing?",
+        content: "Dividend investing is a strategy focused on buying stocks that pay regular cash distributions to shareholders — essentially getting paid just for owning shares. For beginners wondering how to invest in dividend stocks, think of it as being a part-owner of a profitable business that shares its earnings with you every quarter. It's one of the most popular ways to build passive income without selling your holdings.",
+        type: "text",
+      },
+      {
+        heading: "Dividend Yield Explained: The Key Metric",
+        content: "The dividend yield is the annual dividend per share divided by the stock price, expressed as a percentage. A $100 stock paying $4 per year has a 4% yield. But here's the catch: an unusually high yield (above 6-8%) can be a red flag — the stock price may have fallen because the business is struggling, and the dividend might be cut. A sustainable 2-5% yield from a growing company beats an unsustainable 10% yield from a company in decline.",
+        type: "callout",
+      },
+      {
+        heading: "How Much Do I Need to Invest to Make $1,000 Per Month?",
+        content: "This is one of the most searched investing questions — and the math is straightforward. At a 3% dividend yield, you'd need about $400,000 invested. At 4%, it drops to $300,000. At 5%, about $240,000. The exact number depends on the yield, but the real insight is this: passive income through dividends is a marathon, not a sprint. Start early, reinvest dividends, and let compounding do the heavy lifting over decades.",
+        type: "text",
+      },
+      {
+        heading: "Dividend Aristocrats and Kings",
+        content: "Not all dividend stocks are created equal. Dividend Aristocrats are S&P 500 companies that have increased their dividend every year for at least 25 consecutive years — names like Coca-Cola, Johnson & Johnson, and Procter & Gamble. Dividend Kings go further: 50+ years of annual increases. These companies have survived recessions, wars, and market crashes while still growing their payouts — making them the gold standard for dividend investors seeking reliable passive income.",
+        type: "text",
+      },
+      {
+        heading: "DRIP: The Secret Weapon of Dividend Investors",
+        content: "DRIP stands for Dividend ReInvestment Plan. Instead of taking dividends as cash, a DRIP automatically uses them to buy more shares. Over time, this creates a compounding snowball: you own more shares, which pay more dividends, which buy more shares. A $10,000 investment in dividend stocks with a 4% yield, reinvested over 30 years, can grow to over $32,000 — without adding a single extra dollar. That's the power of DRIP investing.",
+        type: "callout",
+      },
+      {
+        heading: "Best Dividend ETFs for Beginners",
+        content: "If picking individual dividend stocks feels overwhelming, dividend ETFs offer instant diversification. Here are some of the most popular dividend ETFs to consider.",
+        type: "list",
+        items: [
+          "VYM (Vanguard High Dividend Yield ETF) — broad market, low 0.06% expense ratio",
+          "SCHD (Schwab U.S. Dividend Equity ETF) — focuses on quality, sustainable dividends",
+          "VIG (Vanguard Dividend Appreciation ETF) — companies with 10+ years of dividend growth",
+          "DGRO (iShares Core Dividend Growth ETF) — dividend growth at a low cost",
+          "SPHD (Invesco S&P 500 High Dividend Low Volatility ETF) — monthly payouts",
+        ],
+      },
+      {
+        heading: "Individual Dividend Stocks vs Dividend ETFs",
+        content: "Individual stocks let you target higher yields and cherry-pick your favorite companies, but they concentrate risk — if one company cuts its dividend, your income drops. ETFs spread risk across dozens or hundreds of companies. For most investors, the best approach is a core position in a dividend ETF, supplemented by a handful of individual stocks you've researched thoroughly.",
+        type: "text",
+      },
+      {
+        heading: "Tax-Smart Dividend Investing",
+        content: "Not all dividends are taxed equally. Qualified dividends (from most U.S. companies held for 60+ days) are taxed at the lower long-term capital gains rate — 0%, 15%, or 20% depending on your income. Ordinary dividends (from REITs, BDCs, and some foreign companies) are taxed as regular income. For maximum tax efficiency, hold dividend-paying stocks in tax-advantaged accounts like IRAs and 401(k)s where dividends grow tax-free or tax-deferred.",
+        type: "text",
+      },
+      {
+        heading: "Common Dividend Investing Mistakes",
+        content: "New dividend investors often fall into these traps: chasing the highest yield without checking if the dividend is sustainable, ignoring payout ratios (above 80% is a warning sign), forgetting to diversify across sectors (don't put everything in utilities and REITs), and overlooking dividend growth — a 2% yield growing 15% per year will overtake a static 5% yield faster than you'd expect.",
+        type: "callout",
+      },
+      {
+        heading: "Getting Started with Dividend Investing",
+        content: "You don't need a fortune to start building passive income with dividend stocks. Open a brokerage account, start with a low-cost dividend ETF like SCHD or VYM, and enable DRIP so every dividend buys more shares. Add money consistently each month — even $100 adds up. Track your passive income over time and watch the snowball grow. The best time to start was 20 years ago. The second best time is today.",
+        type: "text",
+      },
+    ],
+  },
 ];
 
 export function getLearnArticle(slug: string): LearnArticle | undefined {
