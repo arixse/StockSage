@@ -456,6 +456,81 @@ export const learnArticles: LearnArticle[] = [
       },
     ],
   },
+  {
+    slug: "sector-rotation-strategy",
+    title: "Sector Rotation Strategy: How to Navigate the Great Rotation of 2026",
+    description: "Money is rotating out of AI and tech stocks into financials, banks, and undervalued sectors. Learn what sector rotation is, why the Great Rotation is happening now, and how to position your portfolio for the IPO boom, higher-for-longer interest rates, and shifting market leadership.",
+    readTime: "9 min",
+    icon: "RefreshCw",
+    date: "2026-07-17",
+    lastUpdated: "2026-07-17",
+    tags: ["Intermediate", "Sector Rotation", "Market Strategy", "Financial Stocks", "AI Bubble"],
+    sections: [
+      {
+        heading: "What Is Sector Rotation?",
+        content: "Sector rotation is the movement of capital from one industry group to another as the economic cycle evolves. Different sectors perform differently depending on where we are in the cycle — early expansion favors cyclicals and tech, while late-cycle environments often benefit financials, energy, and defensive names. Smart investors don't just pick good stocks; they pay attention to which sectors the smart money is rotating into.",
+        type: "text",
+      },
+      {
+        heading: "The Great Rotation of 2026: What's Happening Right Now",
+        content: "Since June 2026, we've witnessed one of the most significant sector rotations in recent memory. The Financial Select Sector SPDR ETF (XLF) has surged more than 8%, while the Roundhill Magnificent Seven ETF (MAGS), tracking mega-cap tech, has fallen nearly 4%. Bank stocks like JPMorgan Chase, Bank of America, Goldman Sachs, and Morgan Stanley are hitting new highs, while AI darlings that dominated the first half of 2026 are cooling off. This isn't just a blip — it's a structural shift in market leadership driven by fundamental changes in the economic landscape.",
+        type: "callout",
+      },
+      {
+        heading: "Why Is Money Rotating Out of Tech?",
+        content: "Three forces are driving capital away from AI and tech names. First, AI fatigue — enormous capex approaching 1.5% of U.S. GDP lacks a clear path to returns, and 45% of fund managers now name 'AI bubble' as the biggest tail risk. Second, valuations — after a blistering rally, many tech stocks trade at stretched multiples that leave little room for error. Third, the higher-for-longer interest rate environment (Fed Funds Rate around 3.5%) makes future earnings worth less today, disproportionately hurting high-growth tech names whose profits lie far in the future.",
+        type: "text",
+      },
+      {
+        heading: "Why Financial Stocks Are Winning",
+        content: "Financial stocks are the primary beneficiaries of this rotation for several converging reasons. Higher interest rates widen banks' net interest margins — Bank of America reported net interest income up 9% year-over-year. Meanwhile, a record-breaking IPO market (global IPO proceeds up over 200% in H1 2026, headlined by SpaceX's historic public debut) is generating billions in investment banking fees. Combined equity and debt trading revenue at the top four U.S. banks hit $38 billion last quarter, up over a third from a year ago. And remarkably, despite the rally, the sector remains relatively cheap — JPMorgan trades at ~15x forward earnings, Bank of America at ~13x.",
+        type: "callout",
+      },
+      {
+        heading: "The IPO Boom: A Tailwind for Financials",
+        content: "The 2026 IPO market is the hottest in years, and it's not just SpaceX. The pipeline includes anticipated public debuts from OpenAI, Anthropic, Databricks, Canva, and Shein — household names that could each raise tens of billions. Investment banks earn substantial fees from underwriting these offerings, creating a direct revenue tailwind for the financial sector that could persist well into 2027.",
+        type: "text",
+      },
+      {
+        heading: "The AI Bubble Debate: Is Tech Down for the Count?",
+        content: "Despite the rotation, the AI story isn't over. The Bank of America July Global Fund Manager Survey revealed a split: while 45% of managers call AI a bubble, 48% say it's not, and 61% don't expect hyperscalers to cut AI spending in 2026. Long semiconductors remains the most crowded trade for the third straight month. The takeaway? This is a rotation, not a crash. Quality tech names with real earnings will likely stabilize and recover — but the days of everything AI-related going up indiscriminately may be behind us.",
+        type: "text",
+      },
+      {
+        heading: "Sentiment Check: Too Bullish?",
+        content: "The BofA Bull & Bear Indicator has reached 9.4 — described as 'extremely bullish.' Cash allocations among fund managers fell to an uber-low 3.6%, triggering a contrarian sell signal. A record 54% of managers expect a 'no landing' economic scenario. When everyone is this bullish, it pays to be cautious. The New York Fed estimates only a 16% recession probability, but extreme sentiment readings often precede corrections.",
+        type: "callout",
+      },
+      {
+        heading: "How to Position Your Portfolio for the Rotation",
+        content: "Navigating sector rotation requires balance — you want exposure to the winning sectors without abandoning long-term positions in quality tech. Here's a practical framework.",
+        type: "list",
+        items: [
+          "Add financial sector exposure: Consider XLF (broad financials ETF) or individual bank stocks like JPMorgan and Goldman Sachs — still reasonably valued despite the rally",
+          "Trim, don't abandon, tech winners: Reduce positions in overbought AI names with no earnings, but hold quality tech with real cash flows",
+          "Watch the IPO calendar: Upcoming IPOs from OpenAI and Databricks could reignite tech enthusiasm — be ready to rotate back",
+          "Monitor the Fed: If rate cut expectations rise, growth stocks could catch a bid. The July FOMC meeting is a key catalyst",
+          "Check correlations: Financials are surging partly because of AI-driven trading and IPO activity — they're not a perfect hedge against a tech downturn",
+          "Keep cash ready: With sentiment at extreme bullish levels, a 5-10% correction would create buying opportunities in both sectors",
+        ],
+      },
+      {
+        heading: "The Hidden Risk: Banks Are an AI Bet Too",
+        content: "Here's the paradox most investors miss: the financial sector's current surge is itself a byproduct of the AI boom. Record trading revenues come from AI-driven market volatility. Record IPO fees come from AI companies going public. If the AI trade truly unwinds, bank earnings would suffer too. The rotation offers less diversification than it appears on the surface — financials and tech are more correlated today than in previous cycles.",
+        type: "callout",
+      },
+      {
+        heading: "Key Indicators to Watch",
+        content: "Sector rotations can last months or years. To gauge whether this one has legs, track these signals: the 10-year Treasury yield (rising yields favor financials), the IPO pipeline (more deals = more bank revenue), quarterly bank earnings reports (JPM, BAC, GS, MS), and the relative strength of XLF vs QQQ. A sustained trend of XLF outperforming the Nasdaq is the clearest confirmation that the rotation has further to run.",
+        type: "text",
+      },
+      {
+        heading: "The Bottom Line",
+        content: "The Great Rotation of 2026 is a reminder that market leadership never stays static. The AI trade that dominated the first half of the year is giving way to financials, value stocks, and IPO-driven themes. Rather than chasing every shift, build a portfolio that can withstand rotation: own both growth and value, tech and financials, and keep enough dry powder to capitalize when sentiment inevitably swings too far in either direction. The best investors don't predict rotations — they prepare for them.",
+        type: "text",
+      },
+    ],
+  },
 ];
 
 export function getLearnArticle(slug: string): LearnArticle | undefined {

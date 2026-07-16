@@ -186,3 +186,6 @@ src/
 6. Newsletter 页面的 `price_alerts` 开关只是 UI，后端无实际 alert 逻辑
 7. 影响网站核心功能的重要决策需要征得开发者同意才能执行，不要擅自决定
 8. Cron使用github action,不要用vercel cron
+
+## 自我进化
+在遇到问题后总结经验教训并写会这个项目的CLAUDE.md
