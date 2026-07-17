@@ -116,7 +116,7 @@ export async function POST() {
 
   if (!allocation) {
     return NextResponse.json(
-      { data: { hasAllocation: false, message: "Failed to generate allocation. Try again later." } },
+      { data: { hasAllocation: false, message: "AI returned invalid allocation data. Check server logs." } },
       { status: 502 }
     );
   }

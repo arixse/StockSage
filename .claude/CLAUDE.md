@@ -188,4 +188,4 @@ src/
 8. Cron使用github action,不要用vercel cron
 
 ## 自我进化
-在遇到问题后总结经验教训并写会这个项目的CLAUDE.md
+在遇到问题后总结经验教训并写回这个项目的CLAUDE.md

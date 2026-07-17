@@ -358,7 +358,14 @@ riskLevel must be one of: "conservative", "moderate", "aggressive"`;
     return null;
   }
 
-  const rawAllocations = Array.isArray(result.allocations) ? result.allocations : [];
+  const rawAllocations = Array.isArray(result.allocations) ? result.allocations
+    : Array.isArray(result.allocation) ? result.allocation
+    : typeof result.allocations === "object" && result.allocations !== null
+      ? Object.entries(result.allocations as Record<string, unknown>).map(([k, v]) => {
+          if (typeof v === "object" && v !== null) return { ticker: k, ...(v as object) };
+          return { ticker: k, percentage: v };
+        })
+      : [];
   const allocations: AllocationItem[] = [];
 
   for (const item of rawAllocations) {
@@ -366,7 +373,7 @@ riskLevel must be one of: "conservative", "moderate", "aggressive"`;
     const stock = stocks.find((s) => s.ticker === ticker);
     if (!ticker || !stock) continue;
 
-    const rawPct = item.percentage ?? item.percent ?? item.allocation;
+    const rawPct = item.percentage ?? item.percent ?? item.weight ?? item.allocation;
     let percentage = typeof rawPct === "number" ? Math.round(rawPct)
       : typeof rawPct === "string" ? Math.round(parseFloat(rawPct))
       : 0;
@@ -437,7 +444,9 @@ riskLevel must be one of: "conservative", "moderate", "aggressive"`;
 
   // Validate: need at least 1 meaningful allocation
   if (allocations.length === 0) {
-    console.error("[ai] generateAllocation returned no valid allocations:", JSON.stringify(result).slice(0, 400));
+    const snippet = JSON.stringify(result).slice(0, 500);
+    console.error("[ai] generateAllocation no valid allocations. Raw LLM:", snippet);
+    // Include a hint in the return so the API can show it
     return null;
   }
 
