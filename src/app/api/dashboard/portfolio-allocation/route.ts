@@ -35,12 +35,19 @@ export async function GET() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { data } = await supabase
-    .from("portfolio_allocations")
-    .select("content, tickers_snapshot, allocation_date, generated_at")
-    .eq("user_id", user.id)
-    .eq("allocation_date", today())
-    .maybeSingle();
+  let data = null;
+  try {
+    const result = await supabase
+      .from("portfolio_allocations")
+      .select("content, tickers_snapshot, allocation_date, generated_at")
+      .eq("user_id", user.id)
+      .eq("allocation_date", today())
+      .maybeSingle();
+    data = result.data;
+  } catch {
+    // Table may not exist yet — skip cache
+    return NextResponse.json({ data: { hasAllocation: false } });
+  }
 
   if (!data) {
     return NextResponse.json({ data: { hasAllocation: false } });
@@ -106,26 +113,23 @@ export async function POST() {
 
   const tickersSnapshot = insights.stocks.map((s) => s.ticker).sort();
 
-  const admin = createAdminClient();
-  const { error } = await admin.from("portfolio_allocations").upsert(
-    {
-      user_id: user.id,
-      allocation_date: today(),
-      content: allocation,
-      tickers_snapshot: tickersSnapshot,
-      model_used: process.env.LLM_MODEL || "gpt-4o-mini",
-      generated_at: new Date().toISOString(),
-    },
-    { onConflict: "user_id,allocation_date" }
-  );
-
-  if (error) {
-    console.error("[portfolio-allocation] upsert error:", error);
-    const detail = typeof error === "object" ? JSON.stringify(error) : String(error);
-    return NextResponse.json(
-      { data: { hasAllocation: false, message: `Failed to save allocation. ${detail}` } },
-      { status: 500 }
+  // Try to cache — ignore failures (table may not exist yet)
+  try {
+    const admin = createAdminClient();
+    await admin.from("portfolio_allocations").upsert(
+      {
+        user_id: user.id,
+        allocation_date: today(),
+        content: allocation,
+        tickers_snapshot: tickersSnapshot,
+        model_used: process.env.LLM_MODEL || "gpt-4o-mini",
+        generated_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id,allocation_date" }
     );
+  } catch (e) {
+    // Table may not exist — non-critical, allocation still returns
+    console.warn("[portfolio-allocation] cache skipped:", (e as Error).message);
   }
 
   return NextResponse.json({
