@@ -456,6 +456,172 @@ export const learnArticles: LearnArticle[] = [
       },
     ],
   },
+  {
+    slug: "sector-rotation-strategy",
+    title: "Sector Rotation Strategy: How to Navigate the Great Rotation of 2026",
+    description: "Money is rotating out of AI and tech stocks into financials, banks, and undervalued sectors. Learn what sector rotation is, why the Great Rotation is happening now, and how to position your portfolio for the IPO boom, higher-for-longer interest rates, and shifting market leadership.",
+    readTime: "9 min",
+    icon: "RefreshCw",
+    date: "2026-07-17",
+    lastUpdated: "2026-07-17",
+    tags: ["Intermediate", "Sector Rotation", "Market Strategy", "Financial Stocks", "AI Bubble"],
+    sections: [
+      {
+        heading: "What Is Sector Rotation?",
+        content: "Sector rotation is the movement of capital from one industry group to another as the economic cycle evolves. Different sectors perform differently depending on where we are in the cycle — early expansion favors cyclicals and tech, while late-cycle environments often benefit financials, energy, and defensive names. Smart investors don't just pick good stocks; they pay attention to which sectors the smart money is rotating into.",
+        type: "text",
+      },
+      {
+        heading: "The Great Rotation of 2026: What's Happening Right Now",
+        content: "Since June 2026, we've witnessed one of the most significant sector rotations in recent memory. The Financial Select Sector SPDR ETF (XLF) has surged more than 8%, while the Roundhill Magnificent Seven ETF (MAGS), tracking mega-cap tech, has fallen nearly 4%. Bank stocks like JPMorgan Chase, Bank of America, Goldman Sachs, and Morgan Stanley are hitting new highs, while AI darlings that dominated the first half of 2026 are cooling off. This isn't just a blip — it's a structural shift in market leadership driven by fundamental changes in the economic landscape.",
+        type: "callout",
+      },
+      {
+        heading: "Why Is Money Rotating Out of Tech?",
+        content: "Three forces are driving capital away from AI and tech names. First, AI fatigue — enormous capex approaching 1.5% of U.S. GDP lacks a clear path to returns, and 45% of fund managers now name 'AI bubble' as the biggest tail risk. Second, valuations — after a blistering rally, many tech stocks trade at stretched multiples that leave little room for error. Third, the higher-for-longer interest rate environment (Fed Funds Rate around 3.5%) makes future earnings worth less today, disproportionately hurting high-growth tech names whose profits lie far in the future.",
+        type: "text",
+      },
+      {
+        heading: "Why Financial Stocks Are Winning",
+        content: "Financial stocks are the primary beneficiaries of this rotation for several converging reasons. Higher interest rates widen banks' net interest margins — Bank of America reported net interest income up 9% year-over-year. Meanwhile, a record-breaking IPO market (global IPO proceeds up over 200% in H1 2026, headlined by SpaceX's historic public debut) is generating billions in investment banking fees. Combined equity and debt trading revenue at the top four U.S. banks hit $38 billion last quarter, up over a third from a year ago. And remarkably, despite the rally, the sector remains relatively cheap — JPMorgan trades at ~15x forward earnings, Bank of America at ~13x.",
+        type: "callout",
+      },
+      {
+        heading: "The IPO Boom: A Tailwind for Financials",
+        content: "The 2026 IPO market is the hottest in years, and it's not just SpaceX. The pipeline includes anticipated public debuts from OpenAI, Anthropic, Databricks, Canva, and Shein — household names that could each raise tens of billions. Investment banks earn substantial fees from underwriting these offerings, creating a direct revenue tailwind for the financial sector that could persist well into 2027.",
+        type: "text",
+      },
+      {
+        heading: "The AI Bubble Debate: Is Tech Down for the Count?",
+        content: "Despite the rotation, the AI story isn't over. The Bank of America July Global Fund Manager Survey revealed a split: while 45% of managers call AI a bubble, 48% say it's not, and 61% don't expect hyperscalers to cut AI spending in 2026. Long semiconductors remains the most crowded trade for the third straight month. The takeaway? This is a rotation, not a crash. Quality tech names with real earnings will likely stabilize and recover — but the days of everything AI-related going up indiscriminately may be behind us.",
+        type: "text",
+      },
+      {
+        heading: "Sentiment Check: Too Bullish?",
+        content: "The BofA Bull & Bear Indicator has reached 9.4 — described as 'extremely bullish.' Cash allocations among fund managers fell to an uber-low 3.6%, triggering a contrarian sell signal. A record 54% of managers expect a 'no landing' economic scenario. When everyone is this bullish, it pays to be cautious. The New York Fed estimates only a 16% recession probability, but extreme sentiment readings often precede corrections.",
+        type: "callout",
+      },
+      {
+        heading: "How to Position Your Portfolio for the Rotation",
+        content: "Navigating sector rotation requires balance — you want exposure to the winning sectors without abandoning long-term positions in quality tech. Here's a practical framework.",
+        type: "list",
+        items: [
+          "Add financial sector exposure: Consider XLF (broad financials ETF) or individual bank stocks like JPMorgan and Goldman Sachs — still reasonably valued despite the rally",
+          "Trim, don't abandon, tech winners: Reduce positions in overbought AI names with no earnings, but hold quality tech with real cash flows",
+          "Watch the IPO calendar: Upcoming IPOs from OpenAI and Databricks could reignite tech enthusiasm — be ready to rotate back",
+          "Monitor the Fed: If rate cut expectations rise, growth stocks could catch a bid. The July FOMC meeting is a key catalyst",
+          "Check correlations: Financials are surging partly because of AI-driven trading and IPO activity — they're not a perfect hedge against a tech downturn",
+          "Keep cash ready: With sentiment at extreme bullish levels, a 5-10% correction would create buying opportunities in both sectors",
+        ],
+      },
+      {
+        heading: "The Hidden Risk: Banks Are an AI Bet Too",
+        content: "Here's the paradox most investors miss: the financial sector's current surge is itself a byproduct of the AI boom. Record trading revenues come from AI-driven market volatility. Record IPO fees come from AI companies going public. If the AI trade truly unwinds, bank earnings would suffer too. The rotation offers less diversification than it appears on the surface — financials and tech are more correlated today than in previous cycles.",
+        type: "callout",
+      },
+      {
+        heading: "Key Indicators to Watch",
+        content: "Sector rotations can last months or years. To gauge whether this one has legs, track these signals: the 10-year Treasury yield (rising yields favor financials), the IPO pipeline (more deals = more bank revenue), quarterly bank earnings reports (JPM, BAC, GS, MS), and the relative strength of XLF vs QQQ. A sustained trend of XLF outperforming the Nasdaq is the clearest confirmation that the rotation has further to run.",
+        type: "text",
+      },
+      {
+        heading: "The Bottom Line",
+        content: "The Great Rotation of 2026 is a reminder that market leadership never stays static. The AI trade that dominated the first half of the year is giving way to financials, value stocks, and IPO-driven themes. Rather than chasing every shift, build a portfolio that can withstand rotation: own both growth and value, tech and financials, and keep enough dry powder to capitalize when sentiment inevitably swings too far in either direction. The best investors don't predict rotations — they prepare for them.",
+        type: "text",
+      },
+    ],
+  },
+  {
+    slug: "how-to-invest-in-semiconductor-stocks",
+    title: "How to Invest in Semiconductor Stocks: Understanding the AI Chip Cycle",
+    description: "Semiconductor stocks like TSMC, NVIDIA, and AMD have become the most watched names in the market — but they're also the most volatile. Learn how the AI chip cycle works, why semiconductor stocks sell off on good news, which chip ETFs to consider, and how to invest in the semiconductor industry without getting burned by the boom-bust cycle.",
+    readTime: "10 min",
+    icon: "Cpu",
+    date: "2026-07-17",
+    lastUpdated: "2026-07-17",
+    tags: ["Intermediate", "Semiconductor Stocks", "AI Investing", "Chip Stocks", "How to Invest"],
+    sections: [
+      {
+        heading: "Why Semiconductor Stocks Dominate Headlines in 2026",
+        content: "Semiconductor stocks have become the most important group in the global stock market. The MSCI ACWI Semiconductor Index returned over 110% in the past year, driven by insatiable demand for AI chips. The four biggest US AI operators are expected to spend over $725 billion on infrastructure this year alone — and nearly all of it flows through chipmakers. But with great returns comes great volatility: on July 16, 2026, the Philadelphia Semiconductor Index (SOX) dropped 4.3% in a single day, with memory chip stocks falling as much as 12.6%. If you want to invest in chip stocks, understanding the cycle is essential.",
+        type: "text",
+      },
+      {
+        heading: "The AI Chip Landscape: Who Does What",
+        content: "The semiconductor industry isn't a monolith — it's a complex supply chain where different companies dominate different niches. Knowing who does what is the first step to investing intelligently in the sector.",
+        type: "list",
+        items: [
+          "GPU / AI Accelerators: NVIDIA (market leader), AMD — design the chips that train and run AI models",
+          "Foundry / Manufacturing: TSMC (Taiwan Semiconductor) — manufactures chips designed by NVIDIA, AMD, Apple, and nearly everyone else. TSMC controls over 60% of the global foundry market",
+          "Memory / HBM: Samsung, SK Hynix, Micron — produce High Bandwidth Memory (HBM), the ultra-fast memory essential for AI training. HBM demand is expected to grow 3x in 2026",
+          "Chip Design Tools (EDA): Cadence, Synopsys — the 'pick and shovel' play; every chip designer needs their software",
+          "Manufacturing Equipment: ASML (lithography machines), Applied Materials, Lam Research — ASML is the only company in the world that makes extreme ultraviolet (EUV) lithography machines, without which advanced chips can't be made",
+        ],
+      },
+      {
+        heading: "Why Do Chip Stocks Sell Off on Good News?",
+        content: "On July 16, 2026, TSMC reported a 77% jump in quarterly profit and raised its full-year revenue growth guidance to 40% — and the stock still fell. This 'sell the news' phenomenon is one of the most confusing aspects of semiconductor investing. It happens because: (1) the market prices in expectations months in advance — great results are already reflected in the stock price; (2) rising capex (TSMC boosted spending to $64 billion) raises concerns about overbuilding; (3) investors worry that the AI spending cycle may be peaking. Understanding this dynamic is critical: in semiconductors, you buy the rumor and sell the news.",
+        type: "callout",
+      },
+      {
+        heading: "The Semiconductor Boom-Bust Cycle",
+        content: "Semiconductors are historically one of the most cyclical industries. Periods of chip shortages lead to over-ordering and inventory buildup, which leads to gluts and price crashes, which leads to under-investment, which starts the cycle all over again. The current AI-driven boom is different in scale — AI capex is unlike anything the industry has seen — but the cyclical DNA remains. Memory chips (DRAM, NAND) are especially volatile. The key question for 2026: is AI demand structural enough to smooth out the traditional cycle, or are we building toward a painful correction?",
+        type: "text",
+      },
+      {
+        heading: "Key Metrics for Evaluating Semiconductor Stocks",
+        content: "Chip stocks require different metrics than traditional value stocks. Here's what to watch: Capital expenditure (capex) as a percentage of revenue — rising capex means confidence in future demand, but too much can signal overbuilding. Gross margin trend — a declining margin suggests pricing pressure or rising costs. Book-to-bill ratio — orders received vs. orders shipped; above 1.0 means demand is growing. Inventory days — rising inventory can signal an impending glut. And for memory stocks specifically, track DRAM and NAND spot prices — they're the canary in the coal mine.",
+        type: "list",
+        items: [
+          "Capex / Revenue ratio: Under 30% is healthy; above 40% warrants caution",
+          "Gross margin trend: Expanding margins = pricing power; contracting = trouble ahead",
+          "Book-to-bill ratio: Above 1.0 = demand exceeds supply (bullish)",
+          "Inventory days: Rising faster than revenue growth = potential glut",
+          "DRAM / NAND spot prices: Falling prices = memory cycle turning down",
+        ],
+      },
+      {
+        heading: "Semiconductor ETFs: The Easiest Way to Invest",
+        content: "If analyzing individual chip stocks feels overwhelming, semiconductor ETFs offer diversified exposure. The most popular options give you different slices of the industry without requiring you to pick winners.",
+        type: "list",
+        items: [
+          "SMH (VanEck Semiconductor ETF) — the most popular chip ETF; heavy weight on NVIDIA and TSMC; 0.35% expense ratio",
+          "SOXX (iShares Semiconductor ETF) — broader exposure including equipment makers like ASML and Applied Materials; 0.35% expense ratio",
+          "FTXL (First Trust Nasdaq Semiconductor ETF) — factor-based, tilts toward value-oriented semiconductor names; 0.60% expense ratio",
+          "PSI (Invesco Dynamic Semiconductors ETF) — uses momentum and valuation screens to select and weight holdings",
+          "USD (ProShares Ultra Semiconductors) — leveraged 2x ETF; ONLY for experienced traders; magnifies both gains AND losses",
+        ],
+      },
+      {
+        heading: "The Geopolitical Risk in Chip Investing",
+        content: "Semiconductors are at the center of US-China tensions. TSMC's dominance means the global chip supply runs through Taiwan — a geopolitical flashpoint. The US is spending tens of billions via the CHIPS Act to onshore manufacturing (Intel, TSMC Arizona, Samsung Texas), but building fabs takes years. Any disruption in the Taiwan Strait would have catastrophic effects on the global chip supply. Diversifying across US, European (ASML), and Korean (Samsung, SK Hynix) semiconductor companies helps mitigate single-point-of-failure risk.",
+        type: "callout",
+      },
+      {
+        heading: "Current State of Play: Q2 2026 Earnings Season",
+        content: "As of mid-July 2026, the semiconductor sector is at a critical juncture. TSMC delivered blowout earnings but the stock sold off — raising the question: has peak AI hype been priced in? Memory stocks (SanDisk down 12.6%, Western Digital and Seagate down 5-8%) are under pressure as investors question whether memory pricing has peaked. Alphabet's Gemini 3.5 Pro AI model is reportedly months behind schedule, which could slow demand for the highest-end AI accelerators. Yet the long-term thesis remains intact: AI is real, it requires enormous compute, and semiconductors are the foundation. The current selloff may be a buying opportunity — or the start of a deeper reset. Disciplined, phased entry is wiser than going all-in.",
+        type: "text",
+      },
+      {
+        heading: "How to Build a Semiconductor Position Responsibly",
+        content: "Given the sector's volatility, here's a practical framework for adding chip stocks to your portfolio.",
+        type: "list",
+        items: [
+          "Start with an ETF: SMH or SOXX gives you diversified exposure without single-stock risk",
+          "Core holdings: Focus on wide-moat leaders (TSMC for manufacturing, ASML for equipment) that have near-monopolies",
+          "Size appropriately: Limit semiconductor exposure to 10-15% of your total equity portfolio — the sector's volatility demands position discipline",
+          "Buy in tranches: Instead of going all-in, split your intended investment into 3-4 purchases over 2-3 months to average out entry price",
+          "Watch the capex cycle: When every chip company is raising capex simultaneously, history suggests caution",
+          "Have an exit plan: Decide in advance what would make you sell — whether it's a 20% stop-loss, deteriorating margins, or a macro shock",
+        ],
+      },
+      {
+        heading: "The Bottom Line",
+        content: "Semiconductor stocks are not for the faint of heart — they're capable of delivering both triple-digit returns and double-digit single-day crashes. But for investors willing to do the homework, they represent exposure to what may be the most important technological shift since the internet. The key is to respect the cycle, diversify across the supply chain, keep position sizes manageable, and never forget that in semiconductors, good news doesn't always mean the stock goes up. The AI revolution is real — but the road will be bumpy.",
+        type: "text",
+      },
+    ],
+  },
 ];
 
 export function getLearnArticle(slug: string): LearnArticle | undefined {
