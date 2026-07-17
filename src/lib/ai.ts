@@ -362,11 +362,15 @@ riskLevel must be one of: "conservative", "moderate", "aggressive"`;
   const allocations: AllocationItem[] = [];
 
   for (const item of rawAllocations) {
-    const ticker = typeof item.ticker === "string" ? item.ticker : "";
+    const ticker = typeof item.ticker === "string" ? item.ticker.toUpperCase() : "";
     const stock = stocks.find((s) => s.ticker === ticker);
     if (!ticker || !stock) continue;
 
-    let percentage = typeof item.percentage === "number" ? Math.round(item.percentage) : 0;
+    const rawPct = item.percentage ?? item.percent ?? item.allocation;
+    let percentage = typeof rawPct === "number" ? Math.round(rawPct)
+      : typeof rawPct === "string" ? Math.round(parseFloat(rawPct))
+      : 0;
+    if (isNaN(percentage)) percentage = 0;
     if (percentage > 40) percentage = 40;
     if (percentage <= 0) continue;
 
@@ -381,7 +385,11 @@ riskLevel must be one of: "conservative", "moderate", "aggressive"`;
     });
   }
 
-  let cashReserve = typeof result.cashReserve === "number" ? Math.round(result.cashReserve) : 8;
+  const rawCash = result.cashReserve ?? result.cash ?? result.cash_reserve;
+  let cashReserve = typeof rawCash === "number" ? Math.round(rawCash)
+    : typeof rawCash === "string" ? Math.round(parseFloat(rawCash))
+    : 8;
+  if (isNaN(cashReserve)) cashReserve = 8;
   cashReserve = Math.max(5, Math.min(10, cashReserve));
 
   // Normalize: adjust so allocations + cashReserve = 100
@@ -408,17 +416,28 @@ riskLevel must be one of: "conservative", "moderate", "aggressive"`;
   // Sort by percentage descending
   allocations.sort((a, b) => b.percentage - a.percentage);
 
-  const summary = typeof result.summary === "string" && result.summary.length > 10
-    ? result.summary
-    : "";
+  let summary = "";
+  if (typeof result.summary === "string" && result.summary.trim().length > 0) {
+    summary = result.summary.trim();
+  } else if (typeof result.overview === "string" && result.overview.trim().length > 0) {
+    summary = result.overview.trim();
+  }
+  if (!summary && allocations.length > 0) {
+    // Generate a fallback summary from the allocations
+    const top = allocations.slice(0, 2).map(a => `${a.ticker} (${a.percentage}%)`).join(" and ");
+    summary = `Portfolio anchored by ${top}, with ${cashReserve}% held in cash for flexibility.`;
+  }
+
+  const rawRisk = result.riskLevel ?? result.risk_level ?? result.risk;
   const riskLevel =
-    result.riskLevel === "conservative" || result.riskLevel === "moderate" || result.riskLevel === "aggressive"
-      ? result.riskLevel
+    typeof rawRisk === "string" &&
+    ["conservative", "moderate", "aggressive"].includes(rawRisk.toLowerCase())
+      ? rawRisk.toLowerCase() as "conservative" | "moderate" | "aggressive"
       : "moderate";
 
-  // Validate: need at least 1 meaningful allocation and a summary
-  if (allocations.length === 0 || !summary) {
-    console.error("[ai] generateAllocation returned empty/invalid content:", JSON.stringify(result).slice(0, 300));
+  // Validate: need at least 1 meaningful allocation
+  if (allocations.length === 0) {
+    console.error("[ai] generateAllocation returned no valid allocations:", JSON.stringify(result).slice(0, 400));
     return null;
   }
 
