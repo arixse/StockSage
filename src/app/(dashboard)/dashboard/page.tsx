@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { StockLogo } from "@/components/stock/StockLogo";
 import { PortfolioBriefCard } from "@/components/dashboard/PortfolioBriefCard";
+import { AllocationCard } from "@/components/dashboard/AllocationCard";
 import { Sparkline } from "@/components/dashboard/Sparkline";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
@@ -161,6 +162,7 @@ export default async function DashboardPage() {
       {stocks.length > 0 && (
         <>
         <PortfolioBriefCard />
+        <AllocationCard />
         <div className="grid gap-4 md:grid-cols-2">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">

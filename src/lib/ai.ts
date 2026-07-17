@@ -218,6 +218,36 @@ export interface PortfolioBrief {
   actionItems: string[];
 }
 
+// ─── Portfolio Allocation Types ─────────────────────────────────────
+
+export interface AllocationInput {
+  ticker: string;
+  companyName: string;
+  sector: string;
+  price: number | null;
+  changePercent: number | null;
+  aiScore: number | null;
+  recommendation: string | null;
+  sentiment: string | null;
+  rsi14: number | null;
+  trend: string | null;
+}
+
+export interface AllocationItem {
+  ticker: string;
+  companyName: string;
+  sector: string;
+  percentage: number;
+  rationale: string;
+}
+
+export interface AllocationResult {
+  allocations: AllocationItem[];
+  cashReserve: number;
+  summary: string;
+  riskLevel: "conservative" | "moderate" | "aggressive";
+}
+
 export async function generatePortfolioBrief(
   stocks: PortfolioBriefInput[]
 ): Promise<PortfolioBrief | null> {
@@ -272,4 +302,119 @@ Return a JSON object with this exact structure:
 
   const brief: PortfolioBrief = { summary, highlights, risks, actionItems };
   return brief;
+}
+
+export async function generateAllocation(
+  stocks: AllocationInput[]
+): Promise<AllocationResult | null> {
+  if (!isLlmConfigured() || stocks.length < 2) return null;
+
+  const stockText = stocks
+    .map(
+      (s) =>
+        `[${s.ticker}] ${s.companyName} | Sector: ${s.sector} | Price: $${s.price?.toFixed(2) ?? "N/A"} | ` +
+        `Chg: ${s.changePercent?.toFixed(2) ?? "N/A"}% | AI Score: ${s.aiScore ?? "N/A"}/100 ` +
+        `(${s.recommendation ?? "N/A"}, ${s.sentiment ?? "N/A"}) | RSI: ${s.rsi14?.toFixed(0) ?? "N/A"} | Trend: ${s.trend ?? "N/A"}`
+    )
+    .join("\n");
+
+  const systemPrompt = `You are a senior portfolio strategist. Given a user's watchlist, recommend portfolio allocation percentages.
+Focus on diversification, risk-adjusted returns, and sector balance.
+Always respond with valid JSON only — no markdown, no extra text.`;
+
+  const userPrompt = `Watchlist stocks to allocate:
+
+${stockText}
+
+Constraints:
+- All percentages MUST sum to exactly 100% (including cashReserve).
+- No single stock may exceed 40%.
+- At least 3 stocks must receive 5% or more (if the watchlist has fewer than 3 stocks, allocate proportionally).
+- Keep cashReserve between 5% and 10% for flexibility.
+- Prefer stocks with higher AI scores and bullish sentiment, but diversify across sectors.
+- Avoid over-concentrating in any single sector. If multiple stocks share the same sector, cap the combined sector allocation sensibly.
+
+Return a JSON object with this exact structure:
+{
+  "allocations": [
+    {
+      "ticker": "AAPL",
+      "percentage": 30,
+      "rationale": "Strong AI score of 78 with bullish trend and healthy RSI of 55."
+    }
+  ],
+  "cashReserve": 8,
+  "summary": "2-4 sentence strategy overview explaining the allocation philosophy.",
+  "riskLevel": "moderate"
+}
+
+riskLevel must be one of: "conservative", "moderate", "aggressive"`;
+
+  const result = await jsonChat(systemPrompt, userPrompt);
+
+  const rawAllocations = Array.isArray(result.allocations) ? result.allocations : [];
+  const allocations: AllocationItem[] = [];
+
+  for (const item of rawAllocations) {
+    const ticker = typeof item.ticker === "string" ? item.ticker : "";
+    const stock = stocks.find((s) => s.ticker === ticker);
+    if (!ticker || !stock) continue;
+
+    let percentage = typeof item.percentage === "number" ? Math.round(item.percentage) : 0;
+    if (percentage > 40) percentage = 40;
+    if (percentage <= 0) continue;
+
+    allocations.push({
+      ticker,
+      companyName: stock.companyName,
+      sector: stock.sector,
+      percentage,
+      rationale: typeof item.rationale === "string" && item.rationale.length > 0
+        ? item.rationale
+        : `Allocated based on AI score and market conditions.`,
+    });
+  }
+
+  let cashReserve = typeof result.cashReserve === "number" ? Math.round(result.cashReserve) : 8;
+  cashReserve = Math.max(5, Math.min(10, cashReserve));
+
+  // Normalize: adjust so allocations + cashReserve = 100
+  if (allocations.length > 0) {
+    let allocSum = allocations.reduce((sum, a) => sum + a.percentage, 0);
+    const targetSum = 100 - cashReserve;
+
+    if (allocSum > 0 && allocSum !== targetSum) {
+      // Scale all allocations proportionally to hit targetSum
+      const scale = targetSum / allocSum;
+      let scaledSum = 0;
+      for (let i = 0; i < allocations.length; i++) {
+        if (i === allocations.length - 1) {
+          // Last item gets the remainder to hit exact target
+          allocations[i].percentage = targetSum - scaledSum;
+        } else {
+          allocations[i].percentage = Math.max(1, Math.round(allocations[i].percentage * scale));
+          scaledSum += allocations[i].percentage;
+        }
+      }
+    }
+  }
+
+  // Sort by percentage descending
+  allocations.sort((a, b) => b.percentage - a.percentage);
+
+  const summary = typeof result.summary === "string" && result.summary.length > 10
+    ? result.summary
+    : "";
+  const riskLevel =
+    result.riskLevel === "conservative" || result.riskLevel === "moderate" || result.riskLevel === "aggressive"
+      ? result.riskLevel
+      : "moderate";
+
+  // Validate: need at least 1 meaningful allocation and a summary
+  if (allocations.length === 0 || !summary) {
+    console.error("[ai] generateAllocation returned empty/invalid content:", JSON.stringify(result).slice(0, 300));
+    return null;
+  }
+
+  return { allocations, cashReserve, summary, riskLevel };
 }
