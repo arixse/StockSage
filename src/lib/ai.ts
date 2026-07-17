@@ -350,7 +350,13 @@ Return a JSON object with this exact structure:
 
 riskLevel must be one of: "conservative", "moderate", "aggressive"`;
 
-  const result = await jsonChat(systemPrompt, userPrompt);
+  let result: Record<string, unknown>;
+  try {
+    result = await jsonChat(systemPrompt, userPrompt);
+  } catch (e) {
+    console.error("[ai] generateAllocation LLM call failed:", (e as Error).message);
+    return null;
+  }
 
   const rawAllocations = Array.isArray(result.allocations) ? result.allocations : [];
   const allocations: AllocationItem[] = [];

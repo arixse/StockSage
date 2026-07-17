@@ -103,7 +103,17 @@ export async function POST() {
     );
   }
 
-  const allocation = await generateAllocation(buildAllocationInput(insights.stocks));
+  let allocation;
+  try {
+    allocation = await generateAllocation(buildAllocationInput(insights.stocks));
+  } catch (e) {
+    console.error("[portfolio-allocation] generateAllocation threw:", e);
+    return NextResponse.json(
+      { data: { hasAllocation: false, message: `AI error: ${(e as Error).message}` } },
+      { status: 502 }
+    );
+  }
+
   if (!allocation) {
     return NextResponse.json(
       { data: { hasAllocation: false, message: "Failed to generate allocation. Try again later." } },
