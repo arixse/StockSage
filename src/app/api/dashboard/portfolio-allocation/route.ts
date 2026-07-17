@@ -53,6 +53,12 @@ export async function GET() {
     return NextResponse.json({ data: { hasAllocation: false } });
   }
 
+  // Discard stale caches that contain debug/error results (empty allocations)
+  const content = data.content as any;
+  if (!content?.allocations || content.allocations.length === 0) {
+    return NextResponse.json({ data: { hasAllocation: false } });
+  }
+
   // Check watchlist hasn't changed since the allocation was generated
   const { data: watchlists } = await supabase
     .from("watchlists")
@@ -123,23 +129,24 @@ export async function POST() {
 
   const tickersSnapshot = insights.stocks.map((s) => s.ticker).sort();
 
-  // Try to cache — ignore failures (table may not exist yet)
-  try {
-    const admin = createAdminClient();
-    await admin.from("portfolio_allocations").upsert(
-      {
-        user_id: user.id,
-        allocation_date: today(),
-        content: allocation,
-        tickers_snapshot: tickersSnapshot,
-        model_used: process.env.LLM_MODEL || "gpt-4o-mini",
-        generated_at: new Date().toISOString(),
-      },
-      { onConflict: "user_id,allocation_date" }
-    );
-  } catch (e) {
-    // Table may not exist — non-critical, allocation still returns
-    console.warn("[portfolio-allocation] cache skipped:", (e as Error).message);
+  // Only cache valid results (skip debug/error responses with empty allocations)
+  if (allocation.allocations && allocation.allocations.length > 0) {
+    try {
+      const admin = createAdminClient();
+      await admin.from("portfolio_allocations").upsert(
+        {
+          user_id: user.id,
+          allocation_date: today(),
+          content: allocation,
+          tickers_snapshot: tickersSnapshot,
+          model_used: process.env.LLM_MODEL || "gpt-4o-mini",
+          generated_at: new Date().toISOString(),
+        },
+        { onConflict: "user_id,allocation_date" }
+      );
+    } catch (e) {
+      console.warn("[portfolio-allocation] cache skipped:", (e as Error).message);
+    }
   }
 
   return NextResponse.json({
