@@ -77,7 +77,8 @@ async function jsonChat(
       }
     }
     console.error("Failed to parse LLM response as JSON:", content.slice(0, 200));
-    return {};
+    // Surface the raw content so callers can debug
+    return { _parseError: true, _rawContent: content.slice(0, 500) };
   }
 }
 
@@ -356,6 +357,17 @@ riskLevel must be one of: "conservative", "moderate", "aggressive"`;
   } catch (e) {
     console.error("[ai] generateAllocation LLM call failed:", (e as Error).message);
     return null;
+  }
+
+  // If jsonChat couldn't parse the LLM response, surface the raw content
+  if (result._parseError) {
+    const raw = (result._rawContent as string) || "unknown";
+    return {
+      allocations: [],
+      cashReserve: 8,
+      summary: `[DEBUG] LLM returned non-JSON. Raw content: ${raw}`,
+      riskLevel: "moderate",
+    };
   }
 
   const rawAllocations = Array.isArray(result.allocations) ? result.allocations
