@@ -446,8 +446,13 @@ riskLevel must be one of: "conservative", "moderate", "aggressive"`;
   if (allocations.length === 0) {
     const snippet = JSON.stringify(result).slice(0, 500);
     console.error("[ai] generateAllocation no valid allocations. Raw LLM:", snippet);
-    // Include a hint in the return so the API can show it
-    return null;
+    // Return debug info so the user can see what the LLM sent
+    return {
+      allocations: [],
+      cashReserve,
+      summary: `[DEBUG] LLM returned: ${snippet}`,
+      riskLevel: "moderate",
+    };
   }
 
   return { allocations, cashReserve, summary, riskLevel };
