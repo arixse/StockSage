@@ -33,10 +33,11 @@ function supportsJsonFormat(): boolean {
 
 async function jsonChat(
   systemPrompt: string,
-  userPrompt: string
+  userPrompt: string,
+  opts?: { forceNativeJson?: boolean }
 ): Promise<Record<string, unknown>> {
   const client = createClient();
-  const useJsonFormat = supportsJsonFormat();
+  const useJsonFormat = opts?.forceNativeJson ?? supportsJsonFormat();
 
   const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
     { role: "system", content: systemPrompt },
@@ -353,7 +354,9 @@ riskLevel must be one of: "conservative", "moderate", "aggressive"`;
 
   let result: Record<string, unknown>;
   try {
-    result = await jsonChat(systemPrompt, userPrompt);
+    // Try without native JSON format first — some models (DeepSeek) return {}
+    // when response_format json_object is set on complex prompts
+    result = await jsonChat(systemPrompt, userPrompt, { forceNativeJson: false });
   } catch (e) {
     console.error("[ai] generateAllocation LLM call failed:", (e as Error).message);
     return null;
