@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/shared/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { learnArticles, type LearnArticle } from "@/data/learn-articles";
-import { Briefcase, TrendingUp, Search, Layers, Grid3X3, BookOpen, RefreshCw, Cpu } from "lucide-react";
+import { Briefcase, TrendingUp, Search, Layers, Grid3X3, BookOpen, RefreshCw, Cpu, ArrowLeftRight } from "lucide-react";
 import type { ReactNode } from "react";
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -44,6 +44,7 @@ const ICONS: Record<string, ReactNode> = {
   BookOpen: <BookOpen className="h-8 w-8 text-primary" />,
   RefreshCw: <RefreshCw className="h-8 w-8 text-primary" />,
   Cpu: <Cpu className="h-8 w-8 text-primary" />,
+  ArrowLeftRight: <ArrowLeftRight className="h-8 w-8 text-primary" />,
 };
 
 export default function LearnPage() {
