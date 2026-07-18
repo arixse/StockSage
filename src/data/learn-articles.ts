@@ -622,6 +622,66 @@ export const learnArticles: LearnArticle[] = [
       },
     ],
   },
+  {
+    slug: "ai-trade-rotation-infrastructure-to-platforms",
+    title: "AI Trade Rotation: Why Apple Just Passed Nvidia and What It Means for Investors",
+    description: "The Philadelphia Semiconductor Index just entered a bear market while Apple briefly reclaimed the market cap crown. Learn what's driving the rotation from AI infrastructure to AI platforms, why chip stocks are selling off despite record earnings, and how to position your portfolio as the AI trade enters its next phase.",
+    readTime: "9 min",
+    icon: "ArrowLeftRight",
+    date: "2026-07-18",
+    lastUpdated: "2026-07-18",
+    tags: ["Intermediate", "AI Investing", "Market Rotation", "Semiconductor Stocks", "Tech Stocks"],
+    sections: [
+      {
+        heading: "A Seismic Shift in the AI Trade",
+        content: "For the first time since April 2025, Apple's market cap ($4.91 trillion) briefly surpassed Nvidia's ($4.9 trillion) during the July 18 trading session. This wasn't just a random blip — it's the most visible sign of a major rotation happening within the AI trade. The Philadelphia Semiconductor Index has tumbled ~20% from its June record, officially entering a bear market, while platform companies with stable cash flows and clear AI monetization paths are attracting capital. The AI rally isn't over — it's evolving.",
+        type: "text",
+      },
+      {
+        heading: "The Numbers: How Bad Is the Chip Selloff?",
+        content: "The Philadelphia Semiconductor Index (SOX) logged its steepest weekly loss in over a year, down nearly 18% in July alone — though it remains up ~65% year-to-date. Key names have been hit hard: Applied Materials dropped 5.6%, Intel fell 2%, and even Nvidia shed over 2% in a single session. The selloff comes despite TSMC reporting blowout Q2 earnings — a 77% profit jump — signaling that the market's logic has shifted: great earnings are no longer enough when expectations were priced for perfection.",
+        type: "callout",
+      },
+      {
+        heading: "Infrastructure vs. Platforms: Two Sides of the AI Trade",
+        content: "To understand this rotation, you need to understand the two layers of the AI investment landscape. AI infrastructure companies — chipmakers like Nvidia, equipment makers like ASML, and memory suppliers like Micron — are the 'picks and shovels' of the AI gold rush. They benefit from massive capex spending but face cyclical demand and pricing pressure. AI platform companies — Apple, Microsoft, Meta, Google — build the products and services that actually monetize AI. They have recurring revenue, massive user bases, and multiple paths to AI profitability. As the AI buildout matures, capital is rotating from the builders to the beneficiaries.",
+        type: "text",
+      },
+      {
+        heading: "Three Forces Driving the Rotation",
+        content: "Three converging forces are accelerating this shift. First, AI spending fatigue — investors are questioning whether the nearly trillion-dollar infrastructure boom justifies its cost, especially as China's Moonshot AI released a free open-weight model (Kimi K3) rivaling frontier systems, reminiscent of the DeepSeek shock of early 2025. Second, crowding risk — Bank of America's July survey shows 82% of fund managers call long semiconductors the most crowded trade, a record high. When everyone is on the same side of the boat, it doesn't take much to tip it. Third, Apple's AI monetization story — with an AI-powered Siri, a locked-in ecosystem of 2 billion devices, and services revenue growing double digits, Apple represents the 'show me the money' phase of AI that infrastructure plays can't match.",
+        type: "callout",
+      },
+      {
+        heading: "Oil Shock Adds Fuel to the Rotation",
+        content: "Adding to the pressure on tech, oil prices surged to their highest in over a month as US-Iran hostilities escalated in the Strait of Hormuz. WTI crude settled at $82.49/bbl (+4.5% on the day, +14% for the week), while Brent hit $88.10/bbl (+16% weekly). Energy was the only S&P 500 sector to gain on July 18. Higher oil prices mean higher inflation, which means higher-for-longer interest rates — and high-growth tech stocks are the most sensitive to rate expectations. The rotation out of chips and into value-oriented sectors like energy and financials is being amplified by geopolitics.",
+        type: "text",
+      },
+      {
+        heading: "Is This a Buying Opportunity or the Start of Something Bigger?",
+        content: "Semiconductors are historically cyclical, and the current correction may prove to be a healthy reset rather than a structural collapse. The SOX index is still up ~65% year-to-date, and the fundamental demand story — AI needs chips, and lots of them — hasn't changed. But the easy money has been made. The next phase of the AI trade rewards selectivity: which chip companies have pricing power beyond the current capex cycle? Which platform companies are actually converting AI investment into revenue growth? These are the questions that will separate winners from losers in the second half of 2026.",
+        type: "text",
+      },
+      {
+        heading: "How to Position Your Portfolio for the AI Rotation",
+        content: "Rather than picking sides in the infrastructure-vs-platforms debate, the smartest approach is to own both — but rebalance toward quality and away from pure momentum. Here's a practical framework for navigating the rotation.",
+        type: "list",
+        items: [
+          "Diversify across the AI stack: Own chip ETFs (SMH, SOXX) for infrastructure exposure AND mega-cap tech (Apple, Microsoft) for platform exposure",
+          "Trim crowded positions: If semiconductors are 82% of fund managers' most crowded trade, check whether your portfolio is similarly overweight",
+          "Watch energy as a hedge: With oil surging on geopolitical risk, a 5-10% energy allocation (XLE) can offset tech drawdowns",
+          "Track the Apple-Nvidia market cap ratio: A sustained shift would confirm the rotation has legs — make it a weekly check",
+          "Keep cash ready: Q2 earnings season is just getting started (90% of companies beating so far), and volatility creates entry points",
+          "Don't abandon chips entirely: The AI infrastructure story is multi-year — a 20% correction in a sector up 65% YTD is a pullback, not a collapse",
+        ],
+      },
+      {
+        heading: "The Bottom Line",
+        content: "The AI trade isn't dying — it's differentiating. The first phase rewarded anyone selling AI hardware. The second phase will reward companies that can prove AI generates actual profits. Apple briefly passing Nvidia in market cap is a symbolic moment, not a permanent shift — but it captures something real: the market is getting more discerning about where in the AI value chain it places its bets. As an investor, your job isn't to predict which company wins the market cap race. It's to own both the builders and the beneficiaries, stay diversified, and resist the urge to chase whichever narrative is loudest this week.",
+        type: "text",
+      },
+    ],
+  },
 ];
 
 export function getLearnArticle(slug: string): LearnArticle | undefined {
