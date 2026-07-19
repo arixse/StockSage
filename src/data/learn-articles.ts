@@ -682,6 +682,66 @@ export const learnArticles: LearnArticle[] = [
       },
     ],
   },
+  {
+    slug: "goldilocks-is-dead-new-market-regime",
+    title: "Goldilocks Is Dead: How to Invest in the New Market Regime of 2026",
+    description: "Wall Street declares the end of the 'Goldilocks' market. Higher-for-longer interest rates, stubborn inflation, a commodities boom, and geopolitical turmoil have reshaped the investing landscape. Learn what killed Goldilocks, why lithium is up 82%, how to invest in commodities, and how to build a portfolio built for the new regime.",
+    readTime: "9 min",
+    icon: "Zap",
+    date: "2026-07-19",
+    lastUpdated: "2026-07-19",
+    tags: ["Intermediate", "Market Regime", "Commodities", "Interest Rates", "Portfolio Strategy"],
+    sections: [
+      {
+        heading: "What Was the Goldilocks Market — and Why Is It Dead?",
+        content: "For much of the 2023-2025 period, markets enjoyed a 'Goldilocks' environment: inflation falling, growth steady, and the Fed signaling rate cuts. It was 'not too hot, not too cold' — perfect conditions for both stocks and bonds to rally. BMO Capital Markets officially declared this era over in July 2026. The new regime features sticky inflation above central bank targets, interest rates locked at elevated levels, tight liquidity, and a US dollar that refuses to weaken. Understanding what killed Goldilocks is the first step to investing successfully in what comes next.",
+        type: "text",
+      },
+      {
+        heading: "The Four Horsemen of the New Regime",
+        content: "Four structural forces have permanently shifted the investing landscape. First, higher-for-longer rates — the Fed Funds Rate sits near 3.5%, and markets now price the next rate hike for December, not September. Second, geopolitical energy shocks — US-Iran military exchanges have driven Brent crude up 16% in a single week to near $89/barrel, threatening to reignite inflation. Third, fiscal dominance — government deficits remain historically large, absorbing capital that once flowed to private markets. Fourth, deglobalization — supply chains are being reshored, raising costs and reducing the efficiency gains that kept inflation low for decades.",
+        type: "callout",
+      },
+      {
+        heading: "The Commodities Super-Cycle: Lithium +82%, Iridium +58%",
+        content: "One of the clearest signals that Goldilocks is dead is the commodities boom. Lithium hydroxide has surged 82% year-to-date, driven by insatiable demand for EV batteries and grid-scale energy storage. Iridium — essential for clean-tech electrolysis — is up 58%. Natural gas has gained 43% on energy security concerns. Even WTI crude is up 23% YTD before the latest Middle East escalation. Commodities thrive in the new regime because they offer: (1) inflation protection, (2) supply constraints from years of underinvestment, and (3) structural demand from electrification and the energy transition.",
+        type: "text",
+      },
+      {
+        heading: "Safe Havens Aren't Safe Anymore",
+        content: "Traditional safe-haven assets have been crushed in the new regime. Gold is down 23% from its January peak — higher real yields make non-yielding assets unattractive, and the strong dollar adds downward pressure. Bitcoin has fallen 29% year-to-date. Even bonds, the classic safety trade, have been volatile as the 10-year Treasury yield climbed to 4.46%. When the 'risk-free' asset delivers price losses, investors need to rethink what 'safe' means. In the new regime, commodities and cash have replaced gold and bonds as portfolio stabilizers.",
+        type: "callout",
+      },
+      {
+        heading: "The 'No Landing' Consensus: What Could Go Wrong?",
+        content: "A record 54% of fund managers expect a 'no landing' scenario — the economy keeps growing, rates stay elevated, and inflation never quite returns to 2%. Cash allocations have fallen to an uber-low 3.6%, triggering BofA's contrarian sell signal. When consensus is this lopsided, the biggest risk is that everyone is wrong. If inflation re-accelerates (watch oil prices), the Fed could hike into an election year — a historically rare move that would shock markets. If growth slows faster than expected, corporate earnings — currently forecast to grow 26% YoY — could disappoint dramatically.",
+        type: "text",
+      },
+      {
+        heading: "How to Build a New-Regime Portfolio",
+        content: "The playbook that worked in the Goldilocks era — own growth stocks, buy the dip, expect rates to fall — needs a rewrite. Here's a framework for the new regime.",
+        type: "list",
+        items: [
+          "Commodities allocation (10-15%): Lithium ETFs (LIT), broad commodity funds (DBC), or energy sector (XLE) for inflation protection",
+          "Short-duration bonds: With the 10-year at 4.46%, short-term Treasuries and floating-rate notes offer yield without duration risk",
+          "Value over growth: In higher-rate environments, companies with current cash flows outperform those promising future profits — financials (XLF) and energy lead",
+          "Cash as a position: With cash yielding competitive returns and a contrarian sell signal flashing, 5-10% cash provides both optionality and defense",
+          "International diversification: A strong dollar makes ex-US assets cheaper — consider developed Europe and Japan (up 34% YTD) for non-US growth",
+          "Reduce gold and Bitcoin exposure: Both have proven poor hedges in the current rate environment — treat them as speculative positions, not portfolio anchors",
+        ],
+      },
+      {
+        heading: "Commodities for Beginners: How to Get Started",
+        content: "If you've never invested in commodities, the easiest entry point is through ETFs. The LIT ETF (Global X Lithium & Battery Tech) gives exposure to the lithium boom. DBC (Invesco DB Commodity Index) tracks a diversified basket of energy, metals, and agriculture. XLE (Energy Select Sector SPDR) focuses on oil and gas majors. For more targeted exposure, copper ETFs (COPX) and uranium ETFs (URA) tap into electrification and nuclear energy themes. Start small — commodities are volatile — and treat them as portfolio diversifiers, not get-rich-quick bets.",
+        type: "text",
+      },
+      {
+        heading: "The Bottom Line",
+        content: "The end of Goldilocks doesn't mean the end of investing opportunities — it means the end of the easy ones. When rates were zero and inflation was absent, everything went up. In the new regime, asset selection matters again. Commodities are outperforming, value is beating growth, and cash is no longer trash. The investors who adapt to the new regime — by adding inflation hedges, reducing duration exposure, and staying globally diversified — will be the ones who thrive in the second half of the 2020s. The Goldilocks era was comfortable. The new regime rewards preparation.",
+        type: "text",
+      },
+    ],
+  },
 ];
 
 export function getLearnArticle(slug: string): LearnArticle | undefined {
